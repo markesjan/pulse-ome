@@ -5,7 +5,13 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
-add_executable(matching_engine src/main.cpp)
+add_executable(matching_engine
+        src/main.cpp
+        src/DataLoader.cpp
+        src/MatchingEngine.cpp
+        src/OrderBook.cpp
+        src/ResultWriter.cpp
+)
 
 target_include_directories(matching_engine PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
