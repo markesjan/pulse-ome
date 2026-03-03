@@ -9,8 +9,8 @@ namespace engine {
 std::vector<Order> DataLoader::loadOrders(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
-        std::cerr << "Couldn't open the file: " << filePath << std::endl;
-        return {};
+        std::cerr << "Couldn't open file: " << filePath << std::endl;
+        exit(1);
     }
 
     std::vector<Order> orders;
