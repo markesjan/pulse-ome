@@ -12,7 +12,6 @@ struct Order {
     uint32_t quantity;
     uint8_t eventType;
     int8_t side;
-    std::string symbol;
 };
 
 } // namespace engine
