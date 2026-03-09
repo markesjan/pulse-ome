@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 namespace engine {
 
@@ -14,34 +13,45 @@ std::vector<Order> DataLoader::loadOrders(const std::string& filePath) {
     }
 
     std::vector<Order> orders;
+    orders.reserve(1'000'000);
+
     std::string line;
     while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string token;
-        std::vector<std::string> cols;
+        if (line.empty())
+            continue;
 
-        while (std::getline(ss, token, ',')) {
-            cols.push_back(token);
-        }
+        const char* p = line.c_str();
+        char* end;
 
-        if (cols.size() == 6) {
-            uint8_t eventType = static_cast<uint8_t>(std::stoi(cols[1]));
+        double timestamp = std::strtod(p, &end);
+        if (p == end)
+            continue;
+        p = end + 1;
 
-            if (eventType >= 1 && eventType <= 3) {
-                Order order;
+        auto eventType = static_cast<uint8_t>(std::strtol(p, &end, 10));
+        p = end + 1;
 
-                order.timestamp = std::stod(cols[0]);
-                order.eventType = eventType;
-                order.orderId = static_cast<uint64_t>(std::stoi(cols[2]));
-                order.quantity = static_cast<uint32_t>(std::stoi(cols[3]));
-                order.price = static_cast<uint64_t>(std::stoi(cols[4]));
-                order.side = static_cast<int8_t>(std::stoi(cols[5]));
-                order.symbol = "AAPL";
+        if (eventType >= 1 && eventType <= 3) {
+            auto orderId = static_cast<uint64_t>(std::strtoull(p, &end, 10));
+            p = end + 1;
+            auto quantity = static_cast<uint32_t>(std::strtoul(p, &end, 10));
+            p = end + 1;
+            auto price = static_cast<uint64_t>(std::strtoull(p, &end, 10));
+            p = end + 1;
+            auto side = static_cast<int8_t>(std::strtol(p, &end, 10));
 
-                orders.push_back(order);
-            }
+            orders.emplace_back(Order{
+                timestamp,
+                orderId,
+                price,
+                quantity,
+                eventType,
+                side
+            });
         }
     }
+
+    orders.shrink_to_fit();
 
     std::cout << "Loaded " << orders.size() << " relevant order events." << std::endl;
     return orders;
