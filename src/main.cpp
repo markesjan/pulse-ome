@@ -1,10 +1,11 @@
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 
 #include "ConfigParser.hpp"
 #include "Order.hpp"
 #include "DataLoader.hpp"
-#include "MatchingEngine.hpp"
+#include "OrderBook.hpp"
 #include "ResultWriter.hpp"
 #include "Trade.hpp"
 
@@ -18,29 +19,25 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    engine::MatchingEngine matchEngine;
+    engine::OrderBook orderBook;
     std::vector<engine::Trade> allTrades;
-    std::vector<long long> latencies;
+    std::vector<int64_t> latencies;
 
     std::cout << "Started matching orders..." << std::endl;
-    auto totalStart = std::chrono::high_resolution_clock::now();
+    auto matchingStart = std::chrono::high_resolution_clock::now();
 
     for (const auto& order : orders) {
-        auto tickStart = std::chrono::high_resolution_clock::now();
-        std::vector<engine::Trade> newTrades = matchEngine.processOrder(order);
-        auto tickEnd = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
+        orderBook.processOrder(order, allTrades);
+        auto end = std::chrono::high_resolution_clock::now();
 
-        auto durationNs = std::chrono::duration_cast<std::chrono::nanoseconds>(tickEnd - tickStart).
-            count();
+        auto durationNs = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         latencies.push_back(durationNs);
-
-        if (!newTrades.empty())
-            allTrades.insert(allTrades.end(), newTrades.begin(), newTrades.end());
     }
 
-    auto totalEnd = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> totalDuration = totalEnd - totalStart;
-    std::sort(latencies.begin(), latencies.end());
+    auto matchingEnd = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> totalDuration = matchingEnd - matchingStart;
+    std::ranges::sort(latencies);
 
     engine::ResultWriter::printSummary(totalDuration.count(), orders.size(), allTrades.size(),
                                        latencies);
