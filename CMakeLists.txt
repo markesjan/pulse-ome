@@ -26,6 +26,7 @@ add_library(engine_lib
         src/ConfigParser.cpp
         src/DataLoader.cpp
         src/OrderBook.cpp
+        src/OrderGenerator.cpp
         src/ResultWriter.cpp
 )
 

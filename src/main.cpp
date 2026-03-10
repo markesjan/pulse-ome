@@ -6,16 +6,26 @@
 #include "Order.hpp"
 #include "DataLoader.hpp"
 #include "OrderBook.hpp"
+#include "OrderGenerator.hpp"
 #include "ResultWriter.hpp"
 #include "Trade.hpp"
 
 int main(int argc, char* argv[]) {
     engine::Config config = engine::ConfigParser::parseArguments(argc, argv);
-    std::cout << "Loading orders from file: " << config.inFile << std::endl;
-    std::vector<engine::Order> orders = engine::DataLoader::loadOrders(config.inFile);
+
+    std::vector<engine::Order> orders;
+
+    if (!config.inFile.empty()) {
+        std::cout << "Loading orders from file: " << config.inFile << std::endl;
+        orders = engine::DataLoader::loadOrders(config.inFile);
+    } else {
+        std::cout << "Generating " << config.generateCnt << " orders (seed: "
+            << config.seed << ")" << std::endl;
+        orders = engine::OrderGenerator::generate(config.seed, config.generateCnt);
+    }
 
     if (orders.empty()) {
-        std::cerr << "Couldn't load any data" << std::endl;
+        std::cerr << "Couldn't load or generate any data" << std::endl;
         return 1;
     }
 
@@ -41,7 +51,9 @@ int main(int argc, char* argv[]) {
 
     engine::ResultWriter::printSummary(totalDuration.count(), orders.size(), allTrades.size(),
                                        latencies);
-    engine::ResultWriter::writeTrades(allTrades, config.outFile);
+
+    if (!config.outFile.empty())
+        engine::ResultWriter::writeTrades(allTrades, config.outFile);
 
     return 0;
 }
