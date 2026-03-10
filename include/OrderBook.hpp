@@ -18,6 +18,8 @@ private:
     std::map<uint64_t, std::list<std::shared_ptr<Order>>, std::greater<uint64_t>> buys;
     std::map<uint64_t, std::list<std::shared_ptr<Order>>> sells;
 
+    uint64_t tradeIdCnt = 0;
+
     void processBuyOrder(const Order& order, std::vector<Trade>& trades);
     void processSellOrder(const Order& order, std::vector<Trade>& trades);
     void cancelBuyOrder(const Order& order);

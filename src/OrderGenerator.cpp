@@ -26,6 +26,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
 
     uint64_t nextOrderId = 0;
     double currTimestamp = 1.0;
+    std::string symbol("ABCD");
 
     for (size_t i = 0; i < ordersCnt; ++i) {
         currTimestamp += 0.001;
@@ -50,6 +51,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
             }
 
             orders.push_back(Order{
+                symbol,
                 currTimestamp,
                 orderToCancel.id,
                 0,
@@ -65,6 +67,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
             activeOrders.push_back(ActiveOrder{nextOrderId, side});
 
             orders.push_back(Order{
+                symbol,
                 currTimestamp,
                 nextOrderId++,
                 price,

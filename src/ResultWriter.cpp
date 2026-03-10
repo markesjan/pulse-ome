@@ -56,10 +56,13 @@ void ResultWriter::writeTrades(const std::vector<Trade>& trades, const std::stri
         return;
     }
 
-    outFile << "BuyOrderID,SellOrderID,Quantity,Price\n";
+    outFile << "Symbol,Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price\n";
 
     for (const auto& trade : trades) {
-        outFile << trade.buyOrderId << ","
+        outFile << trade.symbol << ","
+            << trade.timestamp << ","
+            << trade.tradeId << ","
+            << trade.buyOrderId << ","
             << trade.sellOrderId << ","
             << trade.quantity << ","
             << trade.price << "\n";

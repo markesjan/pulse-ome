@@ -1,5 +1,6 @@
 #include "DataLoader.hpp"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
@@ -23,6 +24,13 @@ std::vector<Order> DataLoader::loadOrders(const std::string& filePath) {
         const char* p = line.c_str();
         char* end;
 
+        const char* comma = std::strchr(p, ',');
+        if (!comma)
+            continue;
+
+        std::string symbol(p, comma - p);
+        p = comma + 1;
+
         double timestamp = std::strtod(p, &end);
         if (p == end)
             continue;
@@ -41,6 +49,7 @@ std::vector<Order> DataLoader::loadOrders(const std::string& filePath) {
             auto side = static_cast<int8_t>(std::strtol(p, &end, 10));
 
             orders.emplace_back(Order{
+                std::move(symbol),
                 timestamp,
                 orderId,
                 price,

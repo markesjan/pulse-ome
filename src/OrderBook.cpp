@@ -27,6 +27,9 @@ void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) 
             uint32_t tradeQty = std::min(currOrder.quantity, sellOrder->quantity);
 
             trades.emplace_back(Trade{
+                currOrder.symbol,
+                currOrder.timestamp,
+                tradeIdCnt++,
                 currOrder.orderId,
                 sellOrder->orderId,
                 sellOrder->price,
@@ -65,6 +68,9 @@ void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades)
             uint32_t tradeQty = std::min(currOrder.quantity, buyOrder->quantity);
 
             trades.emplace_back(Trade{
+                currOrder.symbol,
+                currOrder.timestamp,
+                tradeIdCnt++,
                 buyOrder->orderId,
                 currOrder.orderId,
                 buyOrder->price,
