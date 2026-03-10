@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "Trade.hpp"
 
@@ -8,7 +9,10 @@ namespace engine {
 
 class ResultWriter {
 public:
-    static void printSummary(double totalTimeSec, size_t ordersCnt, size_t tradesCnt, std::vector<long long> latencies);
+    static void printSummary(double totalTimeSec,
+                             size_t ordersCnt,
+                             size_t tradesCnt,
+                             const std::vector<int64_t>& latencies);
     static void writeTrades(const std::vector<Trade>& trades, const std::string& filePath);
 };
 
