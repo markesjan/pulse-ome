@@ -12,14 +12,14 @@ namespace engine {
 
 class OrderBook {
 public:
-    std::vector<Trade> processOrder(const Order& order);
+    void processOrder(const Order& order, std::vector<Trade>& trades);
 
 private:
     std::map<uint64_t, std::list<std::shared_ptr<Order>>, std::greater<uint64_t>> buys;
     std::map<uint64_t, std::list<std::shared_ptr<Order>>> sells;
 
-    std::vector<Trade> processBuyOrder(const Order& order);
-    std::vector<Trade> processSellOrder(const Order& order);
+    void processBuyOrder(const Order& order, std::vector<Trade>& trades);
+    void processSellOrder(const Order& order, std::vector<Trade>& trades);
     void cancelBuyOrder(const Order& order);
     void cancelSellOrder(const Order& order);
 };

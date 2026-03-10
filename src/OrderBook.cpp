@@ -2,20 +2,19 @@
 
 namespace engine {
 
-std::vector<Trade> OrderBook::processOrder(const Order& order) {
+void OrderBook::processOrder(const Order& order, std::vector<Trade>& trades) {
     if (order.eventType == 2 || order.eventType == 3) {
         order.side == 1 ? cancelBuyOrder(order) : cancelSellOrder(order);
-        return {};
+        return;
     }
 
     if (order.eventType != 1)
-        return {};
+        return;
 
-    return order.side == 1 ? processBuyOrder(order) : processSellOrder(order);
+    order.side == 1 ? processBuyOrder(order, trades) : processSellOrder(order, trades);
 }
 
-std::vector<Trade> OrderBook::processBuyOrder(const Order& order) {
-    std::vector<Trade> trades;
+void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
     auto it = sells.begin();
@@ -27,13 +26,12 @@ std::vector<Trade> OrderBook::processBuyOrder(const Order& order) {
             auto sellOrder = *listIt;
             uint32_t tradeQty = std::min(currOrder.quantity, sellOrder->quantity);
 
-            Trade trade;
-            trade.buyOrderId = currOrder.orderId;
-            trade.sellOrderId = sellOrder->orderId;
-            trade.symbol = currOrder.symbol;
-            trade.price = sellOrder->price;
-            trade.quantity = tradeQty;
-            trades.push_back(trade);
+            trades.emplace_back(Trade{
+                currOrder.orderId,
+                sellOrder->orderId,
+                sellOrder->price,
+                tradeQty,
+            });
 
             currOrder.quantity -= tradeQty;
             sellOrder->quantity -= tradeQty;
@@ -52,12 +50,9 @@ std::vector<Trade> OrderBook::processBuyOrder(const Order& order) {
 
     if (currOrder.quantity > 0)
         buys[currOrder.price].push_back(std::make_shared<Order>(currOrder));
-
-    return trades;
 }
 
-std::vector<Trade> OrderBook::processSellOrder(const Order& order) {
-    std::vector<Trade> trades;
+void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
     auto it = buys.begin();
@@ -69,13 +64,12 @@ std::vector<Trade> OrderBook::processSellOrder(const Order& order) {
             auto buyOrder = *listIt;
             uint32_t tradeQty = std::min(currOrder.quantity, buyOrder->quantity);
 
-            Trade trade;
-            trade.buyOrderId = buyOrder->orderId;
-            trade.sellOrderId = currOrder.orderId;
-            trade.symbol = currOrder.symbol;
-            trade.price = buyOrder->price;
-            trade.quantity = tradeQty;
-            trades.push_back(trade);
+            trades.emplace_back(Trade{
+                buyOrder->orderId,
+                currOrder.orderId,
+                buyOrder->price,
+                tradeQty,
+            });
 
             currOrder.quantity -= tradeQty;
             buyOrder->quantity -= tradeQty;
@@ -94,8 +88,6 @@ std::vector<Trade> OrderBook::processSellOrder(const Order& order) {
 
     if (currOrder.quantity > 0)
         sells[currOrder.price].push_back(std::make_shared<Order>(currOrder));
-
-    return trades;
 }
 
 void OrderBook::cancelBuyOrder(const Order& order) {
