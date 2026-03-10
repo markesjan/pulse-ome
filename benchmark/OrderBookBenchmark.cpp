@@ -8,14 +8,15 @@ static void BM_InsertSamePrice(benchmark::State& state) {
     std::vector<engine::Trade> trades;
 
     for (int i = 0; i < n; ++i)
-        book.processOrder({1.0, static_cast<uint64_t>(i), 10000, 100, 1, 1},
+        book.processOrder({"ABCD", 1.0, static_cast<uint64_t>(i), 10000, 100, 1, 1},
                           trades);
 
     uint64_t nextId = n;
     for (auto _ : state) {
-        book.processOrder({1.0, nextId++, 10000, 100, 1, 1}, trades);
+        book.processOrder({"ABCD", 1.0, nextId++, 10000, 100, 1, 1}, trades);
         benchmark::ClobberMemory();
     }
+
     state.SetComplexityN(n);
 }
 
@@ -28,16 +29,17 @@ static void BM_InsertDiffPrices(benchmark::State& state) {
     std::vector<engine::Trade> trades;
 
     for (int i = 0; i < n; ++i)
-        book.processOrder({1.0, static_cast<uint64_t>(i),
+        book.processOrder({"ABCD", 1.0, static_cast<uint64_t>(i),
                            10000 + static_cast<uint64_t>(i), 100, 1,
                            1}, trades);
 
     uint64_t nextId = n;
     for (auto _ : state) {
         uint64_t newPrice = 20000 + (nextId % n);
-        book.processOrder({1.0, nextId++, newPrice, 100, 1, 1}, trades);
+        book.processOrder({"ABCD", 1.0, nextId++, newPrice, 100, 1, 1}, trades);
         benchmark::ClobberMemory();
     }
+
     state.SetComplexityN(n);
 }
 
@@ -54,10 +56,10 @@ static void BM_LargeSweep(benchmark::State& state) {
         trades.reserve(n);
 
         for (int i = 0; i < n; ++i)
-            book.processOrder({1.0, static_cast<uint64_t>(i), 10000, 10, 1, -1},
+            book.processOrder({"ABCD", 1.0, static_cast<uint64_t>(i), 10000, 10, 1, -1},
                               trades);
 
-        engine::Order sweepOrder{1.0, static_cast<uint64_t>(n + 1), 10000,
+        engine::Order sweepOrder{"ABCD", 1.0, static_cast<uint64_t>(n + 1), 10000,
                                  static_cast<uint32_t>(n * 10), 1, 1};
         state.ResumeTiming();
 
@@ -66,7 +68,8 @@ static void BM_LargeSweep(benchmark::State& state) {
         state.PauseTiming();
         benchmark::DoNotOptimize(trades.data());
     }
-    state.SetComplexityN(state.range(0));
+
+    state.SetComplexityN(n);
 }
 
 BENCHMARK(BM_LargeSweep)->RangeMultiplier(4)->Range(8, 4096)
@@ -81,10 +84,10 @@ static void BM_CancelWorstCase(benchmark::State& state) {
         std::vector<engine::Trade> trades;
 
         for (int i = 0; i < n; ++i)
-            book.processOrder({1.0, static_cast<uint64_t>(i), 10000, 100, 1, 1},
+            book.processOrder({"ABCD", 1.0, static_cast<uint64_t>(i), 10000, 100, 1, 1},
                               trades);
 
-        engine::Order cancelOrder{1.0, static_cast<uint64_t>(n - 1), 10000, 100,
+        engine::Order cancelOrder{"ABCD", 1.0, static_cast<uint64_t>(n - 1), 10000, 100,
                                   3, 1};
         state.ResumeTiming();
 
@@ -93,7 +96,8 @@ static void BM_CancelWorstCase(benchmark::State& state) {
         state.PauseTiming();
         benchmark::ClobberMemory();
     }
-    state.SetComplexityN(state.range(0));
+
+    state.SetComplexityN(n);
 }
 
 BENCHMARK(BM_CancelWorstCase)->RangeMultiplier(4)->Range(8, 4096)
@@ -109,19 +113,19 @@ static void BM_MatchOneToOne(benchmark::State& state) {
         trades.reserve(n);
 
         for (int i = 0; i < n; ++i)
-            book.processOrder({1.0, static_cast<uint64_t>(i), 10000, 10, 1, -1},
+            book.processOrder({"ABCD", 1.0, static_cast<uint64_t>(i), 10000, 10, 1, -1},
                               trades);
 
         state.ResumeTiming();
 
         uint64_t nextId = n;
         for (int i = 0; i < n; ++i)
-            book.processOrder({1.0, nextId++, 10000, 10, 1, 1}, trades);
+            book.processOrder({"ABCD", 1.0, nextId++, 10000, 10, 1, 1}, trades);
 
         state.PauseTiming();
         benchmark::ClobberMemory();
     }
-    state.SetComplexityN(state.range(0));
+    state.SetComplexityN(n);
 }
 
 BENCHMARK(BM_MatchOneToOne)->RangeMultiplier(4)->Range(8, 1'000'000)
@@ -157,8 +161,8 @@ static void BM_MixedWorkload(benchmark::State& state) {
 
         uint64_t id = 1;
         for (const auto& ev : events) {
-            uint64_t targetId = (ev.type == 2) ? (id - 2) : id;
-            book.processOrder({1.0, targetId, ev.price, 10, ev.type, ev.side},
+            uint64_t targetId = ev.type == 2 ? (id - 2) : id;
+            book.processOrder({"ABCD", 1.0, targetId, ev.price, 10, ev.type, ev.side},
                               trades);
             if (ev.type == 1)
                 id++;
@@ -166,7 +170,7 @@ static void BM_MixedWorkload(benchmark::State& state) {
 
         benchmark::ClobberMemory();
     }
-    state.SetComplexityN(state.range(0));
+    state.SetComplexityN(n);
 }
 
 BENCHMARK(BM_MixedWorkload)->RangeMultiplier(4)->Range(8, 65'536)
