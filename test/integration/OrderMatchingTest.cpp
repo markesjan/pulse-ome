@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include "../../include/DataLoader.hpp"
+#include "../../include/OrderLoader.hpp"
 #include "../../include/OrderBook.hpp"
 
 TEST(OrderMatchingTest, Scenario1) {
-    auto orders = engine::DataLoader::loadOrders("../test/integration/data/scenario1.csv");
+    auto orders = engine::OrderLoader::loadOrders("../test/integration/data/scenario1.csv");
     ASSERT_FALSE(orders.empty());
 
     engine::OrderBook orderBook;
@@ -36,7 +36,7 @@ TEST(OrderMatchingTest, Scenario1) {
 }
 
 TEST(OrderMatchingTest, Scenario2) {
-    auto orders = engine::DataLoader::loadOrders("../test/integration/data/scenario2.csv");
+    auto orders = engine::OrderLoader::loadOrders("../test/integration/data/scenario2.csv");
     ASSERT_FALSE(orders.empty());
 
     engine::OrderBook orderBook;
@@ -64,7 +64,7 @@ TEST(OrderMatchingTest, Scenario2) {
 }
 
 TEST(OrderMatchingTest, Scenario3) {
-    auto orders = engine::DataLoader::loadOrders("../test/integration/data/scenario3.csv");
+    auto orders = engine::OrderLoader::loadOrders("../test/integration/data/scenario3.csv");
     ASSERT_FALSE(orders.empty());
 
     engine::OrderBook orderBook;

@@ -1,6 +1,6 @@
 #include "ConfigParser.hpp"
 
-#include <iostream>
+#include <print>
 
 namespace engine {
 
@@ -11,26 +11,28 @@ Config ConfigParser::parseArguments(int argc, char* argv[]) {
         std::string arg = argv[i];
 
         if ((arg == "--input" || arg == "-i") && i + 1 < argc) {
-            config.inFile = argv[++i];
+            config.orderFile = argv[++i];
         } else if ((arg == "--output" || arg == "-o") && i + 1 < argc) {
-            config.outFile = argv[++i];
+            config.tradeFile = argv[++i];
         } else if ((arg == "--generate" || arg == "-g") && i + 1 < argc) {
             config.generateCnt = std::stoull(argv[++i]);
         } else if ((arg == "--seed" || arg == "-s") && i + 1 < argc) {
             config.seed = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "--latency" || arg == "-l") {
+            config.measureLatency = true;
         } else if (arg == "--help" || arg == "-h") {
-            std::cout << "Usage: ./matching_engine [options]\n\n"
-                << "Options:\n"
-                << "  -i, --input <path>      Path to input CSV file with orders\n"
-                << "  -o, --output <path>     Path to output CSV file for trades\n"
-                << "  -g, --generate <count>  Generate specified number of random orders\n"
-                << "  -s, --seed <seed>       Seed for random order generation\n"
-                << "  -h, --help              Show this help message\n"
-                << std::endl;
+            std::print("Usage: ./matching_engine [options]\n\n"
+                "Options:\n"
+                "  -i, --input <path>      Path to input CSV file with orders\n"
+                "  -o, --output <path>     Path to output CSV file for trades\n"
+                "  -g, --generate <count>  Generate specified number of random orders\n"
+                "  -s, --seed <seed>       Seed for random order generation\n"
+                "  -l, --latency           Enable latency measurement (slows throughput)\n"
+                "  -h, --help              Show this help message\n");
             exit(0);
         } else {
-            std::cerr << "Invalid argument: " << arg << std::endl;
-            std::cout << "Use --help/-h for usage" << std::endl;
+            std::println(stderr, "Invalid argument: {}", arg);
+            std::println("Use --help/-h for usage");
             exit(1);
         }
     }

@@ -15,10 +15,10 @@ public:
     void processOrder(const Order& order, std::vector<Trade>& trades);
 
 private:
-    std::map<uint64_t, std::list<std::shared_ptr<Order>>, std::greater<uint64_t>> buys;
-    std::map<uint64_t, std::list<std::shared_ptr<Order>>> sells;
+    std::map<Price, std::list<std::shared_ptr<Order>>, std::greater<>> bids;
+    std::map<Price, std::list<std::shared_ptr<Order>>> asks;
 
-    uint64_t tradeIdCnt = 0;
+    TradeId tradeIdCnt = 0;
 
     void processBuyOrder(const Order& order, std::vector<Trade>& trades);
     void processSellOrder(const Order& order, std::vector<Trade>& trades);

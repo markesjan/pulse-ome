@@ -3,22 +3,32 @@
 namespace engine {
 
 void OrderBook::processOrder(const Order& order, std::vector<Trade>& trades) {
-    if (order.eventType == 2 || order.eventType == 3) {
-        order.side == 1 ? cancelBuyOrder(order) : cancelSellOrder(order);
-        return;
+    switch (order.eventType) {
+        case EventType::New:
+            if (order.side == Side::Buy)
+                processBuyOrder(order, trades);
+            else
+                processSellOrder(order, trades);
+            break;
+
+        case EventType::PartialCancel:
+        case EventType::FullCancel:
+            if (order.side == Side::Buy)
+                cancelBuyOrder(order);
+            else
+                cancelSellOrder(order);
+            break;
+
+        default:
+            break;
     }
-
-    if (order.eventType != 1)
-        return;
-
-    order.side == 1 ? processBuyOrder(order, trades) : processSellOrder(order, trades);
 }
 
 void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
-    auto it = sells.begin();
-    while (it != sells.end() && currOrder.quantity > 0 && currOrder.price >= it->first) {
+    auto it = asks.begin();
+    while (it != asks.end() && currOrder.quantity > 0 && currOrder.price >= it->first) {
         auto& orderList = it->second;
         auto listIt = orderList.begin();
 
@@ -27,7 +37,6 @@ void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) 
             uint32_t tradeQty = std::min(currOrder.quantity, sellOrder->quantity);
 
             trades.emplace_back(Trade{
-                currOrder.symbol,
                 currOrder.timestamp,
                 tradeIdCnt++,
                 currOrder.orderId,
@@ -46,20 +55,20 @@ void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) 
         }
 
         if (orderList.empty())
-            it = sells.erase(it);
+            it = asks.erase(it);
         else
             ++it;
     }
 
     if (currOrder.quantity > 0)
-        buys[currOrder.price].push_back(std::make_shared<Order>(currOrder));
+        bids[currOrder.price].push_back(std::make_shared<Order>(currOrder));
 }
 
 void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
-    auto it = buys.begin();
-    while (it != buys.end() && currOrder.quantity > 0 && currOrder.price <= it->first) {
+    auto it = bids.begin();
+    while (it != bids.end() && currOrder.quantity > 0 && currOrder.price <= it->first) {
         auto& orderList = it->second;
         auto listIt = orderList.begin();
 
@@ -68,7 +77,6 @@ void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades)
             uint32_t tradeQty = std::min(currOrder.quantity, buyOrder->quantity);
 
             trades.emplace_back(Trade{
-                currOrder.symbol,
                 currOrder.timestamp,
                 tradeIdCnt++,
                 buyOrder->orderId,
@@ -87,24 +95,24 @@ void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades)
         }
 
         if (orderList.empty())
-            it = buys.erase(it);
+            it = bids.erase(it);
         else
             ++it;
     }
 
     if (currOrder.quantity > 0)
-        sells[currOrder.price].push_back(std::make_shared<Order>(currOrder));
+        asks[currOrder.price].push_back(std::make_shared<Order>(currOrder));
 }
 
 void OrderBook::cancelBuyOrder(const Order& order) {
-    for (auto mapIt = buys.begin(); mapIt != buys.end(); ++mapIt) {
+    for (auto mapIt = bids.begin(); mapIt != bids.end(); ++mapIt) {
         auto& orderList = mapIt->second;
 
         for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
             if ((*listIt)->orderId == order.orderId) {
-                if (order.eventType == 3)
+                if (order.eventType == EventType::FullCancel)
                     orderList.erase(listIt);
-                else if (order.eventType == 2) {
+                else if (order.eventType == EventType::PartialCancel) {
                     if ((*listIt)->quantity <= order.quantity)
                         orderList.erase(listIt);
                     else
@@ -112,7 +120,7 @@ void OrderBook::cancelBuyOrder(const Order& order) {
                 }
 
                 if (orderList.empty())
-                    buys.erase(mapIt);
+                    bids.erase(mapIt);
 
                 return;
             }
@@ -121,14 +129,14 @@ void OrderBook::cancelBuyOrder(const Order& order) {
 }
 
 void OrderBook::cancelSellOrder(const Order& order) {
-    for (auto mapIt = sells.begin(); mapIt != sells.end(); ++mapIt) {
+    for (auto mapIt = asks.begin(); mapIt != asks.end(); ++mapIt) {
         auto& orderList = mapIt->second;
 
         for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
             if ((*listIt)->orderId == order.orderId) {
-                if (order.eventType == 3)
+                if (order.eventType == EventType::FullCancel)
                     orderList.erase(listIt);
-                else if (order.eventType == 2) {
+                else if (order.eventType == EventType::PartialCancel) {
                     if ((*listIt)->quantity <= order.quantity)
                         orderList.erase(listIt);
                     else
@@ -136,7 +144,7 @@ void OrderBook::cancelSellOrder(const Order& order) {
                 }
 
                 if (orderList.empty())
-                    sells.erase(mapIt);
+                    asks.erase(mapIt);
 
                 return;
             }

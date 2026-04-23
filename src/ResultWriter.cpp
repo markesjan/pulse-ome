@@ -1,72 +1,76 @@
 #include "ResultWriter.hpp"
 
+#include <cstdio>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <numeric>
+#include <print>
 
 namespace engine {
 
-void ResultWriter::printSummary(double totalTimeSec,
+void ResultWriter::printSummary(double avgDurationMs,
+                                double avgThroughput,
                                 size_t ordersCnt,
                                 size_t tradesCnt,
-                                const std::vector<int64_t>& latencies) {
-    std::cout << "\n========== Benchmark results ==========\n";
+                                const std::vector<uint64_t>& latencies) {
+    std::println("\n============= Benchmark results =============");
 
-    std::cout << "--- General ---\n"
-        << std::left << std::setw(20) << "Processed orders:" << ordersCnt << "\n"
-        << std::left << std::setw(20) << "Created trades:" << tradesCnt << "\n"
-        << std::left << std::setw(20) << "Total duration:" << totalTimeSec << " s\n";
+    std::println("--- General ---");
+    std::println("{:<20} {}", "Processed orders:", ordersCnt);
+    std::println("{:<20} {}", "Created trades:", tradesCnt);
 
-    if (totalTimeSec > 0) {
-        std::cout << std::left << std::setw(20) << "Throughput:"
-            << static_cast<int64_t>(ordersCnt / totalTimeSec) << " orders/s\n";
+    if (ordersCnt > 0) {
+        double matchRate = static_cast<double>(tradesCnt) / static_cast<double>(ordersCnt) * 100.0;
+        std::println("{:<20} {:.2f} %", "Match rate:", matchRate);
     }
 
+    std::println("{:<20} {:.2f} ms", "Avg duration:", avgDurationMs);
+    std::println("{:<20} {:.2f} M orders/s", "Avg throughput:", avgThroughput / 1'000'000.0);
+
     if (latencies.empty()) {
-        std::cout << "\nNo latency data available.\n";
-        std::cout << "=======================================\n\n";
+        std::println("\n--- Latency ---\nLatency measurement disabled");
+        std::println("=============================================");
         return;
     }
 
     double sum = std::accumulate(latencies.begin(), latencies.end(), 0.0);
     size_t n = latencies.size();
+    auto dblN = static_cast<double>(n);
 
-    std::cout << "\n--- Latency ---\n"
-        << std::left << std::setw(20) << "Min:" << latencies.front() << " ns\n"
-        << std::left << std::setw(20) << "Max:" << latencies.back() << " ns\n"
-        << std::left << std::setw(20) << "Average:" << (sum / n) << " ns\n"
-        << std::left << std::setw(20) << "Median (p50):" << latencies[static_cast<size_t>(
-            n * 0.50)] << " ns\n"
-        << std::left << std::setw(20) << "90. perc (p90):" << latencies[static_cast<size_t>(
-            n * 0.90)] << " ns\n"
-        << std::left << std::setw(20) << "99. perc (p99):" << latencies[static_cast<size_t>(
-            n * 0.99)] << " ns\n"
-        << std::left << std::setw(20) << "99.9. perc (p99.9):" << latencies[static_cast<size_t>(
-            n * 0.999)] << " ns\n";
+    std::println("\n--- Latency ---");
+    std::println("{:<20} {} ns", "Min:", latencies.front());
+    std::println("{:<20} {} ns", "Max:", latencies.back());
+    std::println("{:<20} {} ns", "Average:", static_cast<size_t>(sum / dblN));
+    std::println("{:<20} {} ns", "Median (p50):",
+                 latencies[static_cast<size_t>(dblN * 0.50)]);
+    std::println("{:<20} {} ns", "90. perc (p90):",
+                 latencies[static_cast<size_t>(dblN * 0.90)]);
+    std::println("{:<20} {} ns", "99. perc (p99):",
+                 latencies[static_cast<size_t>(dblN * 0.99)]);
+    std::println("{:<20} {} ns", "99.9. perc (p99.9):",
+                 latencies[static_cast<size_t>(dblN * 0.999)]);
 
-    std::cout << "=======================================\n" << std::endl;
+    std::println("=============================================");
 }
 
-void ResultWriter::writeTrades(const std::vector<Trade>& trades, const std::string& filePath) {
+void ResultWriter::writeTrades(const std::vector<Trade>& trades,
+                               const std::string& filePath) {
     std::ofstream outFile(filePath);
 
     if (!outFile.is_open()) {
-        std::cerr << "Couldn't open output file: " << filePath << std::endl;
+        std::println(stderr, "Couldn't open output file: {}", filePath);
         return;
     }
 
-    outFile << "Symbol,Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price\n";
+    std::println(outFile, "Symbol,Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
 
-    for (const auto& trade : trades) {
-        outFile << trade.symbol << ","
-            << trade.timestamp << ","
-            << trade.tradeId << ","
-            << trade.buyOrderId << ","
-            << trade.sellOrderId << ","
-            << trade.quantity << ","
-            << trade.price << "\n";
-    }
+    for (const auto& trade : trades)
+        std::println(outFile, "{},{},{},{},{},{}",
+                     trade.timestamp,
+                     trade.tradeId,
+                     trade.buyOrderId,
+                     trade.sellOrderId,
+                     trade.quantity,
+                     trade.price);
 }
 
 } // namespace engine

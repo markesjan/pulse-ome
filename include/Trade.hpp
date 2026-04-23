@@ -1,18 +1,16 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include "Types.hpp"
 
 namespace engine {
 
 struct Trade {
-    std::string symbol;
     double timestamp;
-    uint64_t tradeId;
-    uint64_t buyOrderId;
-    uint64_t sellOrderId;
-    uint64_t price;
-    uint32_t quantity;
+    TradeId tradeId;
+    OrderId buyOrderId;
+    OrderId sellOrderId;
+    Price price;
+    Quantity quantity;
 };
 
 } // namespace engine

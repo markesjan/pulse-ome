@@ -7,9 +7,9 @@
 
 namespace engine {
 
-class DataLoader {
+class OrderLoader {
 public:
-    static std::vector<Order> loadOrders(const std::string &filePath);
+    static std::vector<Order> load(const std::string& filePath);
 };
 
 } // namespace engine
