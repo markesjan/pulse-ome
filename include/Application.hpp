@@ -4,7 +4,7 @@
 
 #include "Config.hpp"
 #include "Order.hpp"
-#include "OrderBook.hpp"
+#include "MatchingEngine.hpp"
 #include "Trade.hpp"
 
 namespace engine {
@@ -16,7 +16,7 @@ public:
 
 private:
     Config config;
-    std::unique_ptr<OrderBook> orderBook;
+    std::unique_ptr<MatchingEngine> matchingEngine;
 
     std::vector<Order> orders;
     std::vector<Trade> trades;

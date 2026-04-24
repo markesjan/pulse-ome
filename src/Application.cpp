@@ -4,14 +4,11 @@
 #include <chrono>
 #include <x86intrin.h>
 #include <cstdio>
-#include <cstring>
 #include <print>
 #include <pthread.h>
-#include <sys/mman.h>
 #include <thread>
 
 #include "OrderLoader.hpp"
-#include "OrderBook.hpp"
 #include "OrderGenerator.hpp"
 #include "ResultWriter.hpp"
 
@@ -41,7 +38,7 @@ void Application::run() {
         if (config.measureLatency)
             latencies.clear();
 
-        orderBook = std::make_unique<OrderBook>();
+        matchingEngine = std::make_unique<MatchingEngine>();
         double durationS = matchOrders();
         double durationMs = durationS * 1000.0;
 
@@ -101,7 +98,7 @@ double Application::matchOrders() {
             uint64_t tickStart = __rdtsc();
             _mm_lfence();
 
-            orderBook->processOrder(order, trades);
+            matchingEngine->processOrder(order, trades);
 
             unsigned int aux;
             uint64_t tickEnd = __rdtscp(&aux);
@@ -111,7 +108,7 @@ double Application::matchOrders() {
         }
     } else {
         for (const auto& order : orders)
-            orderBook->processOrder(order, trades);
+            matchingEngine->processOrder(order, trades);
     }
 
     auto matchingEnd = std::chrono::steady_clock::now();

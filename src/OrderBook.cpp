@@ -2,106 +2,34 @@
 
 namespace engine {
 
-void OrderBook::processOrder(const Order& order, std::vector<Trade>& trades) {
-    switch (order.eventType) {
-        case EventType::New:
-            if (order.side == Side::Buy)
-                processBuyOrder(order, trades);
-            else
-                processSellOrder(order, trades);
-            break;
-
-        case EventType::PartialCancel:
-        case EventType::FullCancel:
-            if (order.side == Side::Buy)
-                cancelBuyOrder(order);
-            else
-                cancelSellOrder(order);
-            break;
-
-        default:
-            break;
-    }
+void OrderBook::addBid(const Order& order) {
+    bids[order.price].push_back(std::make_shared<Order>(order));
 }
 
-void OrderBook::processBuyOrder(const Order& order, std::vector<Trade>& trades) {
-    Order currOrder = order;
-
-    auto it = asks.begin();
-    while (it != asks.end() && currOrder.quantity > 0 && currOrder.price >= it->first) {
-        auto& orderList = it->second;
-        auto listIt = orderList.begin();
-
-        while (listIt != orderList.end() && currOrder.quantity > 0) {
-            auto sellOrder = *listIt;
-            uint32_t tradeQty = std::min(currOrder.quantity, sellOrder->quantity);
-
-            trades.emplace_back(Trade{
-                currOrder.timestamp,
-                tradeIdCnt++,
-                currOrder.orderId,
-                sellOrder->orderId,
-                sellOrder->price,
-                tradeQty,
-            });
-
-            currOrder.quantity -= tradeQty;
-            sellOrder->quantity -= tradeQty;
-
-            if (sellOrder->quantity == 0)
-                listIt = orderList.erase(listIt);
-            else
-                ++listIt;
-        }
-
-        if (orderList.empty())
-            it = asks.erase(it);
-        else
-            ++it;
-    }
-
-    if (currOrder.quantity > 0)
-        bids[currOrder.price].push_back(std::make_shared<Order>(currOrder));
+void OrderBook::addAsk(const Order& order) {
+    asks[order.price].push_back(std::make_shared<Order>(order));
 }
 
-void OrderBook::processSellOrder(const Order& order, std::vector<Trade>& trades) {
-    Order currOrder = order;
+void OrderBook::popBestBid() {
+    if (bids.empty())
+        return;
 
     auto it = bids.begin();
-    while (it != bids.end() && currOrder.quantity > 0 && currOrder.price <= it->first) {
-        auto& orderList = it->second;
-        auto listIt = orderList.begin();
+    it->second.pop_front();
 
-        while (listIt != orderList.end() && currOrder.quantity > 0) {
-            auto buyOrder = *listIt;
-            uint32_t tradeQty = std::min(currOrder.quantity, buyOrder->quantity);
+    if (it->second.empty())
+        bids.erase(it);
+}
 
-            trades.emplace_back(Trade{
-                currOrder.timestamp,
-                tradeIdCnt++,
-                buyOrder->orderId,
-                currOrder.orderId,
-                buyOrder->price,
-                tradeQty,
-            });
+void OrderBook::popBestAsk() {
+    if (asks.empty())
+        return;
 
-            currOrder.quantity -= tradeQty;
-            buyOrder->quantity -= tradeQty;
+    auto it = asks.begin();
+    it->second.pop_front();
 
-            if (buyOrder->quantity == 0)
-                listIt = orderList.erase(listIt);
-            else
-                ++listIt;
-        }
-
-        if (orderList.empty())
-            it = bids.erase(it);
-        else
-            ++it;
-    }
-
-    if (currOrder.quantity > 0)
-        asks[currOrder.price].push_back(std::make_shared<Order>(currOrder));
+    if (it->second.empty())
+        asks.erase(it);
 }
 
 void OrderBook::cancelBuyOrder(const Order& order) {
@@ -150,6 +78,57 @@ void OrderBook::cancelSellOrder(const Order& order) {
             }
         }
     }
+}
+
+Order* OrderBook::getBestBid() {
+    if (bids.empty())
+        return nullptr;
+
+    return bids.begin()->second.front().get();
+}
+
+Order* OrderBook::getBestAsk() {
+    if (asks.empty())
+        return nullptr;
+
+    return asks.begin()->second.front().get();
+}
+
+std::vector<OrderBookLevel> OrderBook::getBookState(std::size_t depth) const {
+    if (depth == 0)
+        return {};
+
+    std::vector<OrderBookLevel> state;
+    state.reserve(depth);
+
+    auto bidIt = bids.begin();
+    auto askIt = asks.begin();
+
+    for (std::size_t i = 0; i < depth; ++i) {
+        OrderBookLevel currLevel;
+
+        if (bidIt != bids.end()) {
+            currLevel.bidPrice = bidIt->first;
+
+            for (const auto& orderPtr : bidIt->second)
+                currLevel.bidQty += orderPtr.get()->quantity;
+
+            ++bidIt;
+        }
+
+        if (askIt != asks.end()) {
+            currLevel.askPrice = askIt->first;
+
+            for (const auto& orderPtr : askIt->second)
+                currLevel.askQty += orderPtr.get()->quantity;
+
+            ++askIt;
+        }
+
+        state.push_back(currLevel);
+    }
+
+    return state;
 }
 
 } // namespace engine

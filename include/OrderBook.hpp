@@ -6,24 +6,27 @@
 #include <vector>
 
 #include "Order.hpp"
-#include "Trade.hpp"
+#include "OrderBookLevel.hpp"
 
 namespace engine {
 
 class OrderBook {
 public:
-    void processOrder(const Order& order, std::vector<Trade>& trades);
+    void addBid(const Order& order);
+    void addAsk(const Order& order);
+    void popBestBid();
+    void popBestAsk();
+    void cancelBuyOrder(const Order& order);
+    void cancelSellOrder(const Order& order);
+
+    Order* getBestBid();
+    Order* getBestAsk();
+
+    std::vector<OrderBookLevel> getBookState(std::size_t depth) const;
 
 private:
     std::map<Price, std::list<std::shared_ptr<Order>>, std::greater<>> bids;
     std::map<Price, std::list<std::shared_ptr<Order>>> asks;
-
-    TradeId tradeIdCnt = 0;
-
-    void processBuyOrder(const Order& order, std::vector<Trade>& trades);
-    void processSellOrder(const Order& order, std::vector<Trade>& trades);
-    void cancelBuyOrder(const Order& order);
-    void cancelSellOrder(const Order& order);
 };
 
 } // namespace engine
