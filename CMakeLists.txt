@@ -57,5 +57,6 @@ include(GoogleTest)
 #gtest_discover_tests(unit_tests)
 gtest_discover_tests(integration_tests)
 
-add_executable(engine_benchmarks benchmark/OrderBookBenchmark.cpp)
+file(GLOB BENCHMARK_SOURCES CONFIGURE_DEPENDS "benchmark/*.cpp")
+add_executable(engine_benchmarks ${BENCHMARK_SOURCES})
 target_link_libraries(engine_benchmarks PRIVATE benchmark::benchmark engine_lib)
