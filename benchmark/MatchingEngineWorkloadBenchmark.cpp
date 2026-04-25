@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
-#include "OrderBook.hpp"
+#include "MatchingEngine.hpp"
 
 constexpr int64_t BATCH_SIZE = 10'000;
 
-static void BM_OrderBookFullWorkload(benchmark::State& state) {
+static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
     const int64_t n = state.range(0);
 
     struct Event {
@@ -34,40 +34,40 @@ static void BM_OrderBookFullWorkload(benchmark::State& state) {
             std::swap(events[static_cast<size_t>(i + 2)], events[static_cast<size_t>(i + 3)]);
     }
 
-    auto setupBook = [n] {
-        auto book = std::make_unique<engine::OrderBook>();
+    auto setupEngine = [n] {
+        auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
         dummyTrades.reserve(static_cast<size_t>(n));
 
         for (int64_t i = 0; i < n / 2; ++i) {
-            book->processOrder({1.0, static_cast<uint64_t>(i), 9000, 10,
-                                engine::EventType::New, engine::Side::Buy}, dummyTrades);
-            book->processOrder({1.0, static_cast<uint64_t>(n + i), 11000, 10,
-                                engine::EventType::New, engine::Side::Sell}, dummyTrades);
+            matchingEngine->processOrder({1.0, static_cast<uint64_t>(i), 9000, 10,
+                                          engine::EventType::New, engine::Side::Buy}, dummyTrades);
+            matchingEngine->processOrder({1.0, static_cast<uint64_t>(n + i), 11000, 10,
+                                          engine::EventType::New, engine::Side::Sell}, dummyTrades);
         }
 
-        return book;
+        return matchingEngine;
     };
 
-    auto book = setupBook();
+    auto matchingEngine = setupEngine();
     std::vector<engine::Trade> trades;
     trades.reserve(BATCH_SIZE);
 
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (const auto& ev : events) {
-            book->processOrder({
-                                   1.0,
-                                   ev.id,
-                                   ev.price,
-                                   10,
-                                   ev.type,
-                                   ev.side
-                               }, trades);
+            matchingEngine->processOrder({
+                                             1.0,
+                                             ev.id,
+                                             ev.price,
+                                             10,
+                                             ev.type,
+                                             ev.side
+                                         }, trades);
         }
 
         state.PauseTiming();
         benchmark::DoNotOptimize(trades.data());
-        book = setupBook();
+        matchingEngine = setupEngine();
         trades.clear();
         state.ResumeTiming();
     }
@@ -76,7 +76,7 @@ static void BM_OrderBookFullWorkload(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(BM_OrderBookFullWorkload)
+BENCHMARK(BM_MatchingEngineFullWorkload)
     ->RangeMultiplier(4)
     ->Range(8, 100'000)
     ->Complexity(benchmark::oAuto)

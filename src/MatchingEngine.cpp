@@ -13,8 +13,8 @@ void MatchingEngine::processOrder(const Order& order, std::vector<Trade>& trades
         case EventType::PartialCancel:
         case EventType::FullCancel:
             order.side == Side::Buy
-                ? lob.cancelBuyOrder(order)
-                : lob.cancelSellOrder(order);
+                ? orderBook.cancelBuyOrder(order)
+                : orderBook.cancelSellOrder(order);
             break;
 
         default:
@@ -26,7 +26,7 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
     Order currOrder = order;
 
     while (currOrder.quantity > 0) {
-        Order* bestAsk = lob.getBestAsk();
+        Order* bestAsk = orderBook.getBestAsk();
 
         if (!bestAsk || currOrder.price < bestAsk->price)
             break;
@@ -46,18 +46,18 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
         bestAsk->quantity -= tradeQty;
 
         if (bestAsk->quantity == 0)
-            lob.popBestAsk();
+            orderBook.popBestAsk();
     }
 
     if (currOrder.quantity > 0)
-        lob.addBid(currOrder);
+        orderBook.addBid(currOrder);
 }
 
 void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
     while (currOrder.quantity > 0) {
-        Order* bestBid = lob.getBestBid();
+        Order* bestBid = orderBook.getBestBid();
 
         if (!bestBid || currOrder.price > bestBid->price)
             break;
@@ -77,15 +77,15 @@ void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& tr
         bestBid->quantity -= tradeQty;
 
         if (bestBid->quantity == 0)
-            lob.popBestBid();
+            orderBook.popBestBid();
     }
 
     if (currOrder.quantity > 0)
-        lob.addAsk(currOrder);
+        orderBook.addAsk(currOrder);
 }
 
 std::vector<OrderBookLevel> MatchingEngine::getBookState(std::size_t depth) const {
-    return lob.getBookState(depth);
+    return orderBook.getBookState(depth);
 }
 
 } // namespace engine

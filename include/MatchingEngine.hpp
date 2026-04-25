@@ -14,7 +14,7 @@ public:
     std::vector<OrderBookLevel> getBookState(std::size_t depth) const;
 
 private:
-    OrderBook lob;
+    OrderBook orderBook;
     TradeId tradeIdCnt = 0;
 
     void processBuyOrder(const Order& order, std::vector<Trade>& trades);
