@@ -9,8 +9,8 @@ namespace engine {
 
 void ResultWriter::printSummary(double avgDurationMs,
                                 double avgThroughput,
-                                size_t ordersCnt,
-                                size_t tradesCnt,
+                                std::size_t ordersCnt,
+                                std::size_t tradesCnt,
                                 const std::vector<uint64_t>& latencies) {
     std::println("\n============= Benchmark results =============");
 
@@ -33,21 +33,21 @@ void ResultWriter::printSummary(double avgDurationMs,
     }
 
     double sum = std::accumulate(latencies.begin(), latencies.end(), 0.0);
-    size_t n = latencies.size();
+    std::size_t n = latencies.size();
     auto dblN = static_cast<double>(n);
 
     std::println("\n--- Latency ---");
     std::println("{:<20} {} ns", "Min:", latencies.front());
     std::println("{:<20} {} ns", "Max:", latencies.back());
-    std::println("{:<20} {} ns", "Average:", static_cast<size_t>(sum / dblN));
+    std::println("{:<20} {} ns", "Average:", static_cast<std::size_t>(sum / dblN));
     std::println("{:<20} {} ns", "Median (p50):",
-                 latencies[static_cast<size_t>(dblN * 0.50)]);
+                 latencies[static_cast<std::size_t>(dblN * 0.50)]);
     std::println("{:<20} {} ns", "90. perc (p90):",
-                 latencies[static_cast<size_t>(dblN * 0.90)]);
+                 latencies[static_cast<std::size_t>(dblN * 0.90)]);
     std::println("{:<20} {} ns", "99. perc (p99):",
-                 latencies[static_cast<size_t>(dblN * 0.99)]);
+                 latencies[static_cast<std::size_t>(dblN * 0.99)]);
     std::println("{:<20} {} ns", "99.9. perc (p99.9):",
-                 latencies[static_cast<size_t>(dblN * 0.999)]);
+                 latencies[static_cast<std::size_t>(dblN * 0.999)]);
 
     std::println("=============================================");
 }

@@ -5,8 +5,8 @@
 namespace engine {
 
 std::vector<Order> OrderGenerator::generate(uint32_t seed,
-                                            size_t ordersCnt,
-                                            size_t cancelPercentage,
+                                            std::size_t ordersCnt,
+                                            std::size_t cancelPercentage,
                                             Price basePrice) {
     std::mt19937 gen(seed);
     std::uniform_int_distribution eventDist(1, 100);
@@ -32,13 +32,13 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
     double currTimestamp = 1.0;
     std::string symbol("ABCD");
 
-    for (size_t i = 0; i < ordersCnt; ++i) {
+    for (std::size_t i = 0; i < ordersCnt; ++i) {
         currTimestamp += 0.001;
 
         if (eventDist(gen) <= static_cast<int>(cancelPercentage) && !activeOrders.empty()) {
-            size_t window_size = std::min<size_t>(activeOrders.size(), 100);
+            std::size_t window_size = std::min<std::size_t>(activeOrders.size(), 100);
             std::uniform_int_distribution recentDist(activeOrders.size() - window_size, activeOrders.size() - 1);
-            size_t cancelIdx = recentDist(gen);
+            std::size_t cancelIdx = recentDist(gen);
             ActiveOrder orderToCancel = activeOrders[cancelIdx];
 
             std::uniform_int_distribution typeDist(2, 3);

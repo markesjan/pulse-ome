@@ -9,7 +9,7 @@ static void BM_MatchingEngineInsertSamePrice(benchmark::State& state) {
     auto setupEngine = [n] {
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
-        dummyTrades.reserve(static_cast<size_t>(n + BATCH_SIZE));
+        dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({
@@ -64,7 +64,7 @@ static void BM_MatchingEngineInsertNewPrice(benchmark::State& state) {
     auto setupEngine = [n] {
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
-        dummyTrades.reserve(static_cast<size_t>(n + BATCH_SIZE));
+        dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({

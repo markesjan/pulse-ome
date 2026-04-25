@@ -10,6 +10,7 @@ using Price = uint64_t;
 using Quantity = uint32_t;
 
 enum class EventType : uint8_t {
+    Invalid = 0,
     New = 1,
     PartialCancel = 2,
     FullCancel = 3,

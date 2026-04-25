@@ -31,13 +31,13 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
         events.push_back({engine::EventType::New, eventId++, 10010, engine::Side::Buy});
 
         if (i % 8 == 0)
-            std::swap(events[static_cast<size_t>(i + 2)], events[static_cast<size_t>(i + 3)]);
+            std::swap(events[static_cast<std::size_t>(i + 2)], events[static_cast<std::size_t>(i + 3)]);
     }
 
     auto setupEngine = [n] {
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
-        dummyTrades.reserve(static_cast<size_t>(n));
+        dummyTrades.reserve(static_cast<std::size_t>(n));
 
         for (int64_t i = 0; i < n / 2; ++i) {
             matchingEngine->processOrder({1.0, static_cast<uint64_t>(i), 9000, 10,

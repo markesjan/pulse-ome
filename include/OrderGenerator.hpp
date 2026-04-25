@@ -10,8 +10,8 @@ namespace engine {
 class OrderGenerator {
 public:
     static std::vector<Order> generate(uint32_t seed,
-                                       size_t ordersCnt,
-                                       size_t cancelPercentage = 20,
+                                       std::size_t ordersCnt,
+                                       std::size_t cancelPercentage = 20,
                                        Price basePrice = 10000);
 };
 

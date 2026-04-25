@@ -9,7 +9,7 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
     auto setupEngine = [n] {
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
-        dummyTrades.reserve(static_cast<size_t>(n + BATCH_SIZE));
+        dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
         for (int64_t i = 0; i < n + BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
@@ -69,7 +69,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
         const int64_t totalResting = n * SWEEP_BATCH_SIZE;
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
-        dummyTrades.reserve(static_cast<size_t>(totalResting));
+        dummyTrades.reserve(static_cast<std::size_t>(totalResting));
 
         for (int64_t i = 0; i < totalResting; ++i) {
             matchingEngine->processOrder({
@@ -87,7 +87,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
 
     auto matchingEngine = setupEngine();
     std::vector<engine::Trade> trades;
-    trades.reserve(static_cast<size_t>(n * SWEEP_BATCH_SIZE));
+    trades.reserve(static_cast<std::size_t>(n * SWEEP_BATCH_SIZE));
     int64_t nextId = n * SWEEP_BATCH_SIZE;
 
     while (state.KeepRunningBatch(SWEEP_BATCH_SIZE)) {
