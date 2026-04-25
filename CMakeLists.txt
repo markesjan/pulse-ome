@@ -52,7 +52,8 @@ target_link_libraries(matching_engine PRIVATE engine_lib)
 #add_executable(unit_tests test/unit/xxx.cpp)
 #target_link_libraries(unit_tests PRIVATE gtest_main engine_lib)
 
-add_executable(integration_tests test/integration/OrderMatchingTest.cpp)
+file(GLOB INTEGRATION_TEST_SOURCES CONFIGURE_DEPENDS "test/integration/*.cpp")
+add_executable(integration_tests ${INTEGRATION_TEST_SOURCES})
 target_link_libraries(integration_tests PRIVATE gtest_main engine_lib)
 
 include(GoogleTest)
