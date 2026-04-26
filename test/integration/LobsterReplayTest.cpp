@@ -2,8 +2,8 @@
 #include <print>
 
 #include "MatchingEngine.hpp"
-#include "OrderLoader.hpp"
-#include "LobStateLoader.hpp"
+#include "LobsterOrderLoader.hpp"
+#include "LobsterStateLoader.hpp"
 
 namespace engine {
 
@@ -31,8 +31,8 @@ protected:
 TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
     const auto& [symbol, depth, msgPath, bookPath] = GetParam();
 
-    auto orders = OrderLoader::load(msgPath);
-    auto expectedStates = LobStateLoader::load(bookPath, depth);
+    auto orders = LobsterOrderLoader::load(msgPath);
+    auto expectedStates = LobsterStateLoader::load(bookPath, depth);
 
     ASSERT_FALSE(orders.empty()) << "Empty data for " << symbol;
     ASSERT_EQ(orders.size(), expectedStates.size()) << "Row count mismatch for " << symbol;

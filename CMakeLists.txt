@@ -27,9 +27,9 @@ FetchContent_MakeAvailable(googlebenchmark)
 add_library(engine_lib
         src/Application.cpp
         src/ConfigParser.cpp
-        src/LobStateLoader.cpp
+        src/LobsterOrderLoader.cpp
+        src/LobsterStateLoader.cpp
         src/MatchingEngine.cpp
-        src/OrderLoader.cpp
         src/OrderGenerator.cpp
         src/OrderBook.cpp
         src/ResultWriter.cpp

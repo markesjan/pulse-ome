@@ -7,7 +7,7 @@
 
 namespace engine {
 
-class OrderLoader {
+class LobsterOrderLoader {
 public:
     static std::vector<Order> load(const std::string& filePath);
 };

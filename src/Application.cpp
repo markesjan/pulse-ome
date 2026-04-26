@@ -8,7 +8,7 @@
 #include <pthread.h>
 #include <thread>
 
-#include "OrderLoader.hpp"
+#include "LobsterOrderLoader.hpp"
 #include "OrderGenerator.hpp"
 #include "ResultWriter.hpp"
 
@@ -77,7 +77,7 @@ void Application::run() {
 void Application::prepareOrders() {
     if (!config.orderFile.empty()) {
         std::println("Loading orders from file: {}", config.orderFile);
-        orders = OrderLoader::load(config.orderFile);
+        orders = LobsterOrderLoader::load(config.orderFile);
     } else {
         std::println("Generating {} orders (seed: {})", config.generateCnt, config.seed);
         orders = OrderGenerator::generate(config.seed, config.generateCnt);

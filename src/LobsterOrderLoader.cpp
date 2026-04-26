@@ -1,4 +1,4 @@
-#include "OrderLoader.hpp"
+#include "LobsterOrderLoader.hpp"
 
 #include <cstring>
 #include <fstream>
@@ -7,7 +7,7 @@
 
 namespace engine {
 
-std::vector<Order> OrderLoader::load(const std::string& filePath) {
+std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::println(stderr, "Couldn't open file: {}", filePath);

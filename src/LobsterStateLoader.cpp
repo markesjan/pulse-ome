@@ -1,4 +1,4 @@
-#include "LobStateLoader.hpp"
+#include "LobsterStateLoader.hpp"
 
 #include <print>
 #include <cstring>
@@ -6,7 +6,7 @@
 
 namespace engine {
 
-LobStates LobStateLoader::load(const std::string& filePath, std::size_t depth) {
+LobStates LobsterStateLoader::load(const std::string& filePath, std::size_t depth) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::println(stderr, "Couldn't open file: {}", filePath);
