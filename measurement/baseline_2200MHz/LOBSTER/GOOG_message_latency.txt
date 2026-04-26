@@ -1,0 +1,104 @@
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl1.csv
+Loading orders from file: ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl1.csv
+Loaded 37804 relevant order events.
+Running 11 iterations...
+
+Warmup:        25.71 ms
+[ 1/10] Bench: 25.72 ms
+[ 2/10] Bench: 26.08 ms
+[ 3/10] Bench: 26.56 ms
+[ 4/10] Bench: 26.91 ms
+[ 5/10] Bench: 26.80 ms
+[ 6/10] Bench: 29.22 ms
+[ 7/10] Bench: 27.29 ms
+[ 8/10] Bench: 28.48 ms
+[ 9/10] Bench: 27.71 ms
+[10/10] Bench: 27.55 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    37804
+Created trades:      13220
+Match rate:          34.97 %
+Avg duration:        27.23 ms
+Avg throughput:      1.39 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 35830 ns
+Average:             685 ns
+Median (p50):        170 ns
+90. perc (p90):      1261 ns
+99. perc (p99):      9072 ns
+99.9. perc (p99.9):  12698 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl5.csv
+Loading orders from file: ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl5.csv
+Loaded 100995 relevant order events.
+Running 11 iterations...
+
+Warmup:        68.86 ms
+[ 1/10] Bench: 72.77 ms
+[ 2/10] Bench: 73.24 ms
+[ 3/10] Bench: 75.82 ms
+[ 4/10] Bench: 73.15 ms
+[ 5/10] Bench: 78.02 ms
+[ 6/10] Bench: 76.89 ms
+[ 7/10] Bench: 77.89 ms
+[ 8/10] Bench: 75.42 ms
+[ 9/10] Bench: 76.00 ms
+[10/10] Bench: 74.89 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100995
+Created trades:      14609
+Match rate:          14.47 %
+Avg duration:        75.41 ms
+Avg throughput:      1.34 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 69955 ns
+Average:             697 ns
+Median (p50):        180 ns
+90. perc (p90):      741 ns
+99. perc (p99):      13340 ns
+99.9. perc (p99.9):  19939 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/GOOG/GOOG_2012-06-21_message_lvl10.csv
+Loaded 136238 relevant order events.
+Running 11 iterations...
+
+Warmup:        60.26 ms
+[ 1/10] Bench: 59.38 ms
+[ 2/10] Bench: 60.81 ms
+[ 3/10] Bench: 61.66 ms
+[ 4/10] Bench: 62.03 ms
+[ 5/10] Bench: 61.07 ms
+[ 6/10] Bench: 60.60 ms
+[ 7/10] Bench: 62.02 ms
+[ 8/10] Bench: 63.79 ms
+[ 9/10] Bench: 63.34 ms
+[10/10] Bench: 62.40 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    136238
+Created trades:      11649
+Match rate:          8.55 %
+Avg duration:        61.71 ms
+Avg throughput:      2.21 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 30404 ns
+Average:             415 ns
+Median (p50):        180 ns
+90. perc (p90):      500 ns
+99. perc (p99):      7160 ns
+99.9. perc (p99.9):  10305 ns
+=============================================

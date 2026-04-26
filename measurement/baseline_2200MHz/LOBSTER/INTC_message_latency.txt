@@ -1,0 +1,104 @@
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl1.csv
+Loading orders from file: ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl1.csv
+Loaded 372503 relevant order events.
+Running 11 iterations...
+
+Warmup:        648.98 ms
+[ 1/10] Bench: 691.32 ms
+[ 2/10] Bench: 734.24 ms
+[ 3/10] Bench: 760.94 ms
+[ 4/10] Bench: 774.50 ms
+[ 5/10] Bench: 778.03 ms
+[ 6/10] Bench: 807.87 ms
+[ 7/10] Bench: 807.80 ms
+[ 8/10] Bench: 827.94 ms
+[ 9/10] Bench: 809.18 ms
+[10/10] Bench: 874.58 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    372503
+Created trades:      63156
+Match rate:          16.95 %
+Avg duration:        786.64 ms
+Avg throughput:      0.47 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 189135 ns
+Average:             2302 ns
+Median (p50):        130 ns
+90. perc (p90):      1041 ns
+99. perc (p99):      76483 ns
+99.9. perc (p99.9):  100929 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl5.csv
+Loading orders from file: ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl5.csv
+Loaded 548547 relevant order events.
+Running 11 iterations...
+
+Warmup:        318.65 ms
+[ 1/10] Bench: 335.66 ms
+[ 2/10] Bench: 364.03 ms
+[ 3/10] Bench: 364.33 ms
+[ 4/10] Bench: 373.63 ms
+[ 5/10] Bench: 375.39 ms
+[ 6/10] Bench: 383.03 ms
+[ 7/10] Bench: 380.46 ms
+[ 8/10] Bench: 388.58 ms
+[ 9/10] Bench: 387.51 ms
+[10/10] Bench: 396.70 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    548547
+Created trades:      34808
+Match rate:          6.35 %
+Avg duration:        374.93 ms
+Avg throughput:      1.46 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 143908 ns
+Average:             680 ns
+Median (p50):        140 ns
+90. perc (p90):      640 ns
+99. perc (p99):      8211 ns
+99.9. perc (p99.9):  66626 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/INTC/INTC_2012-06-21_message_lvl10.csv
+Loaded 591557 relevant order events.
+Running 11 iterations...
+
+Warmup:        256.05 ms
+[ 1/10] Bench: 279.93 ms
+[ 2/10] Bench: 289.54 ms
+[ 3/10] Bench: 293.10 ms
+[ 4/10] Bench: 299.19 ms
+[ 5/10] Bench: 302.55 ms
+[ 6/10] Bench: 298.80 ms
+[ 7/10] Bench: 300.92 ms
+[ 8/10] Bench: 297.99 ms
+[ 9/10] Bench: 303.77 ms
+[10/10] Bench: 304.26 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    591557
+Created trades:      31466
+Match rate:          5.32 %
+Avg duration:        297.01 ms
+Avg throughput:      1.99 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 95901 ns
+Average:             471 ns
+Median (p50):        140 ns
+90. perc (p90):      771 ns
+99. perc (p99):      4666 ns
+99.9. perc (p99.9):  26719 ns
+=============================================

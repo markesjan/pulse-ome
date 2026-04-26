@@ -1,0 +1,83 @@
+cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        16.70 ms
+[ 1/10] Bench: 8.77 ms
+[ 2/10] Bench: 16.15 ms
+[ 3/10] Bench: 15.17 ms
+[ 4/10] Bench: 14.60 ms
+[ 5/10] Bench: 16.34 ms
+[ 6/10] Bench: 13.99 ms
+[ 7/10] Bench: 13.26 ms
+[ 8/10] Bench: 18.06 ms
+[ 9/10] Bench: 16.68 ms
+[10/10] Bench: 14.86 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        14.79 ms
+Avg throughput:      6.76 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        5167.18 ms
+[ 1/10] Bench: 6220.01 ms
+[ 2/10] Bench: 6378.38 ms
+[ 3/10] Bench: 6553.36 ms
+[ 4/10] Bench: 6800.08 ms
+[ 5/10] Bench: 7020.38 ms
+[ 6/10] Bench: 7054.87 ms
+[ 7/10] Bench: 7125.61 ms
+[ 8/10] Bench: 7102.39 ms
+[ 9/10] Bench: 7095.31 ms
+[10/10] Bench: 7099.05 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        6844.94 ms
+Avg throughput:      0.01 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        753.44 ms
+[ 1/10] Bench: 744.54 ms
+[ 2/10] Bench: 768.74 ms
+[ 3/10] Bench: 774.19 ms
+[ 4/10] Bench: 768.14 ms
+[ 5/10] Bench: 769.01 ms
+[ 6/10] Bench: 764.40 ms
+[ 7/10] Bench: 766.70 ms
+[ 8/10] Bench: 769.43 ms
+[ 9/10] Bench: 764.95 ms
+[10/10] Bench: 767.99 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69489
+Match rate:          69.49 %
+Avg duration:        765.81 ms
+Avg throughput:      0.13 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================

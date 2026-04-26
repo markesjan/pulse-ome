@@ -1,0 +1,86 @@
+cmake-build-release (feature/baseline) ✗ ./matching_engine -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        155.23 ms
+[ 1/10] Bench: 165.04 ms
+[ 2/10] Bench: 170.24 ms
+[ 3/10] Bench: 170.35 ms
+[ 4/10] Bench: 167.59 ms
+[ 5/10] Bench: 172.32 ms
+[ 6/10] Bench: 170.77 ms
+[ 7/10] Bench: 175.69 ms
+[ 8/10] Bench: 175.49 ms
+[ 9/10] Bench: 174.09 ms
+[10/10] Bench: 173.69 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        171.52 ms
+Avg throughput:      2.13 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        98.30 ms
+[ 1/10] Bench: 104.50 ms
+[ 2/10] Bench: 105.05 ms
+[ 3/10] Bench: 107.05 ms
+[ 4/10] Bench: 108.28 ms
+[ 5/10] Bench: 111.18 ms
+[ 6/10] Bench: 117.50 ms
+[ 7/10] Bench: 114.41 ms
+[ 8/10] Bench: 110.94 ms
+[ 9/10] Bench: 110.36 ms
+[10/10] Bench: 108.36 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        109.76 ms
+Avg throughput:      2.35 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        298.82 ms
+[ 1/10] Bench: 337.84 ms
+[ 2/10] Bench: 358.01 ms
+[ 3/10] Bench: 381.73 ms
+[ 4/10] Bench: 366.36 ms
+[ 5/10] Bench: 368.68 ms
+[ 6/10] Bench: 376.87 ms
+[ 7/10] Bench: 370.44 ms
+[ 8/10] Bench: 381.37 ms
+[ 9/10] Bench: 364.41 ms
+[10/10] Bench: 369.45 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        367.52 ms
+Avg throughput:      1.73 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
