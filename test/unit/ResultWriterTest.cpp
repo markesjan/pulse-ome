@@ -33,8 +33,8 @@ protected:
 
 TEST_F(ResultWriterTest, WriteTradesValidDataCreatesValidCsv) {
     std::vector<Trade> trades = {
-        {1.0, 1001, 10, 20, 15000, 50},
-        {1.5, 1002, 11, 21, 15100, 100}
+        {1'000'000'000, 1001, 10, 20, 15000, 50},
+        {1'500'000'000, 1002, 11, 21, 15100, 100}
     };
 
     ResultWriter::writeTrades(trades, testFilePath);
@@ -43,8 +43,8 @@ TEST_F(ResultWriterTest, WriteTradesValidDataCreatesValidCsv) {
     ASSERT_GE(lines.size(), 3);
 
     EXPECT_EQ(lines[0], "Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
-    EXPECT_EQ(lines[1], "1,1001,10,20,50,15000");
-    EXPECT_EQ(lines[2], "1.5,1002,11,21,100,15100");
+    EXPECT_EQ(lines[1], "1000000000,1001,10,20,50,15000");
+    EXPECT_EQ(lines[2], "1500000000,1002,11,21,100,15100");
 }
 
 TEST_F(ResultWriterTest, WriteTradesInvalidPathReturnsError) {

@@ -13,7 +13,7 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(i),
                                              10'000,
                                              100,
@@ -33,7 +33,7 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::Price>(targetId++),
                                              10'000,
                                              10,
@@ -69,7 +69,7 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(i),
                                              10'000,
                                              100,
@@ -80,7 +80,7 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
 
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(n + i),
                                              10'000,
                                              100,
@@ -100,7 +100,7 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(cancelId++),
                                              10'000,
                                              100,

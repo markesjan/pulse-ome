@@ -31,7 +31,8 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
         events.push_back({engine::EventType::New, eventId++, 10010, engine::Side::Buy});
 
         if (i % 8 == 0)
-            std::swap(events[static_cast<std::size_t>(i + 2)], events[static_cast<std::size_t>(i + 3)]);
+            std::swap(events[static_cast<std::size_t>(i + 2)],
+                      events[static_cast<std::size_t>(i + 3)]);
     }
 
     auto setupEngine = [n] {
@@ -40,9 +41,9 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
         dummyTrades.reserve(static_cast<std::size_t>(n));
 
         for (int64_t i = 0; i < n / 2; ++i) {
-            matchingEngine->processOrder({1.0, static_cast<uint64_t>(i), 9000, 10,
+            matchingEngine->processOrder({1'000'000'000, static_cast<uint64_t>(i), 9000, 10,
                                           engine::EventType::New, engine::Side::Buy}, dummyTrades);
-            matchingEngine->processOrder({1.0, static_cast<uint64_t>(n + i), 11000, 10,
+            matchingEngine->processOrder({1'000'000'000, static_cast<uint64_t>(n + i), 11000, 10,
                                           engine::EventType::New, engine::Side::Sell}, dummyTrades);
         }
 
@@ -56,7 +57,7 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (const auto& ev : events) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              ev.id,
                                              ev.price,
                                              10,

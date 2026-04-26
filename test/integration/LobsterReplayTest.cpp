@@ -41,13 +41,13 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         const auto& firstState = expectedStates[0];
         for (std::size_t lvl = 0; lvl < depth; ++lvl) {
             if (firstState[lvl].askQty > 0) {
-                matchingEngine.processOrder(Order{0.0, 999999900 + lvl, firstState[lvl].askPrice,
+                matchingEngine.processOrder(Order{0, 999999900 + lvl, firstState[lvl].askPrice,
                                                   firstState[lvl].askQty, EventType::New,
                                                   Side::Sell},
                                             trades);
             }
             if (firstState[lvl].bidQty > 0) {
-                matchingEngine.processOrder(Order{0.0, 999999800 + lvl, firstState[lvl].bidPrice,
+                matchingEngine.processOrder(Order{0, 999999800 + lvl, firstState[lvl].bidPrice,
                                                   firstState[lvl].bidQty, EventType::New,
                                                   Side::Buy},
                                             trades);

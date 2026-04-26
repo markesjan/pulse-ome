@@ -5,7 +5,7 @@
 namespace engine {
 
 struct Order {
-    double timestamp;
+    Timestamp timestamp;
     OrderId orderId;
     Price price;
     Quantity quantity;

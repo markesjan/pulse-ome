@@ -32,8 +32,8 @@ protected:
 
 TEST_F(LobsterOrderLoaderTest, LoadValidCsvReturnsOrders) {
     std::string csvData =
-        "34200.03988397,1,16135101,300,309500,1\n"
-        "34200.12345678,4,16135102,100,309500,1\n"
+        "3420.003988397,1,16135101,300,309500,1\n"
+        "3420.012345678,4,16135102,100,309500,1\n"
         "34200.203283207,3,16166153,100,309700,-1\n";
 
     createDummyCsv(csvData);
@@ -41,18 +41,18 @@ TEST_F(LobsterOrderLoaderTest, LoadValidCsvReturnsOrders) {
 
     ASSERT_EQ(orders.size(), 2);
 
-    EXPECT_DOUBLE_EQ(orders[0].timestamp, 34200.03988397);
+    EXPECT_EQ(orders[0].timestamp, 3'420'003'988'397);
     EXPECT_EQ(orders[0].eventType, EventType::New);
-    EXPECT_EQ(orders[0].orderId, 16135101);
+    EXPECT_EQ(orders[0].orderId, 16'135'101);
     EXPECT_EQ(orders[0].quantity, 300);
-    EXPECT_EQ(orders[0].price, 309500);
+    EXPECT_EQ(orders[0].price, 309'500);
     EXPECT_EQ(orders[0].side, Side::Buy);
 
-    EXPECT_DOUBLE_EQ(orders[1].timestamp, 34200.203283207);
+    EXPECT_EQ(orders[1].timestamp, 34'200'203'283'207);
     EXPECT_EQ(orders[1].eventType, EventType::FullCancel);
-    EXPECT_EQ(orders[1].orderId, 16166153);
+    EXPECT_EQ(orders[1].orderId, 16'166'153);
     EXPECT_EQ(orders[1].quantity, 100);
-    EXPECT_EQ(orders[1].price, 309700);
+    EXPECT_EQ(orders[1].price, 309'700);
     EXPECT_EQ(orders[1].side, Side::Sell);
 }
 

@@ -10,7 +10,7 @@ protected:
     std::vector<Trade> trades;
 
     static Order makeOrder(OrderId id, Price p, Quantity q, Side s, EventType t = EventType::New) {
-        return Order{1.0, id, p, q, t, s};
+        return Order{1'000'000'000, id, p, q, t, s};
     }
 };
 

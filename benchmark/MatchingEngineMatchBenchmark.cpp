@@ -13,7 +13,7 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
 
         for (int64_t i = 0; i < n + BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<uint64_t>(i),
                                              10000,
                                              10,
@@ -33,7 +33,7 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
                                              10000,
                                              10,
@@ -73,7 +73,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
 
         for (int64_t i = 0; i < totalResting; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<uint64_t>(i),
                                              static_cast<engine::Price>(10000 + i),
                                              10,
@@ -93,7 +93,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
     while (state.KeepRunningBatch(SWEEP_BATCH_SIZE)) {
         for (int64_t i = 0; i < SWEEP_BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
                                              2'000'000,
                                              static_cast<engine::Quantity>(n * 10),

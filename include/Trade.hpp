@@ -5,7 +5,7 @@
 namespace engine {
 
 struct Trade {
-    double timestamp;
+    Timestamp timestamp;
     TradeId tradeId;
     OrderId buyOrderId;
     OrderId sellOrderId;

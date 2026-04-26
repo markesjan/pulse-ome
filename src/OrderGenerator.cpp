@@ -19,7 +19,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
     std::normal_distribution sellPriceDist(static_cast<double>(basePrice) + meanOffset, stdDev);
 
     struct ActiveOrder {
-        uint64_t id;
+        OrderId id;
         Side side;
     };
 
@@ -28,12 +28,11 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
     std::vector<ActiveOrder> activeOrders;
     activeOrders.reserve(ordersCount);
 
-    uint64_t nextOrderId = 0;
-    double currTimestamp = 1.0;
-    std::string symbol("ABCD");
+    OrderId nextOrderId = 0;
+    Timestamp currTimestamp = 1'000'000'000;
 
     for (std::size_t i = 0; i < ordersCount; ++i) {
-        currTimestamp += 0.001;
+        currTimestamp += 1'000'000;
 
         if (eventDist(gen) <= static_cast<int>(cancelPercent) && !activeOrders.empty()) {
             std::size_t window_size = std::min<std::size_t>(activeOrders.size(), 100);
@@ -45,7 +44,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
             auto rawCancelType = typeDist(gen);
             auto cancelType = rawCancelType == 3 ? EventType::FullCancel : EventType::PartialCancel;
 
-            uint32_t cancelQty = 0;
+            Quantity cancelQty = 0;
 
             if (cancelType == EventType::FullCancel) {
                 cancelQty = 0;
@@ -68,9 +67,9 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
             auto side = sideDist(gen) == 0 ? Side::Buy : Side::Sell;
 
             double rawPrice = side == Side::Buy ? buyPriceDist(gen) : sellPriceDist(gen);
-            auto price = static_cast<uint64_t>(std::max(1.0, rawPrice));
+            auto price = static_cast<Price>(std::max(1.0, rawPrice));
 
-            auto quantity = static_cast<uint32_t>(quantityDist(gen));
+            auto quantity = static_cast<Quantity>(quantityDist(gen));
 
             activeOrders.push_back(ActiveOrder{nextOrderId, side});
 

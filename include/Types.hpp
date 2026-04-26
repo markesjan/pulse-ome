@@ -4,6 +4,7 @@
 
 namespace engine {
 
+using Timestamp = uint64_t;
 using OrderId = uint64_t;
 using TradeId = uint64_t;
 using Price = uint64_t;

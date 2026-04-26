@@ -20,7 +20,7 @@ TEST(OrderGeneratorTest, GenerateSameSeedProducesIdenticalResults) {
 
     ASSERT_EQ(orders1.size(), orders2.size());
     for (std::size_t i = 0; i < orders1.size(); ++i) {
-        EXPECT_DOUBLE_EQ(orders1[i].timestamp, orders2[i].timestamp);
+        EXPECT_EQ(orders1[i].timestamp, orders2[i].timestamp);
         EXPECT_EQ(orders1[i].orderId, orders2[i].orderId);
         EXPECT_EQ(orders1[i].price, orders2[i].price);
         EXPECT_EQ(orders1[i].quantity, orders2[i].quantity);
@@ -78,7 +78,7 @@ TEST(OrderGeneratorTest, GenerateTimestampsAreStrictlyIncreasing) {
     auto orders = OrderGenerator::generate(42, 100, 10, 10'000, 14.0, 8);
 
     ASSERT_FALSE(orders.empty());
-    double prevTimestamp = orders[0].timestamp;
+    Timestamp prevTimestamp = orders[0].timestamp;
 
     for (std::size_t i = 1; i < orders.size(); ++i) {
         EXPECT_GT(orders[i].timestamp, prevTimestamp);

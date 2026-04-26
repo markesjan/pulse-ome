@@ -9,15 +9,15 @@ protected:
     OrderBook orderBook;
 
     static Order createBuy(OrderId id, Price price, Quantity qty) {
-        return Order{1.0, id, price, qty, EventType::New, Side::Buy};
+        return Order{1'000'000'000, id, price, qty, EventType::New, Side::Buy};
     }
 
     static Order createSell(OrderId id, Price price, Quantity qty) {
-        return Order{1.0, id, price, qty, EventType::New, Side::Sell};
+        return Order{1'000'000'000, id, price, qty, EventType::New, Side::Sell};
     }
 
     static Order createCancel(OrderId id, Quantity qty, EventType type, Side side) {
-        return Order{1.0, id, 0, qty, type, side};
+        return Order{1'000'000'000, id, 0, qty, type, side};
     }
 };
 

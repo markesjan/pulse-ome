@@ -19,22 +19,29 @@ protected:
 };
 
 TEST_F(PriceTimePriorityTest, BasicMatchingAndCancels) {
-    matchingEngine.processOrder({1.0, 101, 10000, 100, EventType::New, Side::Buy}, trades);
-    matchingEngine.processOrder({1.1, 102, 10000, 50, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.2, 103, 10100, 100, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.3, 104, 10200, 100, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.4, 105, 10200, 150, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'000'000'000, 101, 10000, 100, EventType::New, Side::Buy},
+                                trades);
+    matchingEngine.processOrder({1'100'000'000, 102, 10000, 50, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'200'000'000, 103, 10100, 100, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'300'000'000, 104, 10200, 100, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'400'000'000, 105, 10200, 150, EventType::New, Side::Buy},
+                                trades);
     verifyTop(10200, 50, 10000, 50);
 
     // Modify resting liquidity
-    matchingEngine.processOrder({1.5, 104, 10200, 20, EventType::PartialCancel, Side::Sell},
-                                trades);
+    matchingEngine.processOrder(
+        {1'500'000'000, 104, 10200, 20, EventType::PartialCancel, Side::Sell},
+        trades);
     verifyTop(10200, 30, 10000, 50);
-    matchingEngine.processOrder({1.6, 101, 10000, 50, EventType::FullCancel, Side::Buy}, trades);
+    matchingEngine.processOrder({1'600'000'000, 101, 10000, 50, EventType::FullCancel, Side::Buy},
+                                trades);
     verifyTop(10200, 30, 0, 0);
 
     // Match aggressive bid
-    matchingEngine.processOrder({1.7, 106, 10200, 50, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'700'000'000, 106, 10200, 50, EventType::New, Side::Buy}, trades);
     verifyTop(0, 0, 10200, 20);
 
     ASSERT_EQ(trades.size(), 4);
@@ -54,20 +61,27 @@ TEST_F(PriceTimePriorityTest, BasicMatchingAndCancels) {
 }
 
 TEST_F(PriceTimePriorityTest, AggressiveSweepOrder) {
-    matchingEngine.processOrder({1.0, 201, 50000, 100, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.1, 202, 50010, 150, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.2, 203, 50020, 200, EventType::New, Side::Sell}, trades);
-    matchingEngine.processOrder({1.3, 204, 50030, 300, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'000'000'000, 201, 50000, 100, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'100'000'000, 202, 50010, 150, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'200'000'000, 203, 50020, 200, EventType::New, Side::Sell},
+                                trades);
+    matchingEngine.processOrder({1'300'000'000, 204, 50030, 300, EventType::New, Side::Sell},
+                                trades);
     verifyTop(50000, 100, 0, 0);
 
     // Modify passive liquidity
-    matchingEngine.processOrder({1.4, 202, 50010, 50, EventType::PartialCancel, Side::Sell},
+    matchingEngine.processOrder(
+        {1'400'000'000, 202, 50010, 50, EventType::PartialCancel, Side::Sell},
+        trades);
+    matchingEngine.processOrder({1'500'000'000, 203, 50020, 200, EventType::FullCancel, Side::Sell},
                                 trades);
-    matchingEngine.processOrder({1.5, 203, 50020, 200, EventType::FullCancel, Side::Sell}, trades);
     verifyTop(50000, 100, 0, 0);
 
     // Large bid sweep
-    matchingEngine.processOrder({1.6, 205, 50050, 400, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'600'000'000, 205, 50050, 400, EventType::New, Side::Buy},
+                                trades);
     verifyTop(50030, 100, 0, 0);
 
     ASSERT_EQ(trades.size(), 3);
@@ -80,24 +94,30 @@ TEST_F(PriceTimePriorityTest, AggressiveSweepOrder) {
 }
 
 TEST_F(PriceTimePriorityTest, ComplexExecution) {
-    matchingEngine.processOrder({1.0, 301, 15000, 500, EventType::New, Side::Buy}, trades);
-    matchingEngine.processOrder({1.1, 302, 15100, 300, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'000'000'000, 301, 15000, 500, EventType::New, Side::Buy},
+                                trades);
+    matchingEngine.processOrder({1'100'000'000, 302, 15100, 300, EventType::New, Side::Buy},
+                                trades);
     verifyTop(0, 0, 15100, 300);
 
     // Ask outside spread
-    matchingEngine.processOrder({1.2, 303, 15200, 200, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'200'000'000, 303, 15200, 200, EventType::New, Side::Sell},
+                                trades);
     verifyTop(15200, 200, 15100, 300);
 
     // Consuming ask
-    matchingEngine.processOrder({1.3, 304, 15100, 400, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'300'000'000, 304, 15100, 400, EventType::New, Side::Sell},
+                                trades);
     verifyTop(15100, 100, 15000, 500);
 
     // Resting bid
-    matchingEngine.processOrder({1.4, 305, 15050, 100, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'400'000'000, 305, 15050, 100, EventType::New, Side::Buy},
+                                trades);
     verifyTop(15100, 100, 15050, 100);
 
     // Aggressive bid sweep
-    matchingEngine.processOrder({1.5, 306, 15200, 600, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'500'000'000, 306, 15200, 600, EventType::New, Side::Buy},
+                                trades);
     verifyTop(0, 0, 15200, 300);
 
     ASSERT_EQ(trades.size(), 3);
@@ -114,12 +134,15 @@ TEST_F(PriceTimePriorityTest, ComplexExecution) {
 
 TEST_F(PriceTimePriorityTest, TimePriorityWithinLevel) {
     // Bids with same price
-    matchingEngine.processOrder({1.0, 401, 10000, 100, EventType::New, Side::Buy}, trades);
-    matchingEngine.processOrder({1.1, 402, 10000, 100, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'000'000'000, 401, 10000, 100, EventType::New, Side::Buy},
+                                trades);
+    matchingEngine.processOrder({1'100'000'000, 402, 10000, 100, EventType::New, Side::Buy},
+                                trades);
     verifyTop(0, 0, 10000, 200);
 
     // Aggressive ask
-    matchingEngine.processOrder({1.2, 403, 10000, 150, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'200'000'000, 403, 10000, 150, EventType::New, Side::Sell},
+                                trades);
     verifyTop(0, 0, 10000, 50);
 
     ASSERT_EQ(trades.size(), 2);
@@ -131,11 +154,13 @@ TEST_F(PriceTimePriorityTest, TimePriorityWithinLevel) {
 
 TEST_F(PriceTimePriorityTest, PriceSlippage) {
     // Passive ask
-    matchingEngine.processOrder({1.0, 501, 10000, 100, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'000'000'000, 501, 10000, 100, EventType::New, Side::Sell},
+                                trades);
     verifyTop(10000, 100, 0, 0);
 
     // Aggressive bid with too generous price
-    matchingEngine.processOrder({1.1, 502, 10500, 100, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'100'000'000, 502, 10500, 100, EventType::New, Side::Buy},
+                                trades);
 
     ASSERT_EQ(trades.size(), 1);
     EXPECT_EQ(trades[0].price, 10000);
@@ -143,18 +168,21 @@ TEST_F(PriceTimePriorityTest, PriceSlippage) {
 
 TEST_F(PriceTimePriorityTest, FullSweepAndRest) {
     // Passive ask
-    matchingEngine.processOrder({1.0, 601, 10000, 100, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'000'000'000, 601, 10000, 100, EventType::New, Side::Sell},
+                                trades);
     verifyTop(10000, 100, 0, 0);
 
     // Aggressive bid consumes 100 and rests 50
-    matchingEngine.processOrder({1.1, 602, 10100, 150, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'100'000'000, 602, 10100, 150, EventType::New, Side::Buy},
+                                trades);
     verifyTop(0, 0, 10100, 50);
 
     ASSERT_EQ(trades.size(), 1);
     EXPECT_EQ(trades[0].quantity, 100);
 
     // Aggressive ask to match rest
-    matchingEngine.processOrder({1.2, 603, 10100, 50, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'200'000'000, 603, 10100, 50, EventType::New, Side::Sell},
+                                trades);
 
     ASSERT_EQ(trades.size(), 2);
     EXPECT_EQ(trades[1].buyOrderId, 602);
@@ -164,19 +192,23 @@ TEST_F(PriceTimePriorityTest, FullSweepAndRest) {
 
 TEST_F(PriceTimePriorityTest, CancelNonExistentOrAlreadyFilled) {
     // New bid
-    matchingEngine.processOrder({1.0, 701, 10000, 100, EventType::New, Side::Buy}, trades);
+    matchingEngine.processOrder({1'000'000'000, 701, 10000, 100, EventType::New, Side::Buy},
+                                trades);
     verifyTop(0, 0, 10000, 100);
 
     // Full match
-    matchingEngine.processOrder({1.1, 702, 10000, 100, EventType::New, Side::Sell}, trades);
+    matchingEngine.processOrder({1'100'000'000, 702, 10000, 100, EventType::New, Side::Sell},
+                                trades);
 
     // Try to cancel already matched order
     EXPECT_NO_THROW(
-        matchingEngine.processOrder({1.2, 701, 10000, 100, EventType::FullCancel, Side::Buy}, trades
+        matchingEngine.processOrder({1'200'000'000, 701, 10000, 100, EventType::FullCancel, Side::
+            Buy}, trades
         ));
     // Try to cancel a completely random ID
     EXPECT_NO_THROW(
-        matchingEngine.processOrder({1.3, 999, 50000, 100, EventType::FullCancel, Side::Sell},
+        matchingEngine.processOrder({1'300'000'000, 999, 50000, 100, EventType::FullCancel, Side::
+            Sell},
             trades));
 
     ASSERT_EQ(trades.size(), 1);

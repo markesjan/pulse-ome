@@ -13,7 +13,7 @@ static void BM_MatchingEngineInsertSamePrice(benchmark::State& state) {
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(i),
                                              10000,
                                              100,
@@ -32,7 +32,7 @@ static void BM_MatchingEngineInsertSamePrice(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
                                              10000,
                                              100,
@@ -68,7 +68,7 @@ static void BM_MatchingEngineInsertNewPrice(benchmark::State& state) {
 
         for (int64_t i = 0; i < n; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(i),
                                              static_cast<engine::Price>(10000 + i),
                                              100,
@@ -89,7 +89,7 @@ static void BM_MatchingEngineInsertNewPrice(benchmark::State& state) {
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
-                                             1.0,
+                                             1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
                                              nextPrice++,
                                              100,

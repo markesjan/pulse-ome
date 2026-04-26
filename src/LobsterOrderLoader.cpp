@@ -27,7 +27,8 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
         if (!std::strchr(p, ','))
             continue;
 
-        double timestamp = std::strtod(p, &end);
+        double rawTimestamp = std::strtod(p, &end);
+        auto fixedTimestamp = static_cast<Timestamp>(rawTimestamp * 1'000'000'000);
         if (p == end)
             continue;
         p = end + (*end == ',' ? 1 : 0);
@@ -56,7 +57,7 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
             auto rawSide = static_cast<int8_t>(std::strtol(p, &end, 10));
 
             orders.emplace_back(Order{
-                timestamp,
+                fixedTimestamp,
                 orderId,
                 price,
                 quantity,
