@@ -49,17 +49,18 @@ target_compile_options(engine_lib PUBLIC
 add_executable(matching_engine src/main.cpp)
 target_link_libraries(matching_engine PRIVATE engine_lib)
 
-#add_executable(unit_tests test/unit/xxx.cpp)
-#target_link_libraries(unit_tests PRIVATE gtest_main engine_lib)
+file(GLOB BENCHMARK_SOURCES CONFIGURE_DEPENDS "benchmark/*.cpp")
+add_executable(engine_benchmarks ${BENCHMARK_SOURCES})
+target_link_libraries(engine_benchmarks PRIVATE benchmark::benchmark engine_lib)
+
+file(GLOB UNIT_TEST_SOURCES CONFIGURE_DEPENDS "test/unit/*.cpp")
+add_executable(unit_tests ${UNIT_TEST_SOURCES})
+target_link_libraries(unit_tests PRIVATE gtest_main engine_lib)
 
 file(GLOB INTEGRATION_TEST_SOURCES CONFIGURE_DEPENDS "test/integration/*.cpp")
 add_executable(integration_tests ${INTEGRATION_TEST_SOURCES})
 target_link_libraries(integration_tests PRIVATE gtest_main engine_lib)
 
 include(GoogleTest)
-#gtest_discover_tests(unit_tests)
+gtest_discover_tests(unit_tests)
 gtest_discover_tests(integration_tests)
-
-file(GLOB BENCHMARK_SOURCES CONFIGURE_DEPENDS "benchmark/*.cpp")
-add_executable(engine_benchmarks ${BENCHMARK_SOURCES})
-target_link_libraries(engine_benchmarks PRIVATE benchmark::benchmark engine_lib)

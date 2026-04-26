@@ -61,7 +61,7 @@ void ResultWriter::writeTrades(const std::vector<Trade>& trades,
         return;
     }
 
-    std::println(outFile, "Symbol,Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
+    std::println(outFile, "Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
 
     for (const auto& trade : trades)
         std::println(outFile, "{},{},{},{},{},{}",
