@@ -79,8 +79,13 @@ void Application::prepareOrders() {
         std::println("Loading orders from file: {}", config.orderFile);
         orders = LobsterOrderLoader::load(config.orderFile);
     } else {
-        std::println("Generating {} orders (seed: {})", config.generateCnt, config.seed);
-        orders = OrderGenerator::generate(config.seed, config.generateCnt);
+        std::println("Generating {} orders (seed: {})", config.genCount, config.genSeed);
+        orders = OrderGenerator::generate(config.genSeed,
+                                          config.genCount,
+                                          config.genCancelPercent,
+                                          config.genBasePrice,
+                                          config.genMeanOffset,
+                                          config.genStdDev);
     }
 
     if (orders.empty()) {

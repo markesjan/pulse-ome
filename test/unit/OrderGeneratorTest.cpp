@@ -5,18 +5,18 @@
 namespace engine {
 
 TEST(OrderGeneratorTest, GenerateZeroCountReturnsEmpty) {
-    auto orders = OrderGenerator::generate(42, 0, 0, 10000);
+    auto orders = OrderGenerator::generate(42, 0, 0, 10'000, 14.0, 8);
     EXPECT_TRUE(orders.empty());
 }
 
 TEST(OrderGeneratorTest, GenerateSpecificCountReturnsExactSize) {
-    auto orders = OrderGenerator::generate(42, 1000, 10, 10000);
+    auto orders = OrderGenerator::generate(42, 1000, 10, 10'000, 14.0, 8);
     EXPECT_EQ(orders.size(), 1000);
 }
 
 TEST(OrderGeneratorTest, GenerateSameSeedProducesIdenticalResults) {
-    auto orders1 = OrderGenerator::generate(12345, 500, 20, 10000);
-    auto orders2 = OrderGenerator::generate(12345, 500, 20, 10000);
+    auto orders1 = OrderGenerator::generate(12345, 500, 20, 10'000, 14.0, 8);
+    auto orders2 = OrderGenerator::generate(12345, 500, 20, 10'000, 14.0, 8);
 
     ASSERT_EQ(orders1.size(), orders2.size());
     for (std::size_t i = 0; i < orders1.size(); ++i) {
@@ -30,8 +30,8 @@ TEST(OrderGeneratorTest, GenerateSameSeedProducesIdenticalResults) {
 }
 
 TEST(OrderGeneratorTest, GenerateDifferentSeedProducesDifferentResults) {
-    auto orders1 = OrderGenerator::generate(1, 100, 0, 10000);
-    auto orders2 = OrderGenerator::generate(2, 100, 0, 10000);
+    auto orders1 = OrderGenerator::generate(1, 100, 0, 10'000, 14.0, 8);
+    auto orders2 = OrderGenerator::generate(2, 100, 0, 10'000, 14.0, 8);
 
     ASSERT_EQ(orders1.size(), orders2.size());
 
@@ -46,7 +46,7 @@ TEST(OrderGeneratorTest, GenerateDifferentSeedProducesDifferentResults) {
 }
 
 TEST(OrderGeneratorTest, GenerateZeroCancelReturnsOnlyNewOrders) {
-    auto orders = OrderGenerator::generate(42, 500, 0, 10000);
+    auto orders = OrderGenerator::generate(42, 500, 0, 10'000, 14.0, 8);
 
     for (const auto& order : orders) {
         EXPECT_EQ(order.eventType, EventType::New);
@@ -56,7 +56,7 @@ TEST(OrderGeneratorTest, GenerateZeroCancelReturnsOnlyNewOrders) {
 }
 
 TEST(OrderGeneratorTest, GenerateWithCancelsReturnsBothCancelTypes) {
-    auto orders = OrderGenerator::generate(42, 1000, 50, 10000);
+    auto orders = OrderGenerator::generate(42, 1000, 50, 10'000, 14.0, 8);
 
     bool hasCancel = false;
     for (const auto& order : orders) {
@@ -75,7 +75,7 @@ TEST(OrderGeneratorTest, GenerateWithCancelsReturnsBothCancelTypes) {
 }
 
 TEST(OrderGeneratorTest, GenerateTimestampsAreStrictlyIncreasing) {
-    auto orders = OrderGenerator::generate(42, 100, 10, 10000);
+    auto orders = OrderGenerator::generate(42, 100, 10, 10'000, 14.0, 8);
 
     ASSERT_FALSE(orders.empty());
     double prevTimestamp = orders[0].timestamp;
@@ -87,7 +87,7 @@ TEST(OrderGeneratorTest, GenerateTimestampsAreStrictlyIncreasing) {
 }
 
 TEST(OrderGeneratorTest, GeneratePricesNeverDropBelowOne) {
-    auto orders = OrderGenerator::generate(42, 1000, 0, 5);
+    auto orders = OrderGenerator::generate(42, 1000, 0, 5, 14.0, 8.0);
 
     for (const auto& order : orders) {
         EXPECT_GE(order.price, 1);

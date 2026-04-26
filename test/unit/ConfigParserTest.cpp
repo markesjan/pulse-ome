@@ -32,7 +32,7 @@ TEST_F(ConfigParserTest, ParseArgumentsDefaultValuesCreatesDefaultConfig) {
 
     EXPECT_EQ(config.orderFile, "");
     EXPECT_EQ(config.tradeFile, "");
-    EXPECT_EQ(config.generateCnt, 100'000);
+    EXPECT_EQ(config.genCount, 100'000);
     EXPECT_FALSE(config.measureLatency);
 }
 
@@ -46,8 +46,8 @@ TEST_F(ConfigParserTest, ParseArgumentsShortFlagsCreatesValidConfig) {
 
     EXPECT_EQ(config.orderFile, "../input.csv");
     EXPECT_EQ(config.tradeFile, "../out/output.csv");
-    EXPECT_EQ(config.generateCnt, 1000);
-    EXPECT_EQ(config.seed, 67);
+    EXPECT_EQ(config.genCount, 1000);
+    EXPECT_EQ(config.genSeed, 67);
     EXPECT_TRUE(config.measureLatency);
 }
 
@@ -61,8 +61,8 @@ TEST_F(ConfigParserTest, ParseArgumentsLongFlagsCreatesValidConfig) {
 
     EXPECT_EQ(config.orderFile, "data_in.csv");
     EXPECT_EQ(config.tradeFile, "data_out.csv");
-    EXPECT_EQ(config.generateCnt, 5000);
-    EXPECT_EQ(config.seed, 99);
+    EXPECT_EQ(config.genCount, 5000);
+    EXPECT_EQ(config.genSeed, 99);
     EXPECT_TRUE(config.measureLatency);
 }
 

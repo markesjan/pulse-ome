@@ -78,6 +78,6 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
 
 BENCHMARK(BM_MatchingEngineFullWorkload)
     ->RangeMultiplier(4)
-    ->Range(8, 100'000)
+    ->Range(8, 1'000'000)
     ->Complexity(benchmark::oAuto)
     ->Unit(benchmark::kNanosecond);

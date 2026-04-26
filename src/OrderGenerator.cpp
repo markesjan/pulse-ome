@@ -5,16 +5,16 @@
 namespace engine {
 
 std::vector<Order> OrderGenerator::generate(uint32_t seed,
-                                            std::size_t ordersCnt,
-                                            std::size_t cancelPercentage,
-                                            Price basePrice) {
+                                            std::size_t ordersCount,
+                                            uint8_t cancelPercent,
+                                            Price basePrice,
+                                            double meanOffset,
+                                            double stdDev) {
     std::mt19937 gen(seed);
     std::uniform_int_distribution eventDist(1, 100);
     std::uniform_int_distribution sideDist(0, 1);
     std::uniform_int_distribution quantityDist(1, 100);
 
-    double meanOffset = 14.0;
-    double stdDev = 8.0;
     std::normal_distribution buyPriceDist(static_cast<double>(basePrice) - meanOffset, stdDev);
     std::normal_distribution sellPriceDist(static_cast<double>(basePrice) + meanOffset, stdDev);
 
@@ -24,18 +24,18 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
     };
 
     std::vector<Order> orders;
-    orders.reserve(ordersCnt);
+    orders.reserve(ordersCount);
     std::vector<ActiveOrder> activeOrders;
-    activeOrders.reserve(ordersCnt);
+    activeOrders.reserve(ordersCount);
 
     uint64_t nextOrderId = 0;
     double currTimestamp = 1.0;
     std::string symbol("ABCD");
 
-    for (std::size_t i = 0; i < ordersCnt; ++i) {
+    for (std::size_t i = 0; i < ordersCount; ++i) {
         currTimestamp += 0.001;
 
-        if (eventDist(gen) <= static_cast<int>(cancelPercentage) && !activeOrders.empty()) {
+        if (eventDist(gen) <= static_cast<int>(cancelPercent) && !activeOrders.empty()) {
             std::size_t window_size = std::min<std::size_t>(activeOrders.size(), 100);
             std::uniform_int_distribution recentDist(activeOrders.size() - window_size, activeOrders.size() - 1);
             std::size_t cancelIdx = recentDist(gen);

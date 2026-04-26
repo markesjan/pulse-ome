@@ -17,11 +17,8 @@ protected:
 };
 
 TEST_F(SyntheticStressTest, DefaultGeneratorSetup) {
-    constexpr uint32_t SEED = 42;
-    constexpr std::size_t ORDER_COUNT = 100'000;
-
-    auto orders = OrderGenerator::generate(SEED, ORDER_COUNT);
-    ASSERT_EQ(orders.size(), ORDER_COUNT) << "Generated unexpected amount of orders";
+    auto orders = OrderGenerator::generate(42, 100'000, 20, 10'000, 14.0, 8.0);
+    ASSERT_EQ(orders.size(), 100'000) << "Generated unexpected amount of orders";
 
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
@@ -43,12 +40,8 @@ TEST_F(SyntheticStressTest, DefaultGeneratorSetup) {
 }
 
 TEST_F(SyntheticStressTest, ZeroCancels) {
-    constexpr uint32_t SEED = 42;
-    constexpr std::size_t ORDER_COUNT = 100'000;
-    constexpr std::size_t CANCEL_PERCENT = 0;
-
-    auto orders = OrderGenerator::generate(SEED, ORDER_COUNT, CANCEL_PERCENT);
-    ASSERT_EQ(orders.size(), ORDER_COUNT) << "Generated unexpected amount of orders";
+    auto orders = OrderGenerator::generate(42, 100'000, 0, 10'000, 14.0, 8.0);
+    ASSERT_EQ(orders.size(), 100'000) << "Generated unexpected amount of orders";
 
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
@@ -70,12 +63,8 @@ TEST_F(SyntheticStressTest, ZeroCancels) {
 }
 
 TEST_F(SyntheticStressTest, HighCancels) {
-    constexpr uint32_t SEED = 42;
-    constexpr std::size_t ORDER_COUNT = 100'000;
-    constexpr std::size_t CANCEL_PERCENT = 80;
-
-    auto orders = OrderGenerator::generate(SEED, ORDER_COUNT, CANCEL_PERCENT);
-    ASSERT_EQ(orders.size(), ORDER_COUNT) << "Generated unexpected amount of orders";
+    auto orders = OrderGenerator::generate(42, 100'000, 80, 10'000, 14.0, 8.0);
+    ASSERT_EQ(orders.size(), 100'000) << "Generated unexpected amount of orders";
 
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
