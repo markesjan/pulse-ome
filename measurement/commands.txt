@@ -1,0 +1,22 @@
+google_benchmark.txt:
+./engine_benchmarks
+
+lobster_latency.txt:
+./matching_engine -l -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+./matching_engine -l -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+./matching_engine -l -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+
+lobster_throughput.txt:
+./matching_engine -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+./matching_engine -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+./matching_engine -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+
+generated_latency.txt:
+./matching_engine -l -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0
+./matching_engine -l -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0
+./matching_engine -l -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50
+
+generated_throughput.txt:
+./matching_engine -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0
+./matching_engine -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0
+./matching_engine -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50

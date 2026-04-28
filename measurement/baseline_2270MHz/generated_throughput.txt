@@ -2,25 +2,25 @@ cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 
 Generating 100000 orders (seed: 42)
 Running 11 iterations...
 
-Warmup:        16.70 ms
-[ 1/10] Bench: 8.77 ms
-[ 2/10] Bench: 16.15 ms
-[ 3/10] Bench: 15.17 ms
-[ 4/10] Bench: 14.60 ms
-[ 5/10] Bench: 16.34 ms
-[ 6/10] Bench: 13.99 ms
-[ 7/10] Bench: 13.26 ms
-[ 8/10] Bench: 18.06 ms
-[ 9/10] Bench: 16.68 ms
-[10/10] Bench: 14.86 ms
+Warmup:        11.42 ms
+[ 1/10] Bench: 4.88 ms
+[ 2/10] Bench: 6.43 ms
+[ 3/10] Bench: 6.16 ms
+[ 4/10] Bench: 6.71 ms
+[ 5/10] Bench: 7.13 ms
+[ 6/10] Bench: 7.10 ms
+[ 7/10] Bench: 7.09 ms
+[ 8/10] Bench: 6.86 ms
+[ 9/10] Bench: 6.90 ms
+[10/10] Bench: 6.89 ms
 
 ============= Benchmark results =============
 --- General ---
 Processed orders:    100000
 Created trades:      0
 Match rate:          0.00 %
-Avg duration:        14.79 ms
-Avg throughput:      6.76 M orders/s
+Avg duration:        6.61 ms
+Avg throughput:      15.12 M orders/s
 
 --- Latency ---
 Latency measurement disabled
@@ -30,25 +30,25 @@ cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 
 Generating 100000 orders (seed: 42)
 Running 11 iterations...
 
-Warmup:        5167.18 ms
-[ 1/10] Bench: 6220.01 ms
-[ 2/10] Bench: 6378.38 ms
-[ 3/10] Bench: 6553.36 ms
-[ 4/10] Bench: 6800.08 ms
-[ 5/10] Bench: 7020.38 ms
-[ 6/10] Bench: 7054.87 ms
-[ 7/10] Bench: 7125.61 ms
-[ 8/10] Bench: 7102.39 ms
-[ 9/10] Bench: 7095.31 ms
-[10/10] Bench: 7099.05 ms
+Warmup:        4034.95 ms
+[ 1/10] Bench: 4849.36 ms
+[ 2/10] Bench: 4956.28 ms
+[ 3/10] Bench: 5137.27 ms
+[ 4/10] Bench: 5336.22 ms
+[ 5/10] Bench: 5650.71 ms
+[ 6/10] Bench: 5781.46 ms
+[ 7/10] Bench: 5824.89 ms
+[ 8/10] Bench: 5826.11 ms
+[ 9/10] Bench: 5821.64 ms
+[10/10] Bench: 5851.99 ms
 
 ============= Benchmark results =============
 --- General ---
 Processed orders:    100000
 Created trades:      0
 Match rate:          0.00 %
-Avg duration:        6844.94 ms
-Avg throughput:      0.01 M orders/s
+Avg duration:        5503.59 ms
+Avg throughput:      0.02 M orders/s
 
 --- Latency ---
 Latency measurement disabled
@@ -58,25 +58,25 @@ cmake-build-release (feature/baseline) ✗ ./matching_engine -g 100000 --cancel 
 Generating 100000 orders (seed: 42)
 Running 11 iterations...
 
-Warmup:        753.44 ms
-[ 1/10] Bench: 744.54 ms
-[ 2/10] Bench: 768.74 ms
-[ 3/10] Bench: 774.19 ms
-[ 4/10] Bench: 768.14 ms
-[ 5/10] Bench: 769.01 ms
-[ 6/10] Bench: 764.40 ms
-[ 7/10] Bench: 766.70 ms
-[ 8/10] Bench: 769.43 ms
-[ 9/10] Bench: 764.95 ms
-[10/10] Bench: 767.99 ms
+Warmup:        576.18 ms
+[ 1/10] Bench: 616.42 ms
+[ 2/10] Bench: 627.01 ms
+[ 3/10] Bench: 619.08 ms
+[ 4/10] Bench: 618.39 ms
+[ 5/10] Bench: 619.06 ms
+[ 6/10] Bench: 612.96 ms
+[ 7/10] Bench: 622.82 ms
+[ 8/10] Bench: 611.42 ms
+[ 9/10] Bench: 614.12 ms
+[10/10] Bench: 618.79 ms
 
 ============= Benchmark results =============
 --- General ---
 Processed orders:    100000
 Created trades:      69489
 Match rate:          69.49 %
-Avg duration:        765.81 ms
-Avg throughput:      0.13 M orders/s
+Avg duration:        618.01 ms
+Avg throughput:      0.16 M orders/s
 
 --- Latency ---
 Latency measurement disabled

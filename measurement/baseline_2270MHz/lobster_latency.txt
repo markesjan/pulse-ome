@@ -1,0 +1,104 @@
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        190.20 ms
+[ 1/10] Bench: 187.44 ms
+[ 2/10] Bench: 189.65 ms
+[ 3/10] Bench: 192.24 ms
+[ 4/10] Bench: 193.74 ms
+[ 5/10] Bench: 194.76 ms
+[ 6/10] Bench: 195.84 ms
+[ 7/10] Bench: 196.82 ms
+[ 8/10] Bench: 196.86 ms
+[ 9/10] Bench: 196.65 ms
+[10/10] Bench: 196.82 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        194.08 ms
+Avg throughput:      1.88 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 29346 ns
+Average:             497 ns
+Median (p50):        170 ns
+90. perc (p90):      490 ns
+99. perc (p99):      10362 ns
+99.9. perc (p99.9):  15819 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        124.19 ms
+[ 1/10] Bench: 122.55 ms
+[ 2/10] Bench: 123.51 ms
+[ 3/10] Bench: 124.32 ms
+[ 4/10] Bench: 123.75 ms
+[ 5/10] Bench: 124.03 ms
+[ 6/10] Bench: 124.93 ms
+[ 7/10] Bench: 124.08 ms
+[ 8/10] Bench: 124.76 ms
+[ 9/10] Bench: 124.52 ms
+[10/10] Bench: 123.79 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        124.02 ms
+Avg throughput:      2.08 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 40591 ns
+Average:             437 ns
+Median (p50):        160 ns
+90. perc (p90):      550 ns
+99. perc (p99):      8200 ns
+99.9. perc (p99.9):  12105 ns
+=============================================
+
+cmake-build-release (feature/baseline) ✗ ./matching_engine -l -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        275.72 ms
+[ 1/10] Bench: 297.01 ms
+[ 2/10] Bench: 309.44 ms
+[ 3/10] Bench: 314.44 ms
+[ 4/10] Bench: 314.77 ms
+[ 5/10] Bench: 316.61 ms
+[ 6/10] Bench: 316.74 ms
+[ 7/10] Bench: 316.43 ms
+[ 8/10] Bench: 317.64 ms
+[ 9/10] Bench: 316.79 ms
+[10/10] Bench: 324.51 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        314.44 ms
+Avg throughput:      2.02 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 67978 ns
+Average:             469 ns
+Median (p50):        130 ns
+90. perc (p90):      750 ns
+99. perc (p99):      3995 ns
+99.9. perc (p99.9):  36948 ns
+=============================================
