@@ -2,15 +2,14 @@
 
 namespace engine {
 
-void OrderBook::addBid(const Order& order) {
-    bids[order.price].push_back(std::make_shared<Order>(order));
+void OrderBook::insert(const Order& order) {
+    if (order.side == Side::Buy)
+        bids[order.price].push_back(order);
+    else
+        asks[order.price].push_back(order);
 }
 
-void OrderBook::addAsk(const Order& order) {
-    asks[order.price].push_back(std::make_shared<Order>(order));
-}
-
-void OrderBook::popBestBid() {
+void OrderBook::removeBestBid() {
     if (bids.empty())
         return;
 
@@ -21,7 +20,7 @@ void OrderBook::popBestBid() {
         bids.erase(it);
 }
 
-void OrderBook::popBestAsk() {
+void OrderBook::removeBestAsk() {
     if (asks.empty())
         return;
 
@@ -32,69 +31,69 @@ void OrderBook::popBestAsk() {
         asks.erase(it);
 }
 
-void OrderBook::cancelBuyOrder(const Order& order) {
-    for (auto mapIt = bids.begin(); mapIt != bids.end(); ++mapIt) {
-        auto& orderList = mapIt->second;
+void OrderBook::cancel(const Order& order) {
+    if (order.side == Side::Buy) {
+        for (auto mapIt = bids.begin(); mapIt != bids.end(); ++mapIt) {
+            auto& orderList = mapIt->second;
 
-        for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
-            if ((*listIt)->orderId == order.orderId) {
-                if (order.eventType == EventType::FullCancel)
-                    orderList.erase(listIt);
-                else if (order.eventType == EventType::PartialCancel) {
-                    if ((*listIt)->quantity <= order.quantity)
+            for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
+                if (listIt->orderId == order.orderId) {
+                    if (order.eventType == EventType::FullCancel)
                         orderList.erase(listIt);
-                    else
-                        (*listIt)->quantity -= order.quantity;
+                    else if (order.eventType == EventType::PartialCancel) {
+                        if (listIt->quantity <= order.quantity)
+                            orderList.erase(listIt);
+                        else
+                            listIt->quantity -= order.quantity;
+                    }
+
+                    if (orderList.empty())
+                        bids.erase(mapIt);
+
+                    return;
                 }
+            }
+        }
+    } else {
+        for (auto mapIt = asks.begin(); mapIt != asks.end(); ++mapIt) {
+            auto& orderList = mapIt->second;
 
-                if (orderList.empty())
-                    bids.erase(mapIt);
+            for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
+                if (listIt->orderId == order.orderId) {
+                    if (order.eventType == EventType::FullCancel)
+                        orderList.erase(listIt);
+                    else if (order.eventType == EventType::PartialCancel) {
+                        if (listIt->quantity <= order.quantity)
+                            orderList.erase(listIt);
+                        else
+                            listIt->quantity -= order.quantity;
+                    }
 
-                return;
+                    if (orderList.empty())
+                        asks.erase(mapIt);
+
+                    return;
+                }
             }
         }
     }
 }
 
-void OrderBook::cancelSellOrder(const Order& order) {
-    for (auto mapIt = asks.begin(); mapIt != asks.end(); ++mapIt) {
-        auto& orderList = mapIt->second;
-
-        for (auto listIt = orderList.begin(); listIt != orderList.end(); ++listIt) {
-            if ((*listIt)->orderId == order.orderId) {
-                if (order.eventType == EventType::FullCancel)
-                    orderList.erase(listIt);
-                else if (order.eventType == EventType::PartialCancel) {
-                    if ((*listIt)->quantity <= order.quantity)
-                        orderList.erase(listIt);
-                    else
-                        (*listIt)->quantity -= order.quantity;
-                }
-
-                if (orderList.empty())
-                    asks.erase(mapIt);
-
-                return;
-            }
-        }
-    }
-}
-
-Order* OrderBook::getBestBid() {
+Order* OrderBook::bestBid() {
     if (bids.empty())
         return nullptr;
 
-    return bids.begin()->second.front().get();
+    return &bids.begin()->second.front();
 }
 
-Order* OrderBook::getBestAsk() {
+Order* OrderBook::bestAsk() {
     if (asks.empty())
         return nullptr;
 
-    return asks.begin()->second.front().get();
+    return &asks.begin()->second.front();
 }
 
-std::vector<OrderBookLevel> OrderBook::getBookState(std::size_t depth) const {
+std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
     if (depth == 0)
         return {};
 
@@ -111,7 +110,7 @@ std::vector<OrderBookLevel> OrderBook::getBookState(std::size_t depth) const {
             currLevel.bidPrice = bidIt->first;
 
             for (const auto& orderPtr : bidIt->second)
-                currLevel.bidQty += orderPtr.get()->quantity;
+                currLevel.bidQty += orderPtr.quantity;
 
             ++bidIt;
         }
@@ -120,7 +119,7 @@ std::vector<OrderBookLevel> OrderBook::getBookState(std::size_t depth) const {
             currLevel.askPrice = askIt->first;
 
             for (const auto& orderPtr : askIt->second)
-                currLevel.askQty += orderPtr.get()->quantity;
+                currLevel.askQty += orderPtr.quantity;
 
             ++askIt;
         }

@@ -5,7 +5,6 @@
 #include <x86intrin.h>
 #include <cstdio>
 #include <print>
-#include <pthread.h>
 #include <thread>
 
 #include "LobsterOrderLoader.hpp"
@@ -38,7 +37,7 @@ void Application::run() {
         if (config.measureLatency)
             latencies.clear();
 
-        matchingEngine = std::make_unique<MatchingEngine>();
+        matchingEngine = MatchingEngine();
         double durationS = matchOrders();
         double durationMs = durationS * 1000.0;
 
@@ -103,7 +102,7 @@ double Application::matchOrders() {
             uint64_t tickStart = __rdtsc();
             _mm_lfence();
 
-            matchingEngine->processOrder(order, trades);
+            matchingEngine.processOrder(order, trades);
 
             unsigned int aux;
             uint64_t tickEnd = __rdtscp(&aux);
@@ -113,7 +112,7 @@ double Application::matchOrders() {
         }
     } else {
         for (const auto& order : orders)
-            matchingEngine->processOrder(order, trades);
+            matchingEngine.processOrder(order, trades);
     }
 
     auto matchingEnd = std::chrono::steady_clock::now();

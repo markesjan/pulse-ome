@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Config.hpp"
 #include "Order.hpp"
 #include "MatchingEngine.hpp"
@@ -16,7 +14,7 @@ public:
 
 private:
     Config config;
-    std::unique_ptr<MatchingEngine> matchingEngine;
+    MatchingEngine matchingEngine;
 
     std::vector<Order> orders;
     std::vector<Trade> trades;

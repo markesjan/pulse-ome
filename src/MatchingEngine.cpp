@@ -12,9 +12,7 @@ void MatchingEngine::processOrder(const Order& order, std::vector<Trade>& trades
 
         case EventType::PartialCancel:
         case EventType::FullCancel:
-            order.side == Side::Buy
-                ? orderBook.cancelBuyOrder(order)
-                : orderBook.cancelSellOrder(order);
+            orderBook.cancel(order);
             break;
 
         default:
@@ -26,7 +24,7 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
     Order currOrder = order;
 
     while (currOrder.quantity > 0) {
-        Order* bestAsk = orderBook.getBestAsk();
+        Order* bestAsk = orderBook.bestAsk();
 
         if (!bestAsk || currOrder.price < bestAsk->price)
             break;
@@ -46,18 +44,18 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
         bestAsk->quantity -= tradeQty;
 
         if (bestAsk->quantity == 0)
-            orderBook.popBestAsk();
+            orderBook.removeBestAsk();
     }
 
     if (currOrder.quantity > 0)
-        orderBook.addBid(currOrder);
+        orderBook.insert(currOrder);
 }
 
 void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& trades) {
     Order currOrder = order;
 
     while (currOrder.quantity > 0) {
-        Order* bestBid = orderBook.getBestBid();
+        Order* bestBid = orderBook.bestBid();
 
         if (!bestBid || currOrder.price > bestBid->price)
             break;
@@ -77,15 +75,15 @@ void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& tr
         bestBid->quantity -= tradeQty;
 
         if (bestBid->quantity == 0)
-            orderBook.popBestBid();
+            orderBook.removeBestBid();
     }
 
     if (currOrder.quantity > 0)
-        orderBook.addAsk(currOrder);
+        orderBook.insert(currOrder);
 }
 
 std::vector<OrderBookLevel> MatchingEngine::getBookState(std::size_t depth) const {
-    return orderBook.getBookState(depth);
+    return orderBook.bookState(depth);
 }
 
 } // namespace engine
