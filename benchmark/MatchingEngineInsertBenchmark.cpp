@@ -113,5 +113,5 @@ static void BM_MatchingEngineInsertNewPrice(benchmark::State& state) {
 BENCHMARK(BM_MatchingEngineInsertNewPrice)
     ->RangeMultiplier(4)
     ->Range(8, 1'000'000)
-    ->Complexity(benchmark::oAuto)
+    ->Complexity(benchmark::oLogN)
     ->Unit(benchmark::kNanosecond);
