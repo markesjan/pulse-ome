@@ -26,7 +26,8 @@ public:
     std::vector<OrderBookLevel> bookState(std::size_t depth) const;
 
 private:
-    std::pmr::synchronized_pool_resource memoryPool;
+    std::unique_ptr<std::byte[]> preallocBuffer;
+    std::pmr::monotonic_buffer_resource memoryPool;
 
     using PmrOrderVector = std::pmr::vector<Order>;
     using PmrBidsMap = std::pmr::map<Price, PmrOrderVector, std::greater<>>;

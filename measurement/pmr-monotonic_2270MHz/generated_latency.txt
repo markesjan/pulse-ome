@@ -1,0 +1,99 @@
+cmake-build-release (feature/pmr-monotonic) ✗ ./matching_engine -l -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        26.33 ms
+[ 1/10] Bench: 24.81 ms
+[ 2/10] Bench: 24.42 ms
+[ 3/10] Bench: 24.62 ms
+[ 4/10] Bench: 24.82 ms
+[ 5/10] Bench: 24.94 ms
+[ 6/10] Bench: 25.13 ms
+[ 7/10] Bench: 25.49 ms
+[ 8/10] Bench: 24.64 ms
+[ 9/10] Bench: 24.59 ms
+[10/10] Bench: 24.63 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        24.81 ms
+Avg throughput:      4.03 M orders/s
+
+--- Latency ---
+Min:                 70 ns
+Max:                 1442697 ns
+Average:             206 ns
+Median (p50):        90 ns
+90. perc (p90):      100 ns
+99. perc (p99):      2893 ns
+99.9. perc (p99.9):  5507 ns
+=============================================
+ cmake-build-release (feature/pmr-monotonic) ✗ ./matching_engine -l -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        20.08 ms
+[ 1/10] Bench: 19.00 ms
+[ 2/10] Bench: 18.15 ms
+[ 3/10] Bench: 18.61 ms
+[ 4/10] Bench: 18.39 ms
+[ 5/10] Bench: 18.26 ms
+[ 6/10] Bench: 18.38 ms
+[ 7/10] Bench: 18.55 ms
+[ 8/10] Bench: 18.39 ms
+[ 9/10] Bench: 18.00 ms
+[10/10] Bench: 18.07 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        18.38 ms
+Avg throughput:      5.44 M orders/s
+
+--- Latency ---
+Min:                 50 ns
+Max:                 668442 ns
+Average:             141 ns
+Median (p50):        80 ns
+90. perc (p90):      110 ns
+99. perc (p99):      160 ns
+99.9. perc (p99.9):  3604 ns
+=============================================
+ cmake-build-release (feature/pmr-monotonic) ✗ ./matching_engine -l -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        35.72 ms
+[ 1/10] Bench: 32.98 ms
+[ 2/10] Bench: 31.63 ms
+[ 3/10] Bench: 31.30 ms
+[ 4/10] Bench: 31.31 ms
+[ 5/10] Bench: 31.01 ms
+[ 6/10] Bench: 30.95 ms
+[ 7/10] Bench: 30.88 ms
+[ 8/10] Bench: 30.86 ms
+[ 9/10] Bench: 30.93 ms
+[10/10] Bench: 30.86 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69722
+Match rate:          69.72 %
+Avg duration:        31.27 ms
+Avg throughput:      3.20 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 337055 ns
+Average:             268 ns
+Median (p50):        210 ns
+90. perc (p90):      310 ns
+99. perc (p99):      3264 ns
+99.9. perc (p99.9):  5037 ns
+=============================================

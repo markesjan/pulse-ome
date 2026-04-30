@@ -2,8 +2,12 @@
 
 namespace engine {
 
+constexpr std::size_t ONE_GB = 1024ULL * 1024ULL * 1024ULL;
+
 OrderBook::OrderBook()
-    : locations(&memoryPool), bids(&memoryPool), asks(&memoryPool) {
+    : preallocBuffer(std::make_unique_for_overwrite<std::byte[]>(ONE_GB)),
+      memoryPool(preallocBuffer.get(), ONE_GB, std::pmr::new_delete_resource()),
+      locations(&memoryPool), bids(&memoryPool), asks(&memoryPool) {
 }
 
 void OrderBook::insert(const Order& order) {
