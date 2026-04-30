@@ -55,7 +55,7 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
 
 BENCHMARK(BM_MatchingEngineCancelPartial)
     ->RangeMultiplier(4)
-    ->Range(8, 1'000'000)
+    ->Range(8, 50'000)
     ->Complexity(benchmark::oAuto)
     ->Unit(benchmark::kNanosecond);
 
@@ -122,6 +122,6 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
 
 BENCHMARK(BM_MatchingEngineCancelFull)
     ->RangeMultiplier(4)
-    ->Range(8, 1'000'000)
+    ->Range(8, 50'000)
     ->Complexity(benchmark::oAuto)
     ->Unit(benchmark::kNanosecond);

@@ -44,7 +44,7 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
         bestAsk->quantity -= tradeQty;
 
         if (bestAsk->quantity == 0)
-            orderBook.removeBestAsk();
+            orderBook.eraseLocation(bestAsk->orderId);
     }
 
     if (currOrder.quantity > 0)
@@ -75,7 +75,7 @@ void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& tr
         bestBid->quantity -= tradeQty;
 
         if (bestBid->quantity == 0)
-            orderBook.removeBestBid();
+            orderBook.eraseLocation(bestBid->orderId);
     }
 
     if (currOrder.quantity > 0)
