@@ -46,11 +46,11 @@ TEST_F(OrderBookTest, InsertOnceRetrievesAsBestAsk) {
     EXPECT_EQ(bestAsk->quantity, 100);
 }
 
-TEST_F(OrderBookTest, RemoveBestBidRemovesTopOrderAndPreservesLevel) {
+TEST_F(OrderBookTest, CancelTopBidExposesNextOrderAndPreservesLevel) {
     orderBook.insert(createBuy(1, 10000, 50));
     orderBook.insert(createBuy(2, 10000, 40));
 
-    orderBook.removeBestBid();
+    orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Buy));
 
     auto bestBid = orderBook.bestBid();
     ASSERT_NE(bestBid, nullptr);
@@ -58,18 +58,11 @@ TEST_F(OrderBookTest, RemoveBestBidRemovesTopOrderAndPreservesLevel) {
     EXPECT_EQ(bestBid->quantity, 40);
 }
 
-TEST_F(OrderBookTest, RemoveBestBidRemovesLevelWhenEmpty) {
-    orderBook.insert(createBuy(1, 10000, 50));
-    orderBook.removeBestBid();
-
-    EXPECT_EQ(orderBook.bestBid(), nullptr);
-}
-
-TEST_F(OrderBookTest, RemoveBestAskRemovesTopOrderAndPreservesLevel) {
+TEST_F(OrderBookTest, CancelTopAskExposesNextOrderAndPreservesLevel) {
     orderBook.insert(createSell(1, 15000, 50));
     orderBook.insert(createSell(2, 15000, 40));
 
-    orderBook.removeBestAsk();
+    orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Sell));
 
     auto bestAsk = orderBook.bestAsk();
     ASSERT_NE(bestAsk, nullptr);
@@ -77,28 +70,16 @@ TEST_F(OrderBookTest, RemoveBestAskRemovesTopOrderAndPreservesLevel) {
     EXPECT_EQ(bestAsk->quantity, 40);
 }
 
-TEST_F(OrderBookTest, RemoveBestAskRemovesLevelWhenEmpty) {
-    orderBook.insert(createSell(1, 15000, 50));
-    orderBook.removeBestAsk();
-
-    EXPECT_EQ(orderBook.bestAsk(), nullptr);
-}
-
-TEST_F(OrderBookTest, RemoveOnEmptyBookDoesNothing) {
-    EXPECT_NO_THROW(orderBook.removeBestBid());
-    EXPECT_NO_THROW(orderBook.removeBestAsk());
-}
-
 TEST_F(OrderBookTest, CancelFullRemovesBidOrder) {
     orderBook.insert(createBuy(1, 10000, 50));
-    orderBook.cancel(createCancel(1, 0, EventType::FullCancel, Side::Buy));
+    orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Buy));
 
     EXPECT_EQ(orderBook.bestBid(), nullptr);
 }
 
 TEST_F(OrderBookTest, CancelFullRemovesAskOrder) {
     orderBook.insert(createSell(1, 15000, 50));
-    orderBook.cancel(createCancel(1, 0, EventType::FullCancel, Side::Sell));
+    orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Sell));
 
     EXPECT_EQ(orderBook.bestAsk(), nullptr);
 }
@@ -131,19 +112,50 @@ TEST_F(OrderBookTest, CancelPartialGreaterOrEqualRemovesBidOrder) {
 TEST_F(OrderBookTest, CancelNonExistentBidOrderDoesNothing) {
     orderBook.insert(createBuy(1, 10000, 50));
     EXPECT_NO_THROW(
-        orderBook.cancel(createCancel(999, 0, EventType::FullCancel, Side::Buy)));
+        orderBook.cancel(createCancel(999, 50, EventType::FullCancel, Side::Buy)));
 
     ASSERT_NE(orderBook.bestBid(), nullptr);
     EXPECT_EQ(orderBook.bestBid()->quantity, 50);
 }
 
-TEST_F(OrderBookTest, GetBookStateZeroDepthReturnsEmptyVector) {
+TEST_F(OrderBookTest, CancelFirstOrderDoesNotCorruptIndicesOfRemainingOrders) {
+    orderBook.insert(createBuy(1, 10000, 50));
+    orderBook.insert(createBuy(2, 10000, 40));
+
+    orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Buy));
+
+    EXPECT_NO_THROW(orderBook.cancel(createCancel(2, 40, EventType::FullCancel, Side::Buy)));
+
+    EXPECT_EQ(orderBook.bestBid(), nullptr);
+}
+
+TEST_F(OrderBookTest, CancelMiddleOrderDoesNotCorruptSubsequentOrders) {
+    orderBook.insert(createSell(1, 15000, 10));
+    orderBook.insert(createSell(2, 15000, 20));
+    orderBook.insert(createSell(3, 15000, 30));
+
+    orderBook.cancel(createCancel(2, 20, EventType::FullCancel, Side::Sell));
+
+    EXPECT_NO_THROW(orderBook.cancel(createCancel(3, 30, EventType::FullCancel, Side::Sell)));
+
+    auto bestAsk = orderBook.bestAsk();
+    ASSERT_NE(bestAsk, nullptr);
+    EXPECT_EQ(bestAsk->orderId, 1);
+    EXPECT_EQ(bestAsk->quantity, 10);
+}
+
+TEST_F(OrderBookTest, CancelOnEmptyBookDoesNothing) {
+    EXPECT_NO_THROW(orderBook.cancel(createCancel(1, 50, EventType::FullCancel, Side::Buy)));
+    EXPECT_NO_THROW(orderBook.cancel(createCancel(2, 50, EventType::FullCancel, Side::Sell)));
+}
+
+TEST_F(OrderBookTest, BookStateZeroDepthReturnsEmptyVector) {
     orderBook.insert(createBuy(1, 10000, 50));
     auto state = orderBook.bookState(0);
     EXPECT_TRUE(state.empty());
 }
 
-TEST_F(OrderBookTest, GetBookStateReturnsCorrectAggregatedDepths) {
+TEST_F(OrderBookTest, BookStateReturnsCorrectAggregatedDepths) {
     orderBook.insert(createBuy(1, 10000, 50));
     orderBook.insert(createBuy(2, 10000, 30));
     orderBook.insert(createBuy(3, 9900, 100));
