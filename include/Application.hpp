@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "Config.hpp"
 #include "Order.hpp"
 #include "MatchingEngine.hpp"
@@ -14,7 +16,7 @@ public:
 
 private:
     Config config;
-    MatchingEngine matchingEngine;
+    std::optional<MatchingEngine> matchingEngine;
 
     std::vector<Order> orders;
     std::vector<Trade> trades;

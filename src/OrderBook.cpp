@@ -2,6 +2,10 @@
 
 namespace engine {
 
+OrderBook::OrderBook()
+    : locations(&memoryPool), bids(&memoryPool), asks(&memoryPool) {
+}
+
 void OrderBook::insert(const Order& order) {
     if (order.side == Side::Buy) {
         locations[order.orderId] = {Side::Buy, order.price, bids[order.price].size()};
@@ -20,8 +24,8 @@ void OrderBook::cancel(const Order& order) {
     const auto& loc = it->second;
 
     Order& targetOrder = (loc.side == Side::Buy)
-        ? bids[loc.price][loc.vecIdx]
-        : asks[loc.price][loc.vecIdx];
+                             ? bids[loc.price][loc.vecIdx]
+                             : asks[loc.price][loc.vecIdx];
 
     if (order.quantity >= targetOrder.quantity) {
         targetOrder.quantity = 0;

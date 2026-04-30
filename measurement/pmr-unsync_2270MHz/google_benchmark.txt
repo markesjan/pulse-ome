@@ -1,0 +1,97 @@
+cmake-build-release (feature/direct-indexing) ✗ ./engine_benchmarks                                                   
+2026-04-30T20:07:45+02:00
+Running ./engine_benchmarks
+Run on (12 X 2270.74 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x6)
+  L1 Instruction 32 KiB (x6)
+  L2 Unified 512 KiB (x6)
+  L3 Unified 16384 KiB (x1)
+Load Average: 0.44, 0.24, 0.09
+---------------------------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations UserCounters...
+---------------------------------------------------------------------------------------------------
+BM_MatchingEngineCancelPartial/8               8.36 ns         8.35 ns     83500000 items_per_second=119.718M/s
+BM_MatchingEngineCancelPartial/16              8.20 ns         8.19 ns     85230000 items_per_second=122.056M/s
+BM_MatchingEngineCancelPartial/64              8.36 ns         8.35 ns     83450000 items_per_second=119.732M/s
+BM_MatchingEngineCancelPartial/256             10.0 ns         10.0 ns     69860000 items_per_second=99.919M/s
+BM_MatchingEngineCancelPartial/1024            9.78 ns         9.77 ns     71550000 items_per_second=102.329M/s
+BM_MatchingEngineCancelPartial/4096            9.39 ns         9.36 ns     74910000 items_per_second=106.801M/s
+BM_MatchingEngineCancelPartial/16384           8.51 ns         8.50 ns     82180000 items_per_second=117.697M/s
+BM_MatchingEngineCancelPartial/50000           6.44 ns         6.41 ns    109350000 items_per_second=156.125M/s
+BM_MatchingEngineCancelPartial_BigO            8.63 (1)        8.62 (1)  
+BM_MatchingEngineCancelPartial_RMS               12 %            12 %    
+BM_MatchingEngineCancelFull/8                  44.3 ns         44.3 ns     15780000 items_per_second=22.5579M/s
+BM_MatchingEngineCancelFull/16                 44.3 ns         44.3 ns     15800000 items_per_second=22.5595M/s
+BM_MatchingEngineCancelFull/64                 44.4 ns         44.4 ns     15790000 items_per_second=22.5463M/s
+BM_MatchingEngineCancelFull/256                46.8 ns         46.8 ns     14940000 items_per_second=21.3855M/s
+BM_MatchingEngineCancelFull/1024               46.5 ns         46.5 ns     15090000 items_per_second=21.5115M/s
+BM_MatchingEngineCancelFull/4096               44.9 ns         44.9 ns     15590000 items_per_second=22.2746M/s
+BM_MatchingEngineCancelFull/16384              43.8 ns         43.8 ns     15960000 items_per_second=22.8307M/s
+BM_MatchingEngineCancelFull/50000              43.7 ns         43.7 ns     16040000 items_per_second=22.8961M/s
+BM_MatchingEngineCancelFull_BigO              44.84 (1)       44.83 (1)  
+BM_MatchingEngineCancelFull_RMS                   2 %             2 %    
+BM_MatchingEngineInsertSamePrice/8             75.1 ns         75.2 ns      9310000 items_per_second=13.3061M/s
+BM_MatchingEngineInsertSamePrice/16            75.1 ns         75.1 ns      9330000 items_per_second=13.3168M/s
+BM_MatchingEngineInsertSamePrice/64            74.9 ns         74.9 ns      9330000 items_per_second=13.3423M/s
+BM_MatchingEngineInsertSamePrice/256           74.9 ns         74.9 ns      9340000 items_per_second=13.3519M/s
+BM_MatchingEngineInsertSamePrice/1024          78.6 ns         78.6 ns      8890000 items_per_second=12.7221M/s
+BM_MatchingEngineInsertSamePrice/4096          76.3 ns         76.3 ns      9160000 items_per_second=13.1122M/s
+BM_MatchingEngineInsertSamePrice/16384         79.0 ns         78.9 ns      8660000 items_per_second=12.667M/s
+BM_MatchingEngineInsertSamePrice/65536         87.0 ns         87.0 ns      8040000 items_per_second=11.492M/s
+BM_MatchingEngineInsertSamePrice/262144         193 ns          193 ns      3490000 items_per_second=5.1798M/s
+BM_MatchingEngineInsertSamePrice/1000000       94.7 ns         94.5 ns      7390000 items_per_second=10.5832M/s
+BM_MatchingEngineInsertSamePrice_BigO         90.86 (1)       90.85 (1)  
+BM_MatchingEngineInsertSamePrice_RMS             38 %            38 %    
+BM_MatchingEngineInsertNewPrice/8               360 ns          360 ns      1950000 items_per_second=2.77606M/s
+BM_MatchingEngineInsertNewPrice/16              361 ns          361 ns      1940000 items_per_second=2.7682M/s
+BM_MatchingEngineInsertNewPrice/64              370 ns          370 ns      1900000 items_per_second=2.70447M/s
+BM_MatchingEngineInsertNewPrice/256             365 ns          365 ns      1920000 items_per_second=2.7422M/s
+BM_MatchingEngineInsertNewPrice/1024            374 ns          374 ns      1880000 items_per_second=2.67031M/s
+BM_MatchingEngineInsertNewPrice/4096            416 ns          416 ns      1680000 items_per_second=2.40406M/s
+BM_MatchingEngineInsertNewPrice/16384           507 ns          507 ns      1390000 items_per_second=1.97404M/s
+BM_MatchingEngineInsertNewPrice/65536           561 ns          561 ns      1200000 items_per_second=1.78132M/s
+BM_MatchingEngineInsertNewPrice/262144          613 ns          612 ns      1080000 items_per_second=1.63272M/s
+BM_MatchingEngineInsertNewPrice/1000000         648 ns          648 ns      1010000 items_per_second=1.54324M/s
+BM_MatchingEngineInsertNewPrice_BigO          36.58 lgN       36.58 lgN  
+BM_MatchingEngineInsertNewPrice_RMS              26 %            26 %    
+BM_MatchingEngineMatchSingle/8                 4282 ns         4282 ns       170000 items_per_second=233.535k/s
+BM_MatchingEngineMatchSingle/16                4295 ns         4295 ns       170000 items_per_second=232.832k/s
+BM_MatchingEngineMatchSingle/64                4301 ns         4301 ns       170000 items_per_second=232.498k/s
+BM_MatchingEngineMatchSingle/256               4293 ns         4293 ns       170000 items_per_second=232.956k/s
+BM_MatchingEngineMatchSingle/1024              4301 ns         4301 ns       170000 items_per_second=232.488k/s
+BM_MatchingEngineMatchSingle/4096              4302 ns         4302 ns       170000 items_per_second=232.441k/s
+BM_MatchingEngineMatchSingle/16384             4310 ns         4310 ns       170000 items_per_second=232.043k/s
+BM_MatchingEngineMatchSingle/65536             4307 ns         4307 ns       170000 items_per_second=232.181k/s
+BM_MatchingEngineMatchSingle/262144            4307 ns         4306 ns       170000 items_per_second=232.211k/s
+BM_MatchingEngineMatchSingle/1000000           4313 ns         4313 ns       170000 items_per_second=231.876k/s
+BM_MatchingEngineMatchSingle_BigO           4301.10 (1)     4300.98 (1)  
+BM_MatchingEngineMatchSingle_RMS                  0 %             0 %    
+BM_MatchingEngineMatchSweep/8                  1145 ns         1143 ns       612800 items_per_second=6.99976M/s
+BM_MatchingEngineMatchSweep/16                 2234 ns         2233 ns       314200 items_per_second=7.1656M/s
+BM_MatchingEngineMatchSweep/32                 4403 ns         4402 ns       158900 items_per_second=7.26962M/s
+BM_MatchingEngineMatchSweep/64                 8734 ns         8733 ns        80000 items_per_second=7.32846M/s
+BM_MatchingEngineMatchSweep/128               17379 ns        17379 ns        40500 items_per_second=7.36531M/s
+BM_MatchingEngineMatchSweep/256               35304 ns        35304 ns        20000 items_per_second=7.25135M/s
+BM_MatchingEngineMatchSweep/512               76838 ns        76839 ns         9100 items_per_second=6.66332M/s
+BM_MatchingEngineMatchSweep/1024             160272 ns       160272 ns         4300 items_per_second=6.38912M/s
+BM_MatchingEngineMatchSweep/2048             330027 ns       330023 ns         2200 items_per_second=6.20563M/s
+BM_MatchingEngineMatchSweep/4096             680617 ns       680584 ns          900 items_per_second=6.01836M/s
+BM_MatchingEngineMatchSweep/8192            1427188 ns      1427085 ns          500 items_per_second=5.74037M/s
+BM_MatchingEngineMatchSweep/16384           2783241 ns      2782821 ns          300 items_per_second=5.88755M/s
+BM_MatchingEngineMatchSweep/32768           3833955 ns      3833865 ns          200 items_per_second=8.54699M/s
+BM_MatchingEngineMatchSweep/50000           3857001 ns      3856815 ns          200 items_per_second=12.9641M/s
+BM_MatchingEngineMatchSweep_BigO              96.51 N         96.51 N    
+BM_MatchingEngineMatchSweep_RMS                  52 %            52 %    
+BM_MatchingEngineFullWorkload/8                 374 ns          374 ns      1880000 items_per_second=2.67503M/s
+BM_MatchingEngineFullWorkload/16                374 ns          374 ns      1880000 items_per_second=2.67543M/s
+BM_MatchingEngineFullWorkload/64                371 ns          371 ns      1890000 items_per_second=2.69243M/s
+BM_MatchingEngineFullWorkload/256               370 ns          370 ns      1890000 items_per_second=2.70086M/s
+BM_MatchingEngineFullWorkload/1024              374 ns          374 ns      1880000 items_per_second=2.67357M/s
+BM_MatchingEngineFullWorkload/4096              372 ns          372 ns      1880000 items_per_second=2.69104M/s
+BM_MatchingEngineFullWorkload/16384             375 ns          375 ns      1870000 items_per_second=2.66493M/s
+BM_MatchingEngineFullWorkload/65536             370 ns          370 ns      1900000 items_per_second=2.70183M/s
+BM_MatchingEngineFullWorkload/262144            371 ns          371 ns      1890000 items_per_second=2.69904M/s
+BM_MatchingEngineFullWorkload/1000000           371 ns          370 ns      1900000 items_per_second=2.69909M/s
+BM_MatchingEngineFullWorkload_BigO           372.19 (1)      372.13 (1)  
+BM_MatchingEngineFullWorkload_RMS                 0 %             0 %
