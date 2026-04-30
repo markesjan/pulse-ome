@@ -109,8 +109,8 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
         if (bidIt != bids.end()) {
             currLevel.bidPrice = bidIt->first;
 
-            for (const auto& orderPtr : bidIt->second)
-                currLevel.bidQty += orderPtr.quantity;
+            for (const auto& order : bidIt->second)
+                currLevel.bidQty += order.quantity;
 
             ++bidIt;
         }
@@ -118,8 +118,8 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
         if (askIt != asks.end()) {
             currLevel.askPrice = askIt->first;
 
-            for (const auto& orderPtr : askIt->second)
-                currLevel.askQty += orderPtr.quantity;
+            for (const auto& order : askIt->second)
+                currLevel.askQty += order.quantity;
 
             ++askIt;
         }
