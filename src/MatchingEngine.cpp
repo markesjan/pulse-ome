@@ -29,7 +29,7 @@ void MatchingEngine::processBuyOrder(const Order& order, std::vector<Trade>& tra
         if (!bestAsk || currOrder.price < bestAsk->price)
             break;
 
-        uint32_t tradeQty = std::min(currOrder.quantity, bestAsk->quantity);
+        Quantity tradeQty = std::min(currOrder.quantity, bestAsk->quantity);
 
         trades.emplace_back(Trade{
             currOrder.timestamp,
@@ -60,7 +60,7 @@ void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& tr
         if (!bestBid || currOrder.price > bestBid->price)
             break;
 
-        uint32_t tradeQty = std::min(currOrder.quantity, bestBid->quantity);
+        Quantity tradeQty = std::min(currOrder.quantity, bestBid->quantity);
 
         trades.emplace_back(Trade{
             currOrder.timestamp,

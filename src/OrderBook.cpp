@@ -1,29 +1,42 @@
 #include "OrderBook.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 
 namespace engine {
 
-OrderBook::OrderBook(std::size_t maxOrders) {
+OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice) {
     ordersPool.reserve(maxOrders);
     freeIndices.reserve(maxOrders);
+
+    bids.resize(maxPrice + 1);
+    asks.resize(maxPrice + 1);
+
+    locations.resize(maxOrders, INVALID_INDEX);
 }
 
 void OrderBook::insert(const Order& order) {
     OrderIndex idx = allocateOrder(order);
     locations[order.orderId] = idx;
 
-    order.side == Side::Buy
-        ? bids[order.price].push_back(idx)
-        : asks[order.price].push_back(idx);
+    if (order.side == Side::Buy) {
+        bids[order.price].push_back(idx);
+
+        if (order.price > currBestBid)
+            currBestBid = order.price;
+    } else {
+        asks[order.price].push_back(idx);
+
+        if (order.price < currBestAsk)
+            currBestAsk = order.price;
+    }
 }
 
 void OrderBook::cancel(const Order& order) {
-    auto locIt = locations.find(order.orderId);
-    if (locIt == locations.end())
-        return;
+    OrderIndex idx = locations[order.orderId];
 
-    OrderIndex idx = locIt->second;
+    if (idx == INVALID_INDEX)
+        return;
 
     Order& poolOrder = ordersPool[idx];
 
@@ -35,17 +48,17 @@ void OrderBook::cancel(const Order& order) {
     }
 
     poolOrder.quantity = 0;
-    locations.erase(locIt);
+    locations[order.orderId] = INVALID_INDEX;
 }
 
 void OrderBook::eraseLocation(OrderId orderId) {
-    locations.erase(orderId);
+    if (orderId < locations.size())
+        locations[orderId] = INVALID_INDEX;
 }
 
 Order* OrderBook::bestBid() {
-    while (!bids.empty()) {
-        auto levelIt = bids.begin();
-        auto& level = levelIt->second;
+    while (currBestBid > 0) {
+        std::vector<OrderIndex>& level = bids[currBestBid];
 
         while (!level.empty()) {
             OrderIndex frontIdx = level.front();
@@ -58,16 +71,15 @@ Order* OrderBook::bestBid() {
             }
         }
 
-        bids.erase(levelIt);
+        currBestBid--;
     }
 
     return nullptr;
 }
 
 Order* OrderBook::bestAsk() {
-    while (!asks.empty()) {
-        auto levelIt = asks.begin();
-        auto& level = levelIt->second;
+    while (currBestAsk < asks.size()) {
+        std::vector<OrderIndex>& level = asks[currBestAsk];
 
         while (!level.empty()) {
             OrderIndex frontIdx = level.front();
@@ -80,7 +92,7 @@ Order* OrderBook::bestAsk() {
             }
         }
 
-        asks.erase(levelIt);
+        currBestAsk++;
     }
 
     return nullptr;
@@ -93,41 +105,50 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
     std::vector<OrderBookLevel> state;
     state.reserve(depth);
 
-    auto bidIt = bids.begin();
-    auto askIt = asks.begin();
+    Price scanBid = currBestBid;
+    Price scanAsk = currBestAsk;
 
     for (std::size_t i = 0; i < depth; ++i) {
         OrderBookLevel currLevel{};
+        bool foundBid = false;
+        bool foundAsk = false;
 
-        while (bidIt != bids.end()) {
+        while (scanBid > 0 && !foundBid) {
+            const std::vector<OrderIndex>& level = bids[scanBid];
             Quantity totalQty = 0;
-            for (const auto& index : bidIt->second)
-                totalQty += ordersPool[index].quantity;
+
+            for (OrderIndex idx : level)
+                totalQty += ordersPool[idx].quantity;
 
             if (totalQty > 0) {
-                currLevel.bidPrice = bidIt->first;
+                currLevel.bidPrice = scanBid;
                 currLevel.bidQty = totalQty;
-                ++bidIt;
-                break;
+                foundBid = true;
             }
-            ++bidIt;
+            scanBid--;
         }
 
-        while (askIt != asks.end()) {
+        while (scanAsk < asks.size() && !foundAsk) {
+            const std::vector<OrderIndex>& level = asks[scanAsk];
             Quantity totalQty = 0;
-            for (const auto& index : askIt->second)
-                totalQty += ordersPool[index].quantity;
+
+            for (OrderIndex idx : level)
+                totalQty += ordersPool[idx].quantity;
 
             if (totalQty > 0) {
-                currLevel.askPrice = askIt->first;
+                currLevel.askPrice = scanAsk;
                 currLevel.askQty = totalQty;
-                ++askIt;
-                break;
+                foundAsk = true;
             }
-            ++askIt;
+            scanAsk++;
         }
 
-        state.push_back(currLevel);
+        if (foundBid || foundAsk) {
+            state.push_back(currLevel);
+        } else {
+            state.resize(depth);
+            break;
+        }
     }
 
     return state;
