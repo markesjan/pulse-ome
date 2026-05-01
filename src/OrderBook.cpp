@@ -1,42 +1,41 @@
 #include "OrderBook.hpp"
 
+#include <algorithm>
+
 namespace engine {
 
-constexpr std::size_t ONE_GB = 1024ULL * 1024ULL * 1024ULL;
-
-OrderBook::OrderBook()
-    : preallocBuffer(std::make_unique_for_overwrite<std::byte[]>(ONE_GB)),
-      memoryPool(preallocBuffer.get(), ONE_GB, std::pmr::new_delete_resource()),
-      locations(&memoryPool), bids(&memoryPool), asks(&memoryPool) {
+OrderBook::OrderBook(std::size_t maxOrders) {
+    ordersPool.reserve(maxOrders);
+    freeIndices.reserve(maxOrders);
 }
 
 void OrderBook::insert(const Order& order) {
-    if (order.side == Side::Buy) {
-        locations[order.orderId] = {Side::Buy, order.price, bids[order.price].size()};
-        bids[order.price].push_back(order);
-    } else {
-        locations[order.orderId] = {Side::Sell, order.price, asks[order.price].size()};
-        asks[order.price].push_back(order);
-    }
+    OrderIndex idx = allocateOrder(order);
+    locations[order.orderId] = idx;
+
+    order.side == Side::Buy
+        ? bids[order.price].push_back(idx)
+        : asks[order.price].push_back(idx);
 }
 
 void OrderBook::cancel(const Order& order) {
-    auto it = locations.find(order.orderId);
-    if (it == locations.end())
+    auto locIt = locations.find(order.orderId);
+    if (locIt == locations.end())
         return;
 
-    const auto& loc = it->second;
+    OrderIndex idx = locIt->second;
 
-    Order& targetOrder = (loc.side == Side::Buy)
-                             ? bids[loc.price][loc.vecIdx]
-                             : asks[loc.price][loc.vecIdx];
+    Order& poolOrder = ordersPool[idx];
 
-    if (order.quantity >= targetOrder.quantity) {
-        targetOrder.quantity = 0;
-        locations.erase(it);
-    } else {
-        targetOrder.quantity -= order.quantity;
+    if (order.eventType == EventType::PartialCancel) {
+        if (poolOrder.quantity > order.quantity) {
+            poolOrder.quantity -= order.quantity;
+            return;
+        }
     }
+
+    poolOrder.quantity = 0;
+    locations.erase(locIt);
 }
 
 void OrderBook::eraseLocation(OrderId orderId) {
@@ -46,11 +45,18 @@ void OrderBook::eraseLocation(OrderId orderId) {
 Order* OrderBook::bestBid() {
     while (!bids.empty()) {
         auto levelIt = bids.begin();
-        auto& orders = levelIt->second;
+        auto& level = levelIt->second;
 
-        for (auto& order : orders)
-            if (order.quantity > 0)
-                return &order;
+        while (!level.empty()) {
+            OrderIndex frontIdx = level.front();
+
+            if (ordersPool[frontIdx].quantity == 0) {
+                freeOrder(frontIdx);
+                level.erase(level.begin());
+            } else {
+                return &ordersPool[frontIdx];
+            }
+        }
 
         bids.erase(levelIt);
     }
@@ -61,11 +67,18 @@ Order* OrderBook::bestBid() {
 Order* OrderBook::bestAsk() {
     while (!asks.empty()) {
         auto levelIt = asks.begin();
-        auto& orders = levelIt->second;
+        auto& level = levelIt->second;
 
-        for (auto& order : orders)
-            if (order.quantity > 0)
-                return &order;
+        while (!level.empty()) {
+            OrderIndex frontIdx = level.front();
+
+            if (ordersPool[frontIdx].quantity == 0) {
+                freeOrder(frontIdx);
+                level.erase(level.begin());
+            } else {
+                return &ordersPool[frontIdx];
+            }
+        }
 
         asks.erase(levelIt);
     }
@@ -84,13 +97,12 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
     auto askIt = asks.begin();
 
     for (std::size_t i = 0; i < depth; ++i) {
-        OrderBookLevel currLevel;
+        OrderBookLevel currLevel{};
 
         while (bidIt != bids.end()) {
             Quantity totalQty = 0;
-
-            for (const auto& order : bidIt->second)
-                totalQty += order.quantity;
+            for (const auto& index : bidIt->second)
+                totalQty += ordersPool[index].quantity;
 
             if (totalQty > 0) {
                 currLevel.bidPrice = bidIt->first;
@@ -98,15 +110,13 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
                 ++bidIt;
                 break;
             }
-
             ++bidIt;
         }
 
         while (askIt != asks.end()) {
             Quantity totalQty = 0;
-
-            for (const auto& order : askIt->second)
-                totalQty += order.quantity;
+            for (const auto& index : askIt->second)
+                totalQty += ordersPool[index].quantity;
 
             if (totalQty > 0) {
                 currLevel.askPrice = askIt->first;
@@ -114,7 +124,6 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
                 ++askIt;
                 break;
             }
-
             ++askIt;
         }
 
@@ -122,6 +131,25 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
     }
 
     return state;
+}
+
+OrderIndex OrderBook::allocateOrder(const Order& order) {
+    if (!freeIndices.empty()) {
+        OrderIndex idx = freeIndices.back();
+        freeIndices.pop_back();
+        ordersPool[idx] = order;
+        return idx;
+    }
+
+    if (ordersPool.size() >= ordersPool.capacity())
+        throw std::runtime_error("OrderBook memory pool exhausted!");
+
+    ordersPool.push_back(order);
+    return static_cast<OrderIndex>(ordersPool.size() - 1);
+}
+
+void OrderBook::freeOrder(OrderIndex index) {
+    freeIndices.push_back(index);
 }
 
 } // namespace engine

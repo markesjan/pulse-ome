@@ -2,19 +2,17 @@
 
 #include <map>
 #include <memory>
-#include <memory_resource>
 #include <unordered_map>
 #include <vector>
 
 #include "Order.hpp"
 #include "OrderBookLevel.hpp"
-#include "OrderLocation.hpp"
 
 namespace engine {
 
 class OrderBook {
 public:
-    OrderBook();
+    explicit OrderBook(std::size_t maxOrders = 10'000'000);
 
     void insert(const Order& order);
     void cancel(const Order& order);
@@ -26,17 +24,16 @@ public:
     std::vector<OrderBookLevel> bookState(std::size_t depth) const;
 
 private:
-    std::unique_ptr<std::byte[]> preallocBuffer;
-    std::pmr::monotonic_buffer_resource memoryPool;
+    std::vector<Order> ordersPool;
+    std::vector<OrderIndex> freeIndices;
 
-    using PmrOrderVector = std::pmr::vector<Order>;
-    using PmrBidsMap = std::pmr::map<Price, PmrOrderVector, std::greater<>>;
-    using PmrAsksMap = std::pmr::map<Price, PmrOrderVector>;
-    using PmrLocationsUmap = std::pmr::unordered_map<OrderId, OrderLocation>;
+    std::map<Price, std::vector<OrderIndex>, std::greater<>> bids;
+    std::map<Price, std::vector<OrderIndex>> asks;
 
-    PmrLocationsUmap locations;
-    PmrBidsMap bids;
-    PmrAsksMap asks;
+    std::unordered_map<OrderId, OrderIndex> locations;
+
+    OrderIndex allocateOrder(const Order& order);
+    void freeOrder(OrderIndex index);
 };
 
 } // namespace engine

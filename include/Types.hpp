@@ -9,6 +9,7 @@ using OrderId = uint64_t;
 using TradeId = uint64_t;
 using Price = uint64_t;
 using Quantity = uint32_t;
+using OrderIndex = uint32_t;
 
 enum class EventType : uint8_t {
     Invalid = 0,
