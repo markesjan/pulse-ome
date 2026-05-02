@@ -59,7 +59,7 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
 
-        auto actualState = matchingEngine.getBookState(depth);
+        auto actualState = matchingEngine.bookState(depth);
         const auto& expectedState = expectedStates[i];
 
         ASSERT_EQ(actualState.size(), expectedState.size())

@@ -86,7 +86,7 @@ void MatchingEngine::processSellOrder(const Order& order, std::vector<Trade>& tr
         orderBook.insert(currOrder);
 }
 
-std::vector<OrderBookLevel> MatchingEngine::getBookState(std::size_t depth) const {
+std::vector<OrderBookLevel> MatchingEngine::bookState(std::size_t depth) const {
     return orderBook.bookState(depth);
 }
 

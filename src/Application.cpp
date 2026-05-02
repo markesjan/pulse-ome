@@ -59,7 +59,7 @@ void Application::run() {
 
     std::vector<uint64_t> latenciesNs;
     if (config.measureLatency && !latencies.empty()) {
-        double cyclesPerNs = getCyclesPerNs();
+        double cyclesPerNs = countCyclesPerNs();
         latenciesNs.reserve(latencies.size());
 
         for (uint64_t rawCycles : latencies) {
@@ -125,7 +125,7 @@ double Application::matchOrders() {
     return std::chrono::duration<double>(matchingEnd - matchingStart).count();
 }
 
-double Application::getCyclesPerNs() {
+double Application::countCyclesPerNs() {
     _mm_lfence();
     uint64_t startCycles = __rdtsc();
     _mm_lfence();

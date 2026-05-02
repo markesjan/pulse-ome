@@ -26,7 +26,7 @@ private:
 
     void prepareOrders();
     double matchOrders();
-    static double getCyclesPerNs();
+    static double countCyclesPerNs();
 };
 
 } // namespace engine

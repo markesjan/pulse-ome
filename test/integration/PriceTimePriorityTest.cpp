@@ -9,7 +9,7 @@ protected:
     std::vector<Trade> trades;
 
     void verifyTop(Price askPrice, Quantity askQty, Price bidPrice, Quantity bidQty) const {
-        auto state = matchingEngine.getBookState(1);
+        auto state = matchingEngine.bookState(1);
         ASSERT_FALSE(state.empty());
         EXPECT_EQ(state[0].askPrice, askPrice);
         EXPECT_EQ(state[0].askQty, askQty);

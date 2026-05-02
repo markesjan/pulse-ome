@@ -23,7 +23,7 @@ TEST_F(SyntheticStressTest, DefaultGeneratorSetup) {
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
 
-        auto bookState = matchingEngine.getBookState(1);
+        auto bookState = matchingEngine.bookState(1);
         if (bookState.empty())
             continue;
 
@@ -46,7 +46,7 @@ TEST_F(SyntheticStressTest, ZeroCancels) {
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
 
-        auto bookState = matchingEngine.getBookState(1);
+        auto bookState = matchingEngine.bookState(1);
         if (bookState.empty())
             continue;
 
@@ -69,7 +69,7 @@ TEST_F(SyntheticStressTest, HighCancels) {
     for (std::size_t i = 0; i < orders.size(); ++i) {
         matchingEngine.processOrder(orders[i], trades);
 
-        auto bookState = matchingEngine.getBookState(1);
+        auto bookState = matchingEngine.bookState(1);
         if (bookState.empty())
             continue;
 

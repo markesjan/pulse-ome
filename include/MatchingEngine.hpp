@@ -12,7 +12,7 @@ class MatchingEngine {
 public:
     MatchingEngine(std::size_t maxOrders, Price maxPrice);
     void processOrder(const Order& order, std::vector<Trade>& trades);
-    std::vector<OrderBookLevel> getBookState(std::size_t depth) const;
+    std::vector<OrderBookLevel> bookState(std::size_t depth) const;
 
 private:
     OrderBook orderBook;

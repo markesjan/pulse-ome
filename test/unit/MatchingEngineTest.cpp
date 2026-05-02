@@ -17,7 +17,7 @@ protected:
 TEST_F(MatchingEngineTest, ProcessOrderNewBidNoMatchAddsToBook) {
     engine.processOrder(makeOrder(1, 10000, 50, Side::Buy), trades);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(state[0].bidPrice, 10000);
     EXPECT_EQ(state[0].bidQty, 50);
@@ -28,7 +28,7 @@ TEST_F(MatchingEngineTest, ProcessOrderNewBidNoMatchAddsToBook) {
 TEST_F(MatchingEngineTest, ProcessOrderNewAskNoMatchAddsToBook) {
     engine.processOrder(makeOrder(1, 15000, 100, Side::Sell), trades);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(state[0].askPrice, 15000);
     EXPECT_EQ(state[0].askQty, 100);
@@ -46,7 +46,7 @@ TEST_F(MatchingEngineTest, ProcessOrderBidExactMatchGeneratesTrade) {
     EXPECT_EQ(trades[0].price, 10000);
     EXPECT_EQ(trades[0].quantity, 50);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     EXPECT_TRUE(state.empty() || (state[0].askQty == 0 && state[0].bidQty == 0));
 }
 
@@ -68,7 +68,7 @@ TEST_F(MatchingEngineTest, ProcessOrderBidPartialMatchRestsRemainder) {
     ASSERT_EQ(trades.size(), 1);
     EXPECT_EQ(trades[0].quantity, 40);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(state[0].bidPrice, 10000);
     EXPECT_EQ(state[0].bidQty, 60);
@@ -82,7 +82,7 @@ TEST_F(MatchingEngineTest, ProcessOrderAskPartialMatchRestsRemainder) {
     ASSERT_EQ(trades.size(), 1);
     EXPECT_EQ(trades[0].quantity, 40);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(state[0].askPrice, 10000);
     EXPECT_EQ(state[0].askQty, 60);
@@ -110,7 +110,7 @@ TEST_F(MatchingEngineTest, ProcessOrderBidConsumesMultipleAsks) {
     EXPECT_EQ(trades[2].price, 10200);
     EXPECT_EQ(trades[2].quantity, 20);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_FALSE(state.empty());
     EXPECT_EQ(state[0].askPrice, 10200);
     EXPECT_EQ(state[0].askQty, 30);
@@ -137,7 +137,7 @@ TEST_F(MatchingEngineTest, ProcessOrderAskConsumesMultipleBids) {
     EXPECT_EQ(trades[2].price, 10000);
     EXPECT_EQ(trades[2].quantity, 20);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_FALSE(state.empty());
     EXPECT_EQ(state[0].bidPrice, 10000);
     EXPECT_EQ(state[0].bidQty, 30);
@@ -147,7 +147,7 @@ TEST_F(MatchingEngineTest, ProcessOrderFullCancelRemovesOrderFromBook) {
     engine.processOrder(makeOrder(1, 10000, 100, Side::Buy), trades);
     engine.processOrder(makeOrder(1, 0, 100, Side::Buy, EventType::FullCancel), trades);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     EXPECT_TRUE(state.empty() || state[0].bidQty == 0);
 }
 
@@ -155,7 +155,7 @@ TEST_F(MatchingEngineTest, ProcessOrderPartialCancelReducesQuantityInBook) {
     engine.processOrder(makeOrder(1, 15000, 100, Side::Sell), trades);
     engine.processOrder(makeOrder(1, 0, 40, Side::Sell, EventType::PartialCancel), trades);
 
-    auto state = engine.getBookState(1);
+    auto state = engine.bookState(1);
     ASSERT_FALSE(state.empty());
     EXPECT_EQ(state[0].askPrice, 15000);
     EXPECT_EQ(state[0].askQty, 60);
@@ -167,7 +167,7 @@ TEST_F(MatchingEngineTest, GetBookStateReturnsCorrectDepth) {
     engine.processOrder(makeOrder(3, 10100, 10, Side::Sell), trades);
     engine.processOrder(makeOrder(4, 10200, 10, Side::Sell), trades);
 
-    auto state = engine.getBookState(2);
+    auto state = engine.bookState(2);
     ASSERT_EQ(state.size(), 2);
 
     EXPECT_EQ(state[0].bidPrice, 10000);
