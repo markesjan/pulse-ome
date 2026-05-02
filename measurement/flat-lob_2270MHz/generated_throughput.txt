@@ -1,0 +1,81 @@
+cmake-build-release (feature/flat-lob) ✗ ./matching_engine -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        6.07 ms
+[ 1/10] Bench: 6.01 ms
+[ 2/10] Bench: 6.20 ms
+[ 3/10] Bench: 6.23 ms
+[ 4/10] Bench: 6.18 ms
+[ 5/10] Bench: 6.20 ms
+[ 6/10] Bench: 6.21 ms
+[ 7/10] Bench: 6.01 ms
+[ 8/10] Bench: 5.96 ms
+[ 9/10] Bench: 6.11 ms
+[10/10] Bench: 5.97 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        6.11 ms
+Avg throughput:      16.37 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-release (feature/flat-lob) ✗ ./matching_engine -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        4.00 ms
+[ 1/10] Bench: 4.17 ms
+[ 2/10] Bench: 3.96 ms
+[ 3/10] Bench: 3.97 ms
+[ 4/10] Bench: 3.98 ms
+[ 5/10] Bench: 4.16 ms
+[ 6/10] Bench: 4.08 ms
+[ 7/10] Bench: 3.96 ms
+[ 8/10] Bench: 3.96 ms
+[ 9/10] Bench: 3.97 ms
+[10/10] Bench: 3.98 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        4.02 ms
+Avg throughput:      24.88 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-release (feature/flat-lob) ✗ ./matching_engine -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        8.43 ms
+[ 1/10] Bench: 5.77 ms
+[ 2/10] Bench: 5.79 ms
+[ 3/10] Bench: 5.79 ms
+[ 4/10] Bench: 5.83 ms
+[ 5/10] Bench: 6.15 ms
+[ 6/10] Bench: 6.05 ms
+[ 7/10] Bench: 5.88 ms
+[ 8/10] Bench: 5.86 ms
+[ 9/10] Bench: 5.88 ms
+[10/10] Bench: 5.92 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69489
+Match rate:          69.49 %
+Avg duration:        5.89 ms
+Avg throughput:      16.97 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================

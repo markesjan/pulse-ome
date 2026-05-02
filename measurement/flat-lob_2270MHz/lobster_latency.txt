@@ -1,0 +1,102 @@
+cmake-build-release (feature/flat-lob) ✗ ./matching_engine -l -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        47.07 ms
+[ 1/10] Bench: 42.94 ms
+[ 2/10] Bench: 42.62 ms
+[ 3/10] Bench: 42.55 ms
+[ 4/10] Bench: 42.58 ms
+[ 5/10] Bench: 42.58 ms
+[ 6/10] Bench: 43.36 ms
+[ 7/10] Bench: 42.56 ms
+[ 8/10] Bench: 43.01 ms
+[ 9/10] Bench: 43.19 ms
+[10/10] Bench: 43.14 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        42.85 ms
+Avg throughput:      8.53 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 32807 ns
+Average:             78 ns
+Median (p50):        60 ns
+90. perc (p90):      100 ns
+99. perc (p99):      350 ns
+99.9. perc (p99.9):  1652 ns
+=============================================
+ cmake-build-release (feature/flat-lob) ✗ ./matching_engine -l -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        32.83 ms
+[ 1/10] Bench: 30.29 ms
+[ 2/10] Bench: 30.23 ms
+[ 3/10] Bench: 30.30 ms
+[ 4/10] Bench: 29.99 ms
+[ 5/10] Bench: 30.03 ms
+[ 6/10] Bench: 30.00 ms
+[ 7/10] Bench: 30.03 ms
+[ 8/10] Bench: 30.22 ms
+[ 9/10] Bench: 30.12 ms
+[10/10] Bench: 30.10 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        30.13 ms
+Avg throughput:      8.57 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 10664 ns
+Average:             77 ns
+Median (p50):        60 ns
+90. perc (p90):      90 ns
+99. perc (p99):      310 ns
+99.9. perc (p99.9):  2663 ns
+=============================================
+ cmake-build-release (feature/flat-lob) ✗ ./matching_engine -l -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        78.12 ms
+[ 1/10] Bench: 72.68 ms
+[ 2/10] Bench: 72.58 ms
+[ 3/10] Bench: 72.39 ms
+[ 4/10] Bench: 72.57 ms
+[ 5/10] Bench: 72.70 ms
+[ 6/10] Bench: 72.60 ms
+[ 7/10] Bench: 72.36 ms
+[ 8/10] Bench: 72.67 ms
+[ 9/10] Bench: 73.26 ms
+[10/10] Bench: 73.43 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        72.72 ms
+Avg throughput:      8.74 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 143465 ns
+Average:             76 ns
+Median (p50):        70 ns
+90. perc (p90):      90 ns
+99. perc (p99):      200 ns
+99.9. perc (p99.9):  3104 ns
+=============================================
