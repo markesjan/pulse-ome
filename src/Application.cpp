@@ -13,6 +13,9 @@
 
 namespace engine {
 
+constexpr int WARMUP_RUNS = 1;
+constexpr int BENCHMARK_RUNS = 10;
+constexpr int TOTAL_RUNS = WARMUP_RUNS + BENCHMARK_RUNS;
 constexpr std::size_t MAX_ORDERS = 10'000'000;
 constexpr Price MAX_PRICE = 100'000'000;
 
@@ -26,10 +29,6 @@ void Application::run() {
     trades.reserve(orders.size());
     if (config.measureLatency)
         latencies.reserve(orders.size());
-
-    constexpr int WARMUP_RUNS = 1;
-    constexpr int BENCHMARK_RUNS = 10;
-    constexpr int TOTAL_RUNS = WARMUP_RUNS + BENCHMARK_RUNS;
 
     std::println("Running {} iterations...\n", TOTAL_RUNS);
 
