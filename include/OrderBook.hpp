@@ -1,22 +1,17 @@
 #pragma once
 
-#include <limits>
-#include <map>
-#include <unordered_map>
 #include <vector>
 
 #include "Order.hpp"
 #include "OrderBookLevel.hpp"
+#include "PriceBitset.hpp"
+#include "PriceLevel.hpp"
 
 namespace engine {
 
-constexpr OrderIndex INVALID_INDEX = std::numeric_limits<OrderIndex>::max();
-constexpr std::size_t MAX_ORDERS = 10'000'000;
-constexpr Price MAX_PRICE = 10'000'000;
-
 class OrderBook {
 public:
-    explicit OrderBook(std::size_t maxOrders = MAX_ORDERS, Price maxPrice = MAX_PRICE);
+    OrderBook(std::size_t maxOrders, Price maxPrice);
 
     void insert(const Order& order);
     void cancel(const Order& order);
@@ -30,14 +25,16 @@ public:
 private:
     std::vector<Order> ordersPool;
     std::vector<OrderIndex> freeIndices;
-
-    std::vector<std::vector<OrderIndex>> bids;
-    std::vector<std::vector<OrderIndex>> asks;
-
     std::vector<OrderIndex> locations;
 
-    Price currBestBid = 0;
-    Price currBestAsk = std::numeric_limits<Price>::max();
+    std::vector<PriceLevel> bids;
+    std::vector<PriceLevel> asks;
+
+    PriceBitset bidBits;
+    PriceBitset askBits;
+
+    Price currBestBid;
+    Price currBestAsk;
 
     OrderIndex allocateOrder(const Order& order);
     void freeOrder(OrderIndex index);

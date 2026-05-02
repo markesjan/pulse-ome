@@ -13,7 +13,11 @@
 
 namespace engine {
 
+constexpr std::size_t MAX_ORDERS = 10'000'000;
+constexpr Price MAX_PRICE = 100'000'000;
+
 Application::Application(const Config& config) : config(config) {
+    idMapper.emplace(MAX_ORDERS);
 }
 
 void Application::run() {
@@ -37,7 +41,7 @@ void Application::run() {
         if (config.measureLatency)
             latencies.clear();
 
-        matchingEngine.emplace();
+        matchingEngine.emplace(MAX_ORDERS, MAX_PRICE);
         double durationS = matchOrders();
         double durationMs = durationS * 1000.0;
 
@@ -69,14 +73,16 @@ void Application::run() {
     ResultWriter::printSummary(avgDurationMs, avgThroughput, orders.size(), trades.size(),
                                latenciesNs);
 
-    if (!config.tradeFile.empty())
-        ResultWriter::writeTrades(trades, config.tradeFile);
+    if (!config.tradeFile.empty()) {
+        auto* idMapperPtr = config.orderFile.empty() ? nullptr : &(*idMapper);
+        ResultWriter::writeTrades(trades, config.tradeFile, idMapperPtr);
+    }
 }
 
 void Application::prepareOrders() {
     if (!config.orderFile.empty()) {
         std::println("Loading orders from file: {}", config.orderFile);
-        orders = LobsterOrderLoader::load(config.orderFile);
+        orders = LobsterOrderLoader::load(config.orderFile, *idMapper);
     } else {
         std::println("Generating {} orders (seed: {})", config.genCount, config.genSeed);
         orders = OrderGenerator::generate(config.genSeed,

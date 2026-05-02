@@ -5,14 +5,17 @@
 
 namespace engine {
 
-OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice) {
+OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice)
+    : bidBits(maxPrice), askBits(maxPrice) {
     ordersPool.reserve(maxOrders);
     freeIndices.reserve(maxOrders);
+    locations.resize(maxOrders, INVALID_INDEX);
 
     bids.resize(maxPrice + 1);
     asks.resize(maxPrice + 1);
 
-    locations.resize(maxOrders, INVALID_INDEX);
+    currBestBid = 0;
+    currBestAsk = INVALID_PRICE;
 }
 
 void OrderBook::insert(const Order& order) {
@@ -20,14 +23,32 @@ void OrderBook::insert(const Order& order) {
     locations[order.orderId] = idx;
 
     if (order.side == Side::Buy) {
-        bids[order.price].push_back(idx);
+        PriceLevel& level = bids[order.price];
 
-        if (order.price > currBestBid)
+        if (level.headIdx == INVALID_INDEX) {
+            level.headIdx = idx;
+            level.tailIdx = idx;
+            bidBits.setPrice(order.price);
+        } else {
+            ordersPool[level.tailIdx].nextOrderIdx = idx;
+            level.tailIdx = idx;
+        }
+
+        if (currBestBid == INVALID_PRICE || order.price > currBestBid)
             currBestBid = order.price;
     } else {
-        asks[order.price].push_back(idx);
+        PriceLevel& level = asks[order.price];
 
-        if (order.price < currBestAsk)
+        if (level.headIdx == INVALID_INDEX) {
+            level.headIdx = idx;
+            level.tailIdx = idx;
+            askBits.setPrice(order.price);
+        } else {
+            ordersPool[level.tailIdx].nextOrderIdx = idx;
+            level.tailIdx = idx;
+        }
+
+        if (currBestAsk == INVALID_PRICE || order.price < currBestAsk)
             currBestAsk = order.price;
     }
 }
@@ -57,42 +78,59 @@ void OrderBook::eraseLocation(OrderId orderId) {
 }
 
 Order* OrderBook::bestBid() {
-    while (currBestBid > 0) {
-        std::vector<OrderIndex>& level = bids[currBestBid];
+    while (currBestBid != INVALID_PRICE && currBestBid > 0) {
+        PriceLevel& level = bids[currBestBid];
 
-        while (!level.empty()) {
-            OrderIndex frontIdx = level.front();
+        while (level.headIdx != INVALID_INDEX) {
+            Order& headOrder = ordersPool[level.headIdx];
 
-            if (ordersPool[frontIdx].quantity == 0) {
-                freeOrder(frontIdx);
-                level.erase(level.begin());
+            if (headOrder.quantity == 0) {
+                OrderIndex deadIdx = level.headIdx;
+                level.headIdx = headOrder.nextOrderIdx;
+
+                if (level.headIdx == INVALID_INDEX)
+                    level.tailIdx = INVALID_INDEX;
+
+                freeOrder(deadIdx);
             } else {
-                return &ordersPool[frontIdx];
+                return &headOrder;
             }
         }
 
-        currBestBid--;
+        bidBits.clearPrice(currBestBid);
+
+        if (currBestBid == 0)
+            break;
+
+        currBestBid = bidBits.findNextBid(currBestBid - 1);
     }
 
     return nullptr;
 }
 
 Order* OrderBook::bestAsk() {
-    while (currBestAsk < asks.size()) {
-        std::vector<OrderIndex>& level = asks[currBestAsk];
+    while (currBestAsk != INVALID_PRICE) {
+        PriceLevel& level = asks[currBestAsk];
 
-        while (!level.empty()) {
-            OrderIndex frontIdx = level.front();
+        while (level.headIdx != INVALID_INDEX) {
+            Order& headOrder = ordersPool[level.headIdx];
 
-            if (ordersPool[frontIdx].quantity == 0) {
-                freeOrder(frontIdx);
-                level.erase(level.begin());
+            if (headOrder.quantity == 0) {
+                OrderIndex deadIdx = level.headIdx;
+                level.headIdx = headOrder.nextOrderIdx;
+
+                if (level.headIdx == INVALID_INDEX)
+                    level.tailIdx = INVALID_INDEX;
+
+                freeOrder(deadIdx);
             } else {
-                return &ordersPool[frontIdx];
+                return &headOrder;
             }
         }
 
-        currBestAsk++;
+        askBits.clearPrice(currBestAsk);
+
+        currBestAsk = askBits.findNextAsk(currBestAsk + 1);
     }
 
     return nullptr;
@@ -113,34 +151,45 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
         bool foundBid = false;
         bool foundAsk = false;
 
-        while (scanBid > 0 && !foundBid) {
-            const std::vector<OrderIndex>& level = bids[scanBid];
+        while (scanBid != INVALID_PRICE && scanBid > 0 && !foundBid) {
+            const PriceLevel& level = bids[scanBid];
             Quantity totalQty = 0;
 
-            for (OrderIndex idx : level)
-                totalQty += ordersPool[idx].quantity;
+            OrderIndex currIdx = level.headIdx;
+            while (currIdx != INVALID_INDEX) {
+                totalQty += ordersPool[currIdx].quantity;
+                currIdx = ordersPool[currIdx].nextOrderIdx;
+            }
 
             if (totalQty > 0) {
                 currLevel.bidPrice = scanBid;
                 currLevel.bidQty = totalQty;
                 foundBid = true;
             }
-            scanBid--;
+
+            if (scanBid == 0)
+                break;
+
+            scanBid = bidBits.findNextBid(scanBid - 1);
         }
 
-        while (scanAsk < asks.size() && !foundAsk) {
-            const std::vector<OrderIndex>& level = asks[scanAsk];
+        while (scanAsk != INVALID_PRICE && !foundAsk) {
+            const PriceLevel& level = asks[scanAsk];
             Quantity totalQty = 0;
 
-            for (OrderIndex idx : level)
-                totalQty += ordersPool[idx].quantity;
+            OrderIndex currIdx = level.headIdx;
+            while (currIdx != INVALID_INDEX) {
+                totalQty += ordersPool[currIdx].quantity;
+                currIdx = ordersPool[currIdx].nextOrderIdx;
+            }
 
             if (totalQty > 0) {
                 currLevel.askPrice = scanAsk;
                 currLevel.askQty = totalQty;
                 foundAsk = true;
             }
-            scanAsk++;
+
+            scanAsk = askBits.findNextAsk(scanAsk + 1);
         }
 
         if (foundBid || foundAsk) {
@@ -158,7 +207,10 @@ OrderIndex OrderBook::allocateOrder(const Order& order) {
     if (!freeIndices.empty()) {
         OrderIndex idx = freeIndices.back();
         freeIndices.pop_back();
+
         ordersPool[idx] = order;
+        ordersPool[idx].nextOrderIdx = INVALID_INDEX;
+
         return idx;
     }
 
@@ -166,6 +218,7 @@ OrderIndex OrderBook::allocateOrder(const Order& order) {
         throw std::runtime_error("OrderBook memory pool exhausted!");
 
     ordersPool.push_back(order);
+    ordersPool.back().nextOrderIdx = INVALID_INDEX;
     return static_cast<OrderIndex>(ordersPool.size() - 1);
 }
 

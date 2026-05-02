@@ -2,6 +2,10 @@
 
 namespace engine {
 
+MatchingEngine::MatchingEngine(std::size_t maxOrders, Price maxPrice)
+    : orderBook(maxOrders, maxPrice), tradeIdCnt(0) {
+}
+
 void MatchingEngine::processOrder(const Order& order, std::vector<Trade>& trades) {
     switch (order.eventType) {
         case EventType::New:

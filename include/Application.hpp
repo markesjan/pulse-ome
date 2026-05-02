@@ -5,6 +5,7 @@
 #include "Config.hpp"
 #include "Order.hpp"
 #include "MatchingEngine.hpp"
+#include "OrderIdMapper.hpp"
 #include "Trade.hpp"
 
 namespace engine {
@@ -16,6 +17,7 @@ public:
 
 private:
     Config config;
+    std::optional<OrderIdMapper> idMapper;
     std::optional<MatchingEngine> matchingEngine;
 
     std::vector<Order> orders;
