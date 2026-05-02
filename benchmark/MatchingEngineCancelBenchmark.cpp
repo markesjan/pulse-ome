@@ -22,19 +22,30 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
                                          }, dummyTrades);
         }
 
+        for (int64_t i = 0; i < BATCH_SIZE; ++i) {
+            matchingEngine->processOrder({
+                                             1'000'000'000,
+                                             static_cast<engine::OrderId>(n + i),
+                                             10'000,
+                                             100,
+                                             engine::EventType::New,
+                                             engine::Side::Buy
+                                         }, dummyTrades);
+        }
+
         return matchingEngine;
     };
 
     auto matchingEngine = setupEngine();
     std::vector<engine::Trade> trades;
     trades.reserve(BATCH_SIZE);
-    int64_t targetId = n;
+    int64_t cancelId = n;
 
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
                                              1'000'000'000,
-                                             static_cast<engine::Price>(targetId++),
+                                             static_cast<engine::OrderId>(cancelId++),
                                              10'000,
                                              10,
                                              engine::EventType::PartialCancel,
@@ -45,7 +56,7 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
         state.PauseTiming();
         matchingEngine = setupEngine();
         trades.clear();
-        targetId = n;
+        cancelId = n;
         state.ResumeTiming();
     }
 
