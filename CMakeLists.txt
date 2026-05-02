@@ -30,8 +30,10 @@ add_library(engine_lib
         src/LobsterOrderLoader.cpp
         src/LobsterStateLoader.cpp
         src/MatchingEngine.cpp
-        src/OrderGenerator.cpp
         src/OrderBook.cpp
+        src/OrderGenerator.cpp
+        src/OrderIdMapper.cpp
+        src/PriceBitset.cpp
         src/ResultWriter.cpp
 )
 
