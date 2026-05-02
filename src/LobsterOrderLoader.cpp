@@ -6,7 +6,8 @@
 
 namespace engine {
 
-std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
+std::vector<Order> LobsterOrderLoader::load(const std::string& filePath,
+                                            OrderIdMapper& idMapper) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::println(stderr, "Couldn't open file: {}", filePath);
@@ -39,7 +40,7 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
         p = end + (*end == ',' ? 1 : 0);
 
         if (rawEventType >= 1 && rawEventType <= 3) {
-            auto orderId = static_cast<OrderId>(std::strtoull(p, &end, 10));
+            auto rawExternalId = static_cast<OrderId>(std::strtoull(p, &end, 10));
             if (p == end)
                 continue;
             p = end + (*end == ',' ? 1 : 0);
@@ -58,7 +59,7 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath) {
 
             orders.emplace_back(Order{
                 fixedTimestamp,
-                orderId,
+                idMapper.toInternal(rawExternalId),
                 price,
                 quantity,
                 static_cast<EventType>(rawEventType),

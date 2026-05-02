@@ -53,7 +53,8 @@ void ResultWriter::printSummary(double avgDurationMs,
 }
 
 void ResultWriter::writeTrades(const std::vector<Trade>& trades,
-                               const std::string& filePath) {
+                               const std::string& filePath,
+                               const OrderIdMapper* idMapper) {
     std::ofstream outFile(filePath);
 
     if (!outFile.is_open()) {
@@ -63,14 +64,18 @@ void ResultWriter::writeTrades(const std::vector<Trade>& trades,
 
     std::println(outFile, "Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
 
-    for (const auto& trade : trades)
+    for (const auto& trade : trades) {
+        OrderId externalBuyId = idMapper ? idMapper->toExternal(trade.buyOrderId) : trade.buyOrderId;
+        OrderId externalSellId = idMapper ? idMapper->toExternal(trade.sellOrderId) : trade.sellOrderId;
+
         std::println(outFile, "{},{},{},{},{},{}",
                      trade.timestamp,
                      trade.tradeId,
-                     trade.buyOrderId,
-                     trade.sellOrderId,
+                     externalBuyId,
+                     externalSellId,
                      trade.quantity,
                      trade.price);
+    }
 }
 
 } // namespace engine
