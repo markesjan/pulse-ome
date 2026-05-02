@@ -15,7 +15,7 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
 
     std::vector<Event> events;
     events.reserve(BATCH_SIZE);
-    auto eventId = static_cast<engine::OrderId>(n + 1'000'000);
+    auto eventId = static_cast<engine::OrderId>(2 * n + 100);
 
     for (int64_t i = 0; i < BATCH_SIZE; i += 4) {
         engine::OrderId bidId = eventId++;
@@ -41,10 +41,14 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
         dummyTrades.reserve(static_cast<std::size_t>(n));
 
         for (int64_t i = 0; i < n / 2; ++i) {
-            matchingEngine->processOrder({1'000'000'000, static_cast<uint64_t>(i), 9000, 10,
-                                          engine::EventType::New, engine::Side::Buy}, dummyTrades);
-            matchingEngine->processOrder({1'000'000'000, static_cast<uint64_t>(n + i), 11000, 10,
-                                          engine::EventType::New, engine::Side::Sell}, dummyTrades);
+            matchingEngine->processOrder({
+                                             1'000'000'000, static_cast<engine::OrderId>(i),
+                                             9000, 10, engine::EventType::New, engine::Side::Buy},
+                                         dummyTrades);
+            matchingEngine->processOrder({
+                                             1'000'000'000, static_cast<engine::OrderId>(n + i),
+                                             11000, 10, engine::EventType::New, engine::Side::Sell},
+                                         dummyTrades);
         }
 
         return matchingEngine;

@@ -14,7 +14,7 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
         for (int64_t i = 0; i < n + BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
                                              1'000'000'000,
-                                             static_cast<uint64_t>(i),
+                                             static_cast<engine::OrderId>(i),
                                              10000,
                                              10,
                                              engine::EventType::New,
@@ -65,8 +65,11 @@ constexpr int64_t SWEEP_BATCH_SIZE = 100;
 static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
     const int64_t n = state.range(0);
 
-    auto setupEngine = [n] {
-        const int64_t totalResting = n * SWEEP_BATCH_SIZE;
+    const int64_t totalResting = n * SWEEP_BATCH_SIZE;
+    const engine::Price maxGeneratedPrice = static_cast<engine::Price>(10000 + totalResting);
+    const engine::Price sweepPriceLimit = maxGeneratedPrice + 100;
+
+    auto setupEngine = [totalResting] {
         auto matchingEngine = std::make_unique<engine::MatchingEngine>();
         std::vector<engine::Trade> dummyTrades;
         dummyTrades.reserve(static_cast<std::size_t>(totalResting));
@@ -74,7 +77,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
         for (int64_t i = 0; i < totalResting; ++i) {
             matchingEngine->processOrder({
                                              1'000'000'000,
-                                             static_cast<uint64_t>(i),
+                                             static_cast<engine::OrderId>(i),
                                              static_cast<engine::Price>(10000 + i),
                                              10,
                                              engine::EventType::New,
@@ -95,7 +98,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
             matchingEngine->processOrder({
                                              1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
-                                             2'000'000,
+                                             sweepPriceLimit,
                                              static_cast<engine::Quantity>(n * 10),
                                              engine::EventType::New,
                                              engine::Side::Buy
@@ -117,5 +120,5 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
 BENCHMARK(BM_MatchingEngineMatchSweep)
      ->RangeMultiplier(2)
      ->Range(8, 50'000)
-     ->Complexity(benchmark::oAuto)
+     ->Complexity(benchmark::oN)
      ->Unit(benchmark::kNanosecond);
