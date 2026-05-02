@@ -6,7 +6,7 @@ namespace engine {
 
 class MatchingEngineTest : public testing::Test {
 protected:
-    MatchingEngine engine;
+    MatchingEngine engine{10'000, 20'000};
     std::vector<Trade> trades;
 
     static Order makeOrder(OrderId id, Price p, Quantity q, Side s, EventType t = EventType::New) {

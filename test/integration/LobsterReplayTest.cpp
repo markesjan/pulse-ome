@@ -20,7 +20,8 @@ struct LobsterScenario {
 
 class LobsterReplayTest : public testing::TestWithParam<LobsterScenario> {
 protected:
-    MatchingEngine matchingEngine;
+    OrderIdMapper idMapper{10'000'000};
+    MatchingEngine matchingEngine{10'000'000, 100'000'000};
     std::vector<Trade> trades;
 
     void SetUp() override {
@@ -31,7 +32,7 @@ protected:
 TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
     const auto& [symbol, depth, msgPath, bookPath] = GetParam();
 
-    auto orders = LobsterOrderLoader::load(msgPath);
+    auto orders = LobsterOrderLoader::load(msgPath, idMapper);
     auto expectedStates = LobsterStateLoader::load(bookPath, depth);
 
     ASSERT_FALSE(orders.empty()) << "Empty data for " << symbol;

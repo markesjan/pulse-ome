@@ -6,7 +6,7 @@ namespace engine {
 
 class OrderBookTest : public testing::Test {
 protected:
-    OrderBook orderBook;
+    OrderBook orderBook{10'000, 20'000};
 
     static Order createBuy(OrderId id, Price price, Quantity qty) {
         return Order{1'000'000'000, id, price, qty, EventType::New, Side::Buy};

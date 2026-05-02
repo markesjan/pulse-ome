@@ -37,20 +37,21 @@ TEST_F(LobsterOrderLoaderTest, LoadValidCsvReturnsOrders) {
         "34200.203283207,3,16166153,100,309700,-1\n";
 
     createDummyCsv(csvData);
-    auto orders = LobsterOrderLoader::load(testFilePath);
+    OrderIdMapper idMapper(10);
+    auto orders = LobsterOrderLoader::load(testFilePath, idMapper);
 
     ASSERT_EQ(orders.size(), 2);
 
     EXPECT_EQ(orders[0].timestamp, 3'420'003'988'397);
     EXPECT_EQ(orders[0].eventType, EventType::New);
-    EXPECT_EQ(orders[0].orderId, 16'135'101);
+    EXPECT_EQ(orders[0].orderId, idMapper.toInternal(16'135'101));
     EXPECT_EQ(orders[0].quantity, 300);
     EXPECT_EQ(orders[0].price, 309'500);
     EXPECT_EQ(orders[0].side, Side::Buy);
 
     EXPECT_EQ(orders[1].timestamp, 34'200'203'283'207);
     EXPECT_EQ(orders[1].eventType, EventType::FullCancel);
-    EXPECT_EQ(orders[1].orderId, 16'166'153);
+    EXPECT_EQ(orders[1].orderId, idMapper.toInternal(16'166'153));
     EXPECT_EQ(orders[1].quantity, 100);
     EXPECT_EQ(orders[1].price, 309'700);
     EXPECT_EQ(orders[1].side, Side::Sell);
@@ -58,7 +59,8 @@ TEST_F(LobsterOrderLoaderTest, LoadValidCsvReturnsOrders) {
 
 TEST_F(LobsterOrderLoaderTest, LoadEmptyFileReturnsEmpty) {
     createDummyCsv("");
-    auto orders = LobsterOrderLoader::load(testFilePath);
+    OrderIdMapper idMapper(0);
+    auto orders = LobsterOrderLoader::load(testFilePath, idMapper);
     EXPECT_TRUE(orders.empty());
 }
 
@@ -70,15 +72,17 @@ TEST_F(LobsterOrderLoaderTest, LoadInvalidLinesSkipsToNext) {
         "34200.203283207,3,16166153,100,309700,-1\n";
 
     createDummyCsv(csvData);
-    auto orders = LobsterOrderLoader::load(testFilePath);
+    OrderIdMapper idMapper(10);
+    auto orders = LobsterOrderLoader::load(testFilePath, idMapper);
 
     EXPECT_EQ(orders.size(), 2);
 }
 
 TEST_F(LobsterOrderLoaderTest, LoadNonExistentFileExitsWith1) {
     const std::string badPath = "not_exists_12345.csv";
+    OrderIdMapper idMapper(0);
 
-    EXPECT_EXIT(LobsterOrderLoader::load(badPath),
+    EXPECT_EXIT(LobsterOrderLoader::load(badPath, idMapper),
                 testing::ExitedWithCode(1),
                 "Couldn't open file: not_exists_12345.csv");
 }

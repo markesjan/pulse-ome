@@ -5,7 +5,7 @@ namespace engine {
 
 class PriceTimePriorityTest : public testing::Test {
 protected:
-    MatchingEngine matchingEngine;
+    MatchingEngine matchingEngine{10'000, 100'000};
     std::vector<Trade> trades;
 
     void verifyTop(Price askPrice, Quantity askQty, Price bidPrice, Quantity bidQty) const {

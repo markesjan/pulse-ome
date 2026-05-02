@@ -8,7 +8,7 @@ namespace engine {
 
 class SyntheticStressTest : public testing::Test {
 protected:
-    MatchingEngine matchingEngine;
+    MatchingEngine matchingEngine{150'000, 20'000};
     std::vector<Trade> trades;
 
     void SetUp() override {
