@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 
 namespace engine {
 
@@ -10,6 +11,10 @@ using TradeId = uint64_t;
 using Price = uint64_t;
 using Quantity = uint32_t;
 using OrderIndex = uint32_t;
+using BitBlock = uint64_t;
+
+constexpr OrderIndex INVALID_INDEX = std::numeric_limits<OrderIndex>::max();
+constexpr Price INVALID_PRICE = std::numeric_limits<Price>::max();
 
 enum class EventType : uint8_t {
     Invalid = 0,

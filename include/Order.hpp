@@ -11,6 +11,8 @@ struct Order {
     Quantity quantity;
     EventType eventType;
     Side side;
+
+    OrderIndex nextOrderIdx = INVALID_INDEX;
 };
 
 } // namespace engine
