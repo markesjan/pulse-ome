@@ -15,7 +15,7 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
         for (int64_t i = 0; i < n + BATCH_SIZE; ++i) {
             matchingEngine->processOrder({
                                              1'000'000'000,
-                                             static_cast<uint64_t>(i),
+                                             static_cast<engine::OrderId>(i),
                                              10000,
                                              10,
                                              engine::EventType::New,
@@ -81,7 +81,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
         for (int64_t i = 0; i < totalResting; ++i) {
             matchingEngine->processOrder({
                                              1'000'000'000,
-                                             static_cast<uint64_t>(i),
+                                             static_cast<engine::OrderId>(i),
                                              static_cast<engine::Price>(10000 + i),
                                              10,
                                              engine::EventType::New,
