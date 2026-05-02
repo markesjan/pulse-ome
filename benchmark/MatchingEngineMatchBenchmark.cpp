@@ -7,7 +7,8 @@ static void BM_MatchingEngineMatchSingle(benchmark::State& state) {
     const int64_t n = state.range(0);
 
     auto setupEngine = [n] {
-        auto matchingEngine = std::make_unique<engine::MatchingEngine>();
+        auto matchingEngine = std::make_unique<engine::MatchingEngine>(
+            static_cast<std::size_t>(n + 2 * BATCH_SIZE + 1000), 20'000);
         std::vector<engine::Trade> dummyTrades;
         dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
@@ -65,9 +66,15 @@ constexpr int64_t SWEEP_BATCH_SIZE = 100;
 static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
     const int64_t n = state.range(0);
 
-    auto setupEngine = [n] {
-        const int64_t totalResting = n * SWEEP_BATCH_SIZE;
-        auto matchingEngine = std::make_unique<engine::MatchingEngine>();
+    const int64_t totalResting = n * SWEEP_BATCH_SIZE;
+    const engine::Price maxGeneratedPrice = static_cast<engine::Price>(10000 + totalResting);
+    const engine::Price sweepPriceLimit = maxGeneratedPrice + 100;
+
+    auto setupEngine = [totalResting, maxGeneratedPrice] {
+        std::size_t maxOrders = static_cast<std::size_t>(totalResting + SWEEP_BATCH_SIZE + 1000);
+        engine::Price maxPrice = maxGeneratedPrice + 500;
+
+        auto matchingEngine = std::make_unique<engine::MatchingEngine>(maxOrders, maxPrice);
         std::vector<engine::Trade> dummyTrades;
         dummyTrades.reserve(static_cast<std::size_t>(totalResting));
 
@@ -95,7 +102,7 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
             matchingEngine->processOrder({
                                              1'000'000'000,
                                              static_cast<engine::OrderId>(nextId++),
-                                             2'000'000,
+                                             sweepPriceLimit,
                                              static_cast<engine::Quantity>(n * 10),
                                              engine::EventType::New,
                                              engine::Side::Buy
@@ -117,5 +124,5 @@ static void BM_MatchingEngineMatchSweep(benchmark::State& state) {
 BENCHMARK(BM_MatchingEngineMatchSweep)
      ->RangeMultiplier(2)
      ->Range(8, 50'000)
-     ->Complexity(benchmark::oAuto)
+     ->Complexity(benchmark::oN)
      ->Unit(benchmark::kNanosecond);
