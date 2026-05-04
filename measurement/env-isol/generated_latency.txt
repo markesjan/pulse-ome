@@ -1,0 +1,105 @@
+cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        11.31 ms
+[ 1/10] Bench: 11.31 ms
+[ 2/10] Bench: 11.31 ms
+[ 3/10] Bench: 11.32 ms
+[ 4/10] Bench: 11.32 ms
+[ 5/10] Bench: 11.33 ms
+[ 6/10] Bench: 11.32 ms
+[ 7/10] Bench: 11.34 ms
+[ 8/10] Bench: 11.33 ms
+[ 9/10] Bench: 11.31 ms
+[10/10] Bench: 11.31 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        11.32 ms
+Avg throughput:      8.83 M orders/s
+
+--- Latency ---
+Min:                 60 ns
+Max:                 6479 ns
+Average:             73 ns
+Median (p50):        70 ns
+90. perc (p90):      80 ns
+99. perc (p99):      90 ns
+99.9. perc (p99.9):  130 ns
+=============================================
+cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        10.63 ms
+[ 1/10] Bench: 10.62 ms
+[ 2/10] Bench: 10.63 ms
+[ 3/10] Bench: 10.65 ms
+[ 4/10] Bench: 10.64 ms
+[ 5/10] Bench: 10.68 ms
+[ 6/10] Bench: 10.62 ms
+[ 7/10] Bench: 10.64 ms
+[ 8/10] Bench: 10.62 ms
+[ 9/10] Bench: 10.63 ms
+[10/10] Bench: 10.62 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        10.64 ms
+Avg throughput:      9.40 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 6579 ns
+Average:             67 ns
+Median (p50):        70 ns
+90. perc (p90):      80 ns
+99. perc (p99):      90 ns
+99.9. perc (p99.9):  120 ns
+=============================================
+cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        13.29 ms
+[ 1/10] Bench: 13.29 ms
+[ 2/10] Bench: 13.28 ms
+[ 3/10] Bench: 13.26 ms
+[ 4/10] Bench: 13.27 ms
+[ 5/10] Bench: 13.29 ms
+[ 6/10] Bench: 13.27 ms
+[ 7/10] Bench: 13.30 ms
+[ 8/10] Bench: 13.28 ms
+[ 9/10] Bench: 13.27 ms
+[10/10] Bench: 13.27 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69489
+Match rate:          69.49 %
+Avg duration:        13.28 ms
+Avg throughput:      7.53 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 6338 ns
+Average:             93 ns
+Median (p50):        90 ns
+90. perc (p90):      130 ns
+99. perc (p99):      200 ns
+99.9. perc (p99.9):  270 ns
+=============================================

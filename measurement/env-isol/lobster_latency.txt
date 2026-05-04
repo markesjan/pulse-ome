@@ -1,0 +1,108 @@
+cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        42.19 ms
+[ 1/10] Bench: 42.13 ms
+[ 2/10] Bench: 42.03 ms
+[ 3/10] Bench: 41.94 ms
+[ 4/10] Bench: 41.91 ms
+[ 5/10] Bench: 41.91 ms
+[ 6/10] Bench: 42.24 ms
+[ 7/10] Bench: 41.96 ms
+[ 8/10] Bench: 41.89 ms
+[ 9/10] Bench: 41.91 ms
+[10/10] Bench: 41.86 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        41.98 ms
+Avg throughput:      8.70 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 10373 ns
+Average:             75 ns
+Median (p50):        70 ns
+90. perc (p90):      100 ns
+99. perc (p99):      300 ns
+99.9. perc (p99.9):  811 ns
+=============================================
+ cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        29.49 ms
+[ 1/10] Bench: 29.49 ms
+[ 2/10] Bench: 29.38 ms
+[ 3/10] Bench: 29.42 ms
+[ 4/10] Bench: 29.39 ms
+[ 5/10] Bench: 29.31 ms
+[ 6/10] Bench: 29.37 ms
+[ 7/10] Bench: 29.35 ms
+[ 8/10] Bench: 29.34 ms
+[ 9/10] Bench: 29.33 ms
+[10/10] Bench: 29.33 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        29.37 ms
+Avg throughput:      8.80 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 9693 ns
+Average:             74 ns
+Median (p50):        70 ns
+90. perc (p90):      90 ns
+99. perc (p99):      270 ns
+99.9. perc (p99.9):  941 ns
+=============================================
+ cmake-build-release (feature/env-isol) ✗ ./matching_engine -l -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        71.01 ms
+[ 1/10] Bench: 70.81 ms
+[ 2/10] Bench: 71.02 ms
+[ 3/10] Bench: 70.98 ms
+[ 4/10] Bench: 71.11 ms
+[ 5/10] Bench: 71.12 ms
+[ 6/10] Bench: 71.17 ms
+[ 7/10] Bench: 71.14 ms
+[ 8/10] Bench: 71.08 ms
+[ 9/10] Bench: 71.13 ms
+[10/10] Bench: 71.00 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        71.06 ms
+Avg throughput:      8.94 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 17525 ns
+Average:             72 ns
+Median (p50):        70 ns
+90. perc (p90):      90 ns
+99. perc (p99):      150 ns
+99.9. perc (p99.9):  1281 ns
+=============================================
