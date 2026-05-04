@@ -25,6 +25,7 @@ private:
     std::vector<uint64_t> latencies;
 
     void prepareOrders();
+    void applyIsolation() const;
     double matchOrders();
     static double countCyclesPerNs();
 };

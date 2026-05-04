@@ -11,6 +11,8 @@ struct Config {
     std::string orderFile;
     std::string tradeFile;
     bool measureLatency = false;
+    int cpuCore = -1;
+    bool lockMemory = false;
     uint32_t genSeed = 42;
     std::size_t genCount = 100'000;
     uint8_t genCancelPercent = 20;

@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <print>
 #include <thread>
+#include <pthread.h>
+#include <sys/mman.h>
 
 #include "LobsterOrderLoader.hpp"
 #include "OrderGenerator.hpp"
@@ -24,6 +26,7 @@ Application::Application(const Config& config) : config(config) {
 }
 
 void Application::run() {
+    applyIsolation();
     prepareOrders();
 
     trades.reserve(orders.size());
@@ -95,6 +98,26 @@ void Application::prepareOrders() {
     if (orders.empty()) {
         std::println(stderr, "Couldn't load or generate any data");
         exit(1);
+    }
+}
+
+void Application::applyIsolation() const {
+    if (config.lockMemory) {
+        if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0)
+            std::println(stderr, "Warning: Failed to lock memory");
+        else
+            std::println("Memory locked successfully");
+    }
+
+    if (config.cpuCore >= 0) {
+        cpu_set_t cpuset;
+        CPU_ZERO(&cpuset);
+        CPU_SET(config.cpuCore, &cpuset);
+
+        if (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) != 0)
+            std::println(stderr, "Warning: Failed to set thread affinity to core {}", config.cpuCore);
+        else
+            std::println("Thread successfully pinned to core {}", config.cpuCore);
     }
 }
 

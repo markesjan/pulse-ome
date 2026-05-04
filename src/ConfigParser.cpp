@@ -18,6 +18,10 @@ Config ConfigParser::parseArguments(int argc, char* argv[]) {
             config.tradeFile = argv[++i];
         } else if (arg == "--latency" || arg == "-l") {
             config.measureLatency = true;
+        } else if ((arg == "--cpu" || arg == "-c") && i + 1 < argc) {
+            config.cpuCore = std::stoi(argv[++i]);
+        } else if (arg == "--lock-memory" || arg == "-m") {
+            config.lockMemory = true;
         } else if ((arg == "--seed" || arg == "-s") && i + 1 < argc) {
             config.genSeed = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if ((arg == "--generate" || arg == "-g") && i + 1 < argc) {
@@ -36,6 +40,8 @@ Config ConfigParser::parseArguments(int argc, char* argv[]) {
                 "  -i, --input <path>      Path to input CSV file with orders\n"
                 "  -o, --output <path>     Path to output CSV file for trades\n"
                 "  -l, --latency           Enable latency measurement (slows throughput)\n"
+                "  -c, --cpu <core>        Pin thread to specific CPU core\n"
+                "  -m, --lock-memory       Lock memory into RAM\n"
                 "  -s, --seed <seed>       Seed for random order generation\n"
                 "  -g, --generate <count>  Generate specified number of random orders\n"
                 "      --cancel <percent>  Cancellation percentage of all generated orders\n"
