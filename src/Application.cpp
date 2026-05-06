@@ -29,9 +29,9 @@ void Application::run() {
     applyIsolation();
     prepareOrders();
 
-    trades.reserve(orders.size());
+    trades.reserve(orderMsgs.size());
     if (config.measureLatency)
-        latencies.reserve(orders.size());
+        latencies.reserve(orderMsgs.size());
 
     std::println("Running {} iterations...\n", TOTAL_RUNS);
 
@@ -57,7 +57,7 @@ void Application::run() {
     }
 
     double avgDurationMs = totalWarmedUpDurationMs / BENCHMARK_RUNS;
-    double avgThroughput = static_cast<double>(orders.size()) / (avgDurationMs / 1000.0);
+    double avgThroughput = static_cast<double>(orderMsgs.size()) / (avgDurationMs / 1000.0);
 
     std::vector<uint64_t> latenciesNs;
     if (config.measureLatency && !latencies.empty()) {
@@ -72,7 +72,7 @@ void Application::run() {
         std::ranges::sort(latenciesNs);
     }
 
-    ResultWriter::printSummary(avgDurationMs, avgThroughput, orders.size(), trades.size(),
+    ResultWriter::printSummary(avgDurationMs, avgThroughput, orderMsgs.size(), trades.size(),
                                latenciesNs);
 
     if (!config.tradeFile.empty()) {
@@ -84,10 +84,10 @@ void Application::run() {
 void Application::prepareOrders() {
     if (!config.orderFile.empty()) {
         std::println("Loading orders from file: {}", config.orderFile);
-        orders = LobsterOrderLoader::load(config.orderFile, *idMapper);
+        orderMsgs = LobsterOrderLoader::load(config.orderFile, *idMapper);
     } else {
         std::println("Generating {} orders (seed: {})", config.genCount, config.genSeed);
-        orders = OrderGenerator::generate(config.genSeed,
+        orderMsgs = OrderGenerator::generate(config.genSeed,
                                           config.genCount,
                                           config.genCancelPercent,
                                           config.genBasePrice,
@@ -95,7 +95,7 @@ void Application::prepareOrders() {
                                           config.genStdDev);
     }
 
-    if (orders.empty()) {
+    if (orderMsgs.empty()) {
         std::println(stderr, "Couldn't load or generate any data");
         exit(1);
     }
@@ -125,7 +125,7 @@ double Application::matchOrders() {
     auto matchingStart = std::chrono::steady_clock::now();
 
     if (config.measureLatency) {
-        for (const auto& order : orders) {
+        for (const auto& order : orderMsgs) {
             _mm_lfence();
             uint64_t tickStart = __rdtsc();
             _mm_lfence();
@@ -139,7 +139,7 @@ double Application::matchOrders() {
             latencies.push_back(tickEnd - tickStart);
         }
     } else {
-        for (const auto& order : orders)
+        for (const auto& order : orderMsgs)
             matchingEngine->processOrder(order, trades);
     }
 

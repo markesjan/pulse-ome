@@ -6,16 +6,16 @@
 
 namespace engine {
 
-std::vector<Order> LobsterOrderLoader::load(const std::string& filePath,
-                                            OrderIdMapper& idMapper) {
+std::vector<OrderMessage> LobsterOrderLoader::load(const std::string& filePath,
+                                                   OrderIdMapper& idMapper) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::println(stderr, "Couldn't open file: {}", filePath);
         exit(1);
     }
 
-    std::vector<Order> orders;
-    orders.reserve(1'000'000);
+    std::vector<OrderMessage> orderMsgs;
+    orderMsgs.reserve(1'000'000);
 
     std::string line;
     while (std::getline(file, line)) {
@@ -57,7 +57,7 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath,
 
             auto rawSide = static_cast<int8_t>(std::strtol(p, &end, 10));
 
-            orders.emplace_back(Order{
+            orderMsgs.emplace_back(OrderMessage{
                 fixedTimestamp,
                 idMapper.toInternal(rawExternalId),
                 price,
@@ -68,10 +68,10 @@ std::vector<Order> LobsterOrderLoader::load(const std::string& filePath,
         }
     }
 
-    orders.shrink_to_fit();
-    std::println("Loaded {} relevant order events.", orders.size());
+    orderMsgs.shrink_to_fit();
+    std::println("Loaded {} relevant order events.", orderMsgs.size());
 
-    return orders;
+    return orderMsgs;
 }
 
 } // namespace engine

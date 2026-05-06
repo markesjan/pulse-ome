@@ -13,8 +13,9 @@ class OrderBook {
 public:
     OrderBook(std::size_t maxOrders, Price maxPrice);
 
-    void insert(const Order& order);
-    void cancel(const Order& order);
+    void insert(const Order& order, Side side);
+    void cancelPartial(OrderId orderId, Quantity cancelQty);
+    void cancelFull(OrderId orderId);
 
     void eraseLocation(OrderId orderId);
     Order* bestBid();

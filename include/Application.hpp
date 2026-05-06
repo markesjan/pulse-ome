@@ -20,7 +20,7 @@ private:
     std::optional<OrderIdMapper> idMapper;
     std::optional<MatchingEngine> matchingEngine;
 
-    std::vector<Order> orders;
+    std::vector<OrderMessage> orderMsgs;
     std::vector<Trade> trades;
     std::vector<uint64_t> latencies;
 

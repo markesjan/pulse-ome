@@ -4,12 +4,12 @@
 
 namespace engine {
 
-std::vector<Order> OrderGenerator::generate(uint32_t seed,
-                                            std::size_t ordersCount,
-                                            uint8_t cancelPercent,
-                                            Price basePrice,
-                                            double meanOffset,
-                                            double stdDev) {
+std::vector<OrderMessage> OrderGenerator::generate(uint32_t seed,
+                                                   std::size_t ordersCount,
+                                                   uint8_t cancelPercent,
+                                                   Price basePrice,
+                                                   double meanOffset,
+                                                   double stdDev) {
     std::mt19937 gen(seed);
     std::uniform_int_distribution eventDist(1, 100);
     std::uniform_int_distribution sideDist(0, 1);
@@ -23,8 +23,8 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
         Side side;
     };
 
-    std::vector<Order> orders;
-    orders.reserve(ordersCount);
+    std::vector<OrderMessage> orderMsgs;
+    orderMsgs.reserve(ordersCount);
     std::vector<ActiveOrder> activeOrders;
     activeOrders.reserve(ordersCount);
 
@@ -36,7 +36,8 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
 
         if (eventDist(gen) <= static_cast<int>(cancelPercent) && !activeOrders.empty()) {
             std::size_t window_size = std::min<std::size_t>(activeOrders.size(), 100);
-            std::uniform_int_distribution recentDist(activeOrders.size() - window_size, activeOrders.size() - 1);
+            std::uniform_int_distribution recentDist(activeOrders.size() - window_size,
+                                                     activeOrders.size() - 1);
             std::size_t cancelIdx = recentDist(gen);
             ActiveOrder orderToCancel = activeOrders[cancelIdx];
 
@@ -55,7 +56,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
                 cancelQty = partialQtyDist(gen);
             }
 
-            orders.push_back(Order{
+            orderMsgs.push_back(OrderMessage{
                 currTimestamp,
                 orderToCancel.id,
                 0,
@@ -73,7 +74,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
 
             activeOrders.push_back(ActiveOrder{nextOrderId, side});
 
-            orders.push_back(Order{
+            orderMsgs.push_back(OrderMessage{
                 currTimestamp,
                 nextOrderId++,
                 price,
@@ -84,7 +85,7 @@ std::vector<Order> OrderGenerator::generate(uint32_t seed,
         }
     }
 
-    return orders;
+    return orderMsgs;
 }
 
 } // namespace engine

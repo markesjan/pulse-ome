@@ -4,15 +4,23 @@
 
 namespace engine {
 
-struct Order {
+struct OrderMessage {
     Timestamp timestamp;
     OrderId orderId;
     Price price;
     Quantity quantity;
     EventType eventType;
     Side side;
-
-    OrderIndex nextOrderIdx = INVALID_INDEX;
 };
+
+struct alignas(32) Order {
+    Timestamp timestamp;
+    OrderId orderId;
+    Price price;
+    Quantity quantity;
+    OrderIndex nextOrderIdx;
+};
+
+static_assert(sizeof(Order) == 32, "Order struct not aligned with cache line!");
 
 } // namespace engine

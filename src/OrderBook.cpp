@@ -18,11 +18,11 @@ OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice)
     currBestAsk = INVALID_PRICE;
 }
 
-void OrderBook::insert(const Order& order) {
+void OrderBook::insert(const Order& order, Side side) {
     OrderIndex idx = allocateOrder(order);
     locations[order.orderId] = idx;
 
-    if (order.side == Side::Buy) {
+    if (side == Side::Buy) {
         PriceLevel& level = bids[order.price];
 
         if (level.headIdx == INVALID_INDEX) {
@@ -53,23 +53,28 @@ void OrderBook::insert(const Order& order) {
     }
 }
 
-void OrderBook::cancel(const Order& order) {
-    OrderIndex idx = locations[order.orderId];
-
+void OrderBook::cancelPartial(OrderId orderId, Quantity cancelQty) {
+    OrderIndex idx = locations[orderId];
     if (idx == INVALID_INDEX)
         return;
 
     Order& poolOrder = ordersPool[idx];
 
-    if (order.eventType == EventType::PartialCancel) {
-        if (poolOrder.quantity > order.quantity) {
-            poolOrder.quantity -= order.quantity;
-            return;
-        }
+    if (poolOrder.quantity > cancelQty) {
+        poolOrder.quantity -= cancelQty;
+    } else {
+        poolOrder.quantity = 0;
+        locations[orderId] = INVALID_INDEX;
     }
+}
 
-    poolOrder.quantity = 0;
-    locations[order.orderId] = INVALID_INDEX;
+void OrderBook::cancelFull(OrderId orderId) {
+    OrderIndex idx = locations[orderId];
+    if (idx == INVALID_INDEX)
+        return;
+
+    ordersPool[idx].quantity = 0;
+    locations[orderId] = INVALID_INDEX;
 }
 
 void OrderBook::eraseLocation(OrderId orderId) {
