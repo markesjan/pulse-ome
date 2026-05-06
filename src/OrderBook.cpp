@@ -8,7 +8,6 @@ namespace engine {
 OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice)
     : bidBits(maxPrice), askBits(maxPrice) {
     ordersPool.reserve(maxOrders);
-    freeIndices.reserve(maxOrders);
     locations.resize(maxOrders, INVALID_INDEX);
 
     bids.resize(maxPrice + 1);
@@ -16,6 +15,7 @@ OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice)
 
     currBestBid = 0;
     currBestAsk = INVALID_PRICE;
+    firstFreeIdx = INVALID_INDEX;
 }
 
 void OrderBook::insert(const Order& order, Side side) {
@@ -209,9 +209,9 @@ std::vector<OrderBookLevel> OrderBook::bookState(std::size_t depth) const {
 }
 
 OrderIndex OrderBook::allocateOrder(const Order& order) {
-    if (!freeIndices.empty()) {
-        OrderIndex idx = freeIndices.back();
-        freeIndices.pop_back();
+    if (firstFreeIdx != INVALID_INDEX) {
+        OrderIndex idx = firstFreeIdx;
+        firstFreeIdx = ordersPool[idx].nextOrderIdx;
 
         ordersPool[idx] = order;
         ordersPool[idx].nextOrderIdx = INVALID_INDEX;
@@ -228,7 +228,8 @@ OrderIndex OrderBook::allocateOrder(const Order& order) {
 }
 
 void OrderBook::freeOrder(OrderIndex index) {
-    freeIndices.push_back(index);
+    ordersPool[index].nextOrderIdx = firstFreeIdx;
+    firstFreeIdx = index;
 }
 
 } // namespace engine

@@ -25,7 +25,7 @@ public:
 
 private:
     std::vector<Order> ordersPool;
-    std::vector<OrderIndex> freeIndices;
+    OrderIndex firstFreeIdx;
     std::vector<OrderIndex> locations;
 
     std::vector<PriceLevel> bids;
