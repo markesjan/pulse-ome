@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
-string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3 -g -fno-omit-frame-pointer")
+# Add these flags for debug and profiling: -g -fno-omit-frame-pointer
+string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3")
 
 include(FetchContent)
 
