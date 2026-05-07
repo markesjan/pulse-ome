@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <print>
+#include <iostream>
+#include <format>
 
 #include "MatchingEngine.hpp"
 #include "LobsterOrderLoader.hpp"
@@ -42,15 +43,17 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         const auto& firstState = expectedStates[0];
         for (std::size_t lvl = 0; lvl < depth; ++lvl) {
             if (firstState[lvl].askQty > 0) {
-                matchingEngine.processOrder(Order{0, 999999900 + lvl, firstState[lvl].askPrice,
-                                                  firstState[lvl].askQty, EventType::New,
-                                                  Side::Sell},
+                matchingEngine.processOrder(OrderMessage{0, 999999900 + lvl,
+                                                         firstState[lvl].askPrice,
+                                                         firstState[lvl].askQty, EventType::New,
+                                                         Side::Sell},
                                             trades);
             }
             if (firstState[lvl].bidQty > 0) {
-                matchingEngine.processOrder(Order{0, 999999800 + lvl, firstState[lvl].bidPrice,
-                                                  firstState[lvl].bidQty, EventType::New,
-                                                  Side::Buy},
+                matchingEngine.processOrder(OrderMessage{0, 999999800 + lvl,
+                                                         firstState[lvl].bidPrice,
+                                                         firstState[lvl].bidQty, EventType::New,
+                                                         Side::Buy},
                                             trades);
             }
         }
@@ -77,9 +80,9 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         }
 
         if (HasFailure()) {
-            std::println(stderr, "Market desynchronized ({})", symbol);
-            std::println(stderr, "Message ID: {}, Type: {}", orders[i].orderId,
-                         static_cast<int>(orders[i].eventType));
+            std::cerr << std::format("Market desynchronized ({})\n", symbol);
+            std::cerr << std::format("Message ID: {}, Type: {}\n", orders[i].orderId,
+                                     static_cast<int>(orders[i].eventType));
             FAIL() << "Stopping test for " << symbol;
         }
     }

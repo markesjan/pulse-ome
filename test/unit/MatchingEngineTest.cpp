@@ -9,8 +9,12 @@ protected:
     MatchingEngine engine{10'000, 20'000};
     std::vector<Trade> trades;
 
-    static Order makeOrder(OrderId id, Price p, Quantity q, Side s, EventType t = EventType::New) {
-        return Order{1'000'000'000, id, p, q, t, s};
+    static OrderMessage makeOrder(OrderId id,
+                                  Price p,
+                                  Quantity q,
+                                  Side s,
+                                  EventType t = EventType::New) {
+        return OrderMessage{1'000'000'000, id, p, q, t, s};
     }
 };
 
