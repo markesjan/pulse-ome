@@ -1,0 +1,105 @@
+cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -l -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        9.65 ms
+[ 1/10] Bench: 9.66 ms
+[ 2/10] Bench: 9.65 ms
+[ 3/10] Bench: 9.66 ms
+[ 4/10] Bench: 9.67 ms
+[ 5/10] Bench: 9.65 ms
+[ 6/10] Bench: 9.66 ms
+[ 7/10] Bench: 9.67 ms
+[ 8/10] Bench: 9.67 ms
+[ 9/10] Bench: 9.70 ms
+[10/10] Bench: 9.66 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        9.66 ms
+Avg throughput:      10.35 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 7248 ns
+Average:             57 ns
+Median (p50):        60 ns
+90. perc (p90):      60 ns
+99. perc (p99):      70 ns
+99.9. perc (p99.9):  100 ns
+=============================================
+ cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -l -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        9.86 ms
+[ 1/10] Bench: 9.85 ms
+[ 2/10] Bench: 9.86 ms
+[ 3/10] Bench: 9.87 ms
+[ 4/10] Bench: 9.86 ms
+[ 5/10] Bench: 9.86 ms
+[ 6/10] Bench: 9.86 ms
+[ 7/10] Bench: 9.89 ms
+[ 8/10] Bench: 9.87 ms
+[ 9/10] Bench: 9.87 ms
+[10/10] Bench: 9.87 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        9.87 ms
+Avg throughput:      10.14 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 6945 ns
+Average:             59 ns
+Median (p50):        60 ns
+90. perc (p90):      70 ns
+99. perc (p99):      80 ns
+99.9. perc (p99.9):  90 ns
+=============================================
+ cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -l -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        12.08 ms
+[ 1/10] Bench: 12.08 ms
+[ 2/10] Bench: 12.07 ms
+[ 3/10] Bench: 12.05 ms
+[ 4/10] Bench: 12.06 ms
+[ 5/10] Bench: 12.06 ms
+[ 6/10] Bench: 12.07 ms
+[ 7/10] Bench: 12.06 ms
+[ 8/10] Bench: 12.09 ms
+[ 9/10] Bench: 12.07 ms
+[10/10] Bench: 12.07 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69489
+Match rate:          69.49 %
+Avg duration:        12.07 ms
+Avg throughput:      8.29 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 10841 ns
+Average:             81 ns
+Median (p50):        70 ns
+90. perc (p90):      110 ns
+99. perc (p99):      170 ns
+99.9. perc (p99.9):  230 ns
+=============================================

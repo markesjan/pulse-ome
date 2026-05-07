@@ -1,0 +1,87 @@
+cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -g 100000 --cancel 0 --price 100000 --offset 5000 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        1.77 ms
+[ 1/10] Bench: 1.75 ms
+[ 2/10] Bench: 1.75 ms
+[ 3/10] Bench: 1.78 ms
+[ 4/10] Bench: 1.76 ms
+[ 5/10] Bench: 1.75 ms
+[ 6/10] Bench: 1.75 ms
+[ 7/10] Bench: 1.75 ms
+[ 8/10] Bench: 2.30 ms
+[ 9/10] Bench: 1.78 ms
+[10/10] Bench: 1.75 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        1.81 ms
+Avg throughput:      55.11 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -g 100000 --cancel 50 --price 100000 --offset 100 --deviation 0 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        1.90 ms
+[ 1/10] Bench: 1.90 ms
+[ 2/10] Bench: 1.90 ms
+[ 3/10] Bench: 1.90 ms
+[ 4/10] Bench: 1.90 ms
+[ 5/10] Bench: 1.90 ms
+[ 6/10] Bench: 1.91 ms
+[ 7/10] Bench: 1.89 ms
+[ 8/10] Bench: 1.92 ms
+[ 9/10] Bench: 1.91 ms
+[10/10] Bench: 1.90 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      0
+Match rate:          0.00 %
+Avg duration:        1.90 ms
+Avg throughput:      52.52 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-pgo (feature/micro-opt) ✗ ./matching_engine -g 100000 --cancel 10 --price 100000 --offset 0 --deviation 50 -m -c 11
+Memory locked successfully
+Thread successfully pinned to core 11
+Generating 100000 orders (seed: 42)
+Running 11 iterations...
+
+Warmup:        4.04 ms
+[ 1/10] Bench: 4.01 ms
+[ 2/10] Bench: 4.00 ms
+[ 3/10] Bench: 4.02 ms
+[ 4/10] Bench: 4.02 ms
+[ 5/10] Bench: 4.01 ms
+[ 6/10] Bench: 4.03 ms
+[ 7/10] Bench: 4.07 ms
+[ 8/10] Bench: 3.99 ms
+[ 9/10] Bench: 4.02 ms
+[10/10] Bench: 4.02 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    100000
+Created trades:      69489
+Match rate:          69.49 %
+Avg duration:        4.02 ms
+Avg throughput:      24.88 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================

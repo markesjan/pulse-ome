@@ -8,6 +8,30 @@ set(CMAKE_CXX_EXTENSIONS False)
 # Add these flags for debug and profiling: -g -fno-omit-frame-pointer
 string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O3")
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+if (NOT ipo_supported)
+    message(WARNING "IPO / LTO is not supported by your compiler: ${ipo_error}")
+endif ()
+
+option(ENABLE_PGO_GENERATE "Compile with PGO instrumentation" OFF)
+option(ENABLE_PGO_USE "Compile with PGO profile data" OFF)
+
+if (ENABLE_PGO_GENERATE)
+    set(PGO_FLAGS "-fprofile-generate")
+    message(STATUS "PGO: Profile Generation ENABLED")
+elseif (ENABLE_PGO_USE)
+    set(PGO_FLAGS "-fprofile-use" "-fprofile-correction" "-Wno-missing-profile")
+    message(STATUS "PGO: Profile Use ENABLED")
+endif ()
+
+function(apply_pgo TARGET_NAME)
+    if (PGO_FLAGS)
+        target_compile_options(${TARGET_NAME} PRIVATE ${PGO_FLAGS})
+        target_link_options(${TARGET_NAME} PRIVATE ${PGO_FLAGS})
+    endif ()
+endfunction()
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -47,14 +71,28 @@ target_compile_options(engine_lib PUBLIC
         -Wshadow
         -Wconversion
         -Wsign-conversion
+        -march=native
 )
+
+if (ipo_supported)
+    set_target_properties(engine_lib PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+apply_pgo(engine_lib)
 
 add_executable(matching_engine src/main.cpp)
 target_link_libraries(matching_engine PRIVATE engine_lib)
+if (ipo_supported)
+    set_target_properties(matching_engine PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+apply_pgo(matching_engine)
 
 file(GLOB BENCHMARK_SOURCES CONFIGURE_DEPENDS "benchmark/*.cpp")
 add_executable(engine_benchmarks ${BENCHMARK_SOURCES})
 target_link_libraries(engine_benchmarks PRIVATE benchmark::benchmark engine_lib)
+if (ipo_supported)
+    set_target_properties(engine_benchmarks PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+apply_pgo(engine_benchmarks)
 
 file(GLOB UNIT_TEST_SOURCES CONFIGURE_DEPENDS "test/unit/*.cpp")
 add_executable(unit_tests ${UNIT_TEST_SOURCES})
