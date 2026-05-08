@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  OrderGenerator.hpp
- * @brief Declaration of the OrderGenerator class for synthetic order generation.
+ * @brief Definition of the OrderGenerator class for synthetic order generation.
  */
 
 #pragma once

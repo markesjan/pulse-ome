@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  Application.hpp
- * @brief Declaration of the Application class and program execution logic.
+ * @brief Definition of the Application class and program execution logic.
  */
 
 #pragma once

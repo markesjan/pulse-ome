@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  LobsterStateLoader.hpp
- * @brief Declaration of the LobsterStateLoader class for loading LOBSTER order book snapshots.
+ * @brief Definition of the LobsterStateLoader class for loading LOBSTER order book snapshots.
  */
 
 #pragma once

@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  ConfigParser.hpp
- * @brief Declaration of the ConfigParser class for command-line arguments.
+ * @brief Definition of the ConfigParser class for command-line arguments.
  */
 
 #pragma once

@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  LobsterOrderLoader.hpp
- * @brief Declaration of the LobsterOrderLoader class for loading LOBSTER message data.
+ * @brief Definition of the LobsterOrderLoader class for loading LOBSTER message data.
  */
 
 #pragma once

@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  OrderBook.hpp
- * @brief Declaration of the OrderBook class representing the limit order book.
+ * @brief Definition of the OrderBook class representing the limit order book.
  */
 
 #pragma once

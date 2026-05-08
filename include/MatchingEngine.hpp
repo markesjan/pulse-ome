@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  MatchingEngine.hpp
- * @brief Declaration of the MatchingEngine class, which manages order matching and trade execution.
+ * @brief Definition of the MatchingEngine class, which manages order matching and trade execution.
  */
 
 #pragma once
