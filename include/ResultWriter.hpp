@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "OrderIdMapper.hpp"
 #include "Trade.hpp"
@@ -26,7 +26,6 @@ public:
     static void writeTrades(const std::vector<Trade>& trades,
                             const std::string& filePath,
                             const OrderIdMapper* idMapper = nullptr);
-
 };
 
 } // namespace engine

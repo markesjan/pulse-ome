@@ -10,3 +10,5 @@ InsertNewlineAtEOF: true
 MaxEmptyLinesToKeep: 1
 KeepEmptyLinesAtTheStartOfBlocks: true
 SeparateDefinitionBlocks: Always
+AccessModifierOffset: -4
+SpacesBeforeTrailingComments: 1

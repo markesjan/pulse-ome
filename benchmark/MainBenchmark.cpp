@@ -9,9 +9,9 @@
 #include <benchmark/benchmark.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include <print>
 #include <string>
 #include <vector>
-#include <print>
 
 int main(int argc, char** argv) {
     benchmark::MaybeReenterWithoutASLR(argc, argv);

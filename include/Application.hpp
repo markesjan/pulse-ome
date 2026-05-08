@@ -11,8 +11,8 @@
 #include <optional>
 
 #include "Config.hpp"
-#include "Order.hpp"
 #include "MatchingEngine.hpp"
+#include "Order.hpp"
 #include "OrderIdMapper.hpp"
 #include "Trade.hpp"
 

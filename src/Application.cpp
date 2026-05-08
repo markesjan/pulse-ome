@@ -8,14 +8,14 @@
 
 #include "Application.hpp"
 
+#include <pthread.h>
+#include <sys/mman.h>
+#include <x86intrin.h>
 #include <algorithm>
 #include <chrono>
-#include <x86intrin.h>
 #include <cstdio>
 #include <print>
 #include <thread>
-#include <pthread.h>
-#include <sys/mman.h>
 
 #include "LobsterOrderLoader.hpp"
 #include "OrderGenerator.hpp"
@@ -95,12 +95,9 @@ void Application::prepareOrders() {
         orderMsgs = LobsterOrderLoader::load(config.orderFile, *idMapper);
     } else {
         std::println("Generating {} orders (seed: {})", config.genCount, config.genSeed);
-        orderMsgs = OrderGenerator::generate(config.genSeed,
-                                          config.genCount,
-                                          config.genCancelPercent,
-                                          config.genBasePrice,
-                                          config.genMeanOffset,
-                                          config.genStdDev);
+        orderMsgs =
+            OrderGenerator::generate(config.genSeed, config.genCount, config.genCancelPercent,
+                                     config.genBasePrice, config.genMeanOffset, config.genStdDev);
     }
 
     if (orderMsgs.empty()) {
@@ -123,9 +120,9 @@ void Application::applyIsolation() const {
         CPU_SET(config.cpuCore, &cpuset);
 
         if (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) != 0)
-            std::println(stderr, "Warning: Failed to set thread affinity to core {}", config.cpuCore);
+            std::println(stderr, "Warning: Failed to pin thread to core {}", config.cpuCore);
         else
-            std::println("Thread successfully pinned to core {}", config.cpuCore);
+            std::println("Thread successfully pinned thread to core {}", config.cpuCore);
     }
 }
 

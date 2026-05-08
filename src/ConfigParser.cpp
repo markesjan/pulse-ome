@@ -43,7 +43,8 @@ Config ConfigParser::parseArguments(int argc, char* argv[]) {
         } else if (arg == "--deviation" && i + 1 < argc) {
             config.genStdDev = std::stod(argv[++i]);
         } else if (arg == "--help" || arg == "-h") {
-            std::print("Usage: ./matching_engine [options]\n\n"
+            std::print(
+                "Usage: ./matching_engine [options]\n\n"
                 "Options:\n"
                 "  -i, --input <path>      Path to input CSV file with orders\n"
                 "  -o, --output <path>     Path to output CSV file for trades\n"

@@ -11,15 +11,13 @@
 namespace engine {
 
 MatchingEngine::MatchingEngine(std::size_t maxOrders, Price maxPrice)
-    : orderBook(maxOrders, maxPrice), tradeIdCnt(0) {
-}
+    : orderBook(maxOrders, maxPrice), tradeIdCnt(0) {}
 
 void MatchingEngine::processOrder(const OrderMessage& orderMsg, std::vector<Trade>& trades) {
     switch (orderMsg.eventType) {
         case EventType::New:
-            orderMsg.side == Side::Buy
-                ? processBuyOrder(orderMsg, trades)
-                : processSellOrder(orderMsg, trades);
+            orderMsg.side == Side::Buy ? processBuyOrder(orderMsg, trades)
+                                       : processSellOrder(orderMsg, trades);
             break;
 
         case EventType::PartialCancel:
@@ -46,14 +44,8 @@ void MatchingEngine::processBuyOrder(const OrderMessage& orderMsg, std::vector<T
 
         Quantity tradeQty = std::min(remainingQty, bestAsk->quantity);
 
-        trades.emplace_back(Trade{
-            orderMsg.timestamp,
-            tradeIdCnt++,
-            orderMsg.orderId,
-            bestAsk->orderId,
-            bestAsk->price,
-            tradeQty
-        });
+        trades.emplace_back(Trade{orderMsg.timestamp, tradeIdCnt++, orderMsg.orderId,
+                                  bestAsk->orderId, bestAsk->price, tradeQty});
 
         remainingQty -= tradeQty;
         bestAsk->quantity -= tradeQty;
@@ -63,13 +55,12 @@ void MatchingEngine::processBuyOrder(const OrderMessage& orderMsg, std::vector<T
     }
 
     if (remainingQty > 0) {
-        orderBook.insert(Order{
-                             .timestamp = orderMsg.timestamp,
-                             .orderId = orderMsg.orderId,
-                             .price = orderMsg.price,
-                             .quantity = remainingQty,
-                             .nextOrderIdx = INVALID_INDEX
-                         }, Side::Buy);
+        orderBook.insert(Order{.timestamp = orderMsg.timestamp,
+                               .orderId = orderMsg.orderId,
+                               .price = orderMsg.price,
+                               .quantity = remainingQty,
+                               .nextOrderIdx = INVALID_INDEX},
+                         Side::Buy);
     }
 }
 
@@ -84,14 +75,8 @@ void MatchingEngine::processSellOrder(const OrderMessage& orderMsg, std::vector<
 
         Quantity tradeQty = std::min(remainingQty, bestBid->quantity);
 
-        trades.emplace_back(Trade{
-            orderMsg.timestamp,
-            tradeIdCnt++,
-            bestBid->orderId,
-            orderMsg.orderId,
-            bestBid->price,
-            tradeQty
-        });
+        trades.emplace_back(Trade{orderMsg.timestamp, tradeIdCnt++, bestBid->orderId,
+                                  orderMsg.orderId, bestBid->price, tradeQty});
 
         remainingQty -= tradeQty;
         bestBid->quantity -= tradeQty;
@@ -101,13 +86,12 @@ void MatchingEngine::processSellOrder(const OrderMessage& orderMsg, std::vector<
     }
 
     if (remainingQty > 0) {
-        orderBook.insert(Order{
-                             .timestamp = orderMsg.timestamp,
-                             .orderId = orderMsg.orderId,
-                             .price = orderMsg.price,
-                             .quantity = remainingQty,
-                             .nextOrderIdx = INVALID_INDEX
-                         }, Side::Sell);
+        orderBook.insert(Order{.timestamp = orderMsg.timestamp,
+                               .orderId = orderMsg.orderId,
+                               .price = orderMsg.price,
+                               .quantity = remainingQty,
+                               .nextOrderIdx = INVALID_INDEX},
+                         Side::Sell);
     }
 }
 

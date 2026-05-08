@@ -64,14 +64,8 @@ std::vector<OrderMessage> OrderGenerator::generate(uint32_t seed,
                 cancelQty = partialQtyDist(gen);
             }
 
-            orderMsgs.push_back(OrderMessage{
-                currTimestamp,
-                orderToCancel.id,
-                0,
-                cancelQty,
-                cancelType,
-                orderToCancel.side
-            });
+            orderMsgs.push_back(OrderMessage{currTimestamp, orderToCancel.id, 0, cancelQty,
+                                             cancelType, orderToCancel.side});
         } else {
             auto side = sideDist(gen) == 0 ? Side::Buy : Side::Sell;
 
@@ -82,14 +76,8 @@ std::vector<OrderMessage> OrderGenerator::generate(uint32_t seed,
 
             activeOrders.push_back(ActiveOrder{nextOrderId, side});
 
-            orderMsgs.push_back(OrderMessage{
-                currTimestamp,
-                nextOrderId++,
-                price,
-                quantity,
-                EventType::New,
-                side
-            });
+            orderMsgs.push_back(
+                OrderMessage{currTimestamp, nextOrderId++, price, quantity, EventType::New, side});
         }
     }
 

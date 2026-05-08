@@ -20,25 +20,15 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
         dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
         for (int64_t i = 0; i < n; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(i),
-                                             10'000,
-                                             100,
-                                             engine::EventType::New,
-                                             engine::Side::Buy
-                                         }, dummyTrades);
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(i), 10'000,
+                                          100, engine::EventType::New, engine::Side::Buy},
+                                         dummyTrades);
         }
 
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(n + i),
-                                             10'000,
-                                             100,
-                                             engine::EventType::New,
-                                             engine::Side::Buy
-                                         }, dummyTrades);
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(n + i),
+                                          10'000, 100, engine::EventType::New, engine::Side::Buy},
+                                         dummyTrades);
         }
 
         return matchingEngine;
@@ -51,14 +41,10 @@ static void BM_MatchingEngineCancelPartial(benchmark::State& state) {
 
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(cancelId++),
-                                             10'000,
-                                             10,
-                                             engine::EventType::PartialCancel,
-                                             engine::Side::Buy
-                                         }, trades);
+            matchingEngine->processOrder(
+                {1'000'000'000, static_cast<engine::OrderId>(cancelId++), 10'000, 10,
+                 engine::EventType::PartialCancel, engine::Side::Buy},
+                trades);
         }
 
         state.PauseTiming();
@@ -87,25 +73,15 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
         dummyTrades.reserve(static_cast<std::size_t>(n + BATCH_SIZE));
 
         for (int64_t i = 0; i < n; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(i),
-                                             10'000,
-                                             100,
-                                             engine::EventType::New,
-                                             engine::Side::Buy
-                                         }, dummyTrades);
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(i), 10'000,
+                                          100, engine::EventType::New, engine::Side::Buy},
+                                         dummyTrades);
         }
 
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(n + i),
-                                             10'000,
-                                             100,
-                                             engine::EventType::New,
-                                             engine::Side::Buy
-                                         }, dummyTrades);
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(n + i),
+                                          10'000, 100, engine::EventType::New, engine::Side::Buy},
+                                         dummyTrades);
         }
 
         return matchingEngine;
@@ -118,14 +94,10 @@ static void BM_MatchingEngineCancelFull(benchmark::State& state) {
 
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (int64_t i = 0; i < BATCH_SIZE; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             static_cast<engine::OrderId>(cancelId++),
-                                             10'000,
-                                             100,
-                                             engine::EventType::FullCancel,
-                                             engine::Side::Buy
-                                         }, trades);
+            matchingEngine->processOrder(
+                {1'000'000'000, static_cast<engine::OrderId>(cancelId++), 10'000, 100,
+                 engine::EventType::FullCancel, engine::Side::Buy},
+                trades);
         }
 
         state.PauseTiming();

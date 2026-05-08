@@ -13,8 +13,7 @@
 
 namespace engine {
 
-OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice)
-    : bidBits(maxPrice), askBits(maxPrice) {
+OrderBook::OrderBook(std::size_t maxOrders, Price maxPrice) : bidBits(maxPrice), askBits(maxPrice) {
     ordersPool.reserve(maxOrders);
     locations.resize(maxOrders, INVALID_INDEX);
 

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 #include "Order.hpp"
 
@@ -23,7 +23,6 @@ public:
                                               Price basePrice,
                                               double meanOffset,
                                               double stdDev);
-
 };
 
 } // namespace engine

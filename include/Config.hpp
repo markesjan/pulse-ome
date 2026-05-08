@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 #include "Types.hpp"
 

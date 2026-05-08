@@ -33,9 +33,6 @@ enum class EventType : uint8_t {
     HiddenExecution = 5,
 };
 
-enum class Side : int8_t {
-    Sell = -1,
-    Buy = 1
-};
+enum class Side : int8_t { Sell = -1, Buy = 1 };
 
 } // namespace engine

@@ -50,13 +50,11 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
         dummyTrades.reserve(static_cast<std::size_t>(n));
 
         for (int64_t i = 0; i < n / 2; ++i) {
-            matchingEngine->processOrder({
-                                             1'000'000'000, static_cast<engine::OrderId>(i),
-                                             9000, 10, engine::EventType::New, engine::Side::Buy},
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(i), 9000, 10,
+                                          engine::EventType::New, engine::Side::Buy},
                                          dummyTrades);
-            matchingEngine->processOrder({
-                                             1'000'000'000, static_cast<engine::OrderId>(n + i),
-                                             11000, 10, engine::EventType::New, engine::Side::Sell},
+            matchingEngine->processOrder({1'000'000'000, static_cast<engine::OrderId>(n + i), 11000,
+                                          10, engine::EventType::New, engine::Side::Sell},
                                          dummyTrades);
         }
 
@@ -69,14 +67,8 @@ static void BM_MatchingEngineFullWorkload(benchmark::State& state) {
 
     while (state.KeepRunningBatch(BATCH_SIZE)) {
         for (const auto& ev : events) {
-            matchingEngine->processOrder({
-                                             1'000'000'000,
-                                             ev.id,
-                                             ev.price,
-                                             10,
-                                             ev.type,
-                                             ev.side
-                                         }, trades);
+            matchingEngine->processOrder({1'000'000'000, ev.id, ev.price, 10, ev.type, ev.side},
+                                         trades);
         }
 
         state.PauseTiming();

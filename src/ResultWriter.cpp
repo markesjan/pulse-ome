@@ -48,14 +48,13 @@ void ResultWriter::printSummary(double avgDurationMs,
     std::println("{:<20} {} ns", "Min:", latencies.front());
     std::println("{:<20} {} ns", "Max:", latencies.back());
     std::println("{:<20} {} ns", "Average:", static_cast<std::size_t>(sum / dblN));
-    std::println("{:<20} {} ns", "Median (p50):",
-                 latencies[static_cast<std::size_t>(dblN * 0.50)]);
-    std::println("{:<20} {} ns", "90. perc (p90):",
-                 latencies[static_cast<std::size_t>(dblN * 0.90)]);
-    std::println("{:<20} {} ns", "99. perc (p99):",
-                 latencies[static_cast<std::size_t>(dblN * 0.99)]);
-    std::println("{:<20} {} ns", "99.9. perc (p99.9):",
-                 latencies[static_cast<std::size_t>(dblN * 0.999)]);
+    std::println("{:<20} {} ns", "Median (p50):", latencies[static_cast<std::size_t>(dblN * 0.50)]);
+    std::println("{:<20} {} ns",
+                 "90. perc (p90):", latencies[static_cast<std::size_t>(dblN * 0.90)]);
+    std::println("{:<20} {} ns",
+                 "99. perc (p99):", latencies[static_cast<std::size_t>(dblN * 0.99)]);
+    std::println("{:<20} {} ns",
+                 "99.9. perc (p99.9):", latencies[static_cast<std::size_t>(dblN * 0.999)]);
 
     std::println("=============================================");
 }
@@ -73,16 +72,13 @@ void ResultWriter::writeTrades(const std::vector<Trade>& trades,
     std::println(outFile, "Timestamp,TradeID,BuyOrderID,SellOrderID,Quantity,Price");
 
     for (const auto& trade : trades) {
-        OrderId externalBuyId = idMapper ? idMapper->toExternal(trade.buyOrderId) : trade.buyOrderId;
-        OrderId externalSellId = idMapper ? idMapper->toExternal(trade.sellOrderId) : trade.sellOrderId;
+        OrderId externalBuyId =
+            idMapper ? idMapper->toExternal(trade.buyOrderId) : trade.buyOrderId;
+        OrderId externalSellId =
+            idMapper ? idMapper->toExternal(trade.sellOrderId) : trade.sellOrderId;
 
-        std::println(outFile, "{},{},{},{},{},{}",
-                     trade.timestamp,
-                     trade.tradeId,
-                     externalBuyId,
-                     externalSellId,
-                     trade.quantity,
-                     trade.price);
+        std::println(outFile, "{},{},{},{},{},{}", trade.timestamp, trade.tradeId, externalBuyId,
+                     externalSellId, trade.quantity, trade.price);
     }
 }
 
