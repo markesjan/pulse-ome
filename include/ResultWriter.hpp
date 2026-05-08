@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  ResultWriter.hpp
+ * @brief Declaration of the ResultWriter class for printing and saving results.
+ */
+
 #pragma once
 
 #include <vector>

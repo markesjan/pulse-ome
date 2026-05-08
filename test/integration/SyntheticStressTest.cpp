@@ -1,5 +1,12 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  SyntheticStressTest.cpp
+ * @brief Integration tests using synthetic order generation to stress test the matching engine.
+ */
+
 #include <gtest/gtest.h>
-#include <print>
 
 #include "MatchingEngine.hpp"
 #include "OrderGenerator.hpp"

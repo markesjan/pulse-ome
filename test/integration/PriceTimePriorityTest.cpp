@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  PriceTimePriorityTest.cpp
+ * @brief Integration tests verifying the price-time priority matching logic.
+ */
+
 #include <gtest/gtest.h>
 #include "MatchingEngine.hpp"
 

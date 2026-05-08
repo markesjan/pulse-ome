@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  ResultWriter.cpp
+ * @brief Implementation of the ResultWriter class.
+ */
+
 #include "ResultWriter.hpp"
 
 #include <cstdio>

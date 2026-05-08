@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  OrderBook.cpp
+ * @brief Implementation of the OrderBook class.
+ */
+
 #include "OrderBook.hpp"
 
 #include <algorithm>

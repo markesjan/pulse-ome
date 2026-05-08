@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  MatchingEngine.cpp
+ * @brief Implementation of the MatchingEngine class.
+ */
+
 #include "MatchingEngine.hpp"
 
 namespace engine {

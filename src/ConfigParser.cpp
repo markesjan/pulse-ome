@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  ConfigParser.cpp
+ * @brief Implementation of the ConfigParser class.
+ */
+
 #include "ConfigParser.hpp"
 
 #include <print>

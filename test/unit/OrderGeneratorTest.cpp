@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  OrderGeneratorTest.cpp
+ * @brief Unit tests for the OrderGenerator class.
+ */
+
 #include <gtest/gtest.h>
 
 #include "OrderGenerator.hpp"

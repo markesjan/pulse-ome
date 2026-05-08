@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  Order.hpp
+ * @brief Definitions of Order and OrderMessage structures.
+ */
+
 #pragma once
 
 #include "Types.hpp"

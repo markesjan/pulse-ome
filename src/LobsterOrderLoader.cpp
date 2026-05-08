@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  LobsterOrderLoader.cpp
+ * @brief Implementation of the LobsterOrderLoader class.
+ */
+
 #include "LobsterOrderLoader.hpp"
 
 #include <cstring>

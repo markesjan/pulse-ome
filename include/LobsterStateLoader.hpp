@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  LobsterStateLoader.hpp
+ * @brief Declaration of the LobsterStateLoader class for loading LOBSTER order book snapshots.
+ */
+
 #pragma once
 
 #include <string>

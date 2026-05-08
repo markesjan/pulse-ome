@@ -1,6 +1,14 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  LobsterReplayTest.cpp
+ * @brief Integration tests replaying LOBSTER data and comparing matching engine state with
+ *        provided snapshots. Kept only for demonstration purposes, not working because the
+ *        data doesn't contain all the needed information.
+ */
+
 #include <gtest/gtest.h>
-#include <iostream>
-#include <format>
 
 #include "MatchingEngine.hpp"
 #include "LobsterOrderLoader.hpp"
@@ -80,9 +88,9 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         }
 
         if (HasFailure()) {
-            std::cerr << std::format("Market desynchronized ({})\n", symbol);
-            std::cerr << std::format("Message ID: {}, Type: {}\n", orders[i].orderId,
-                                     static_cast<int>(orders[i].eventType));
+            std::println(stderr, "Market desynchronized ({})", symbol);
+            std::println(stderr, "Message ID: {}, Type: {}", orders[i].orderId,
+                         static_cast<int>(orders[i].eventType));
             FAIL() << "Stopping test for " << symbol;
         }
     }

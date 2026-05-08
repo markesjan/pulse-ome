@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  PriceBitset.cpp
+ * @brief Implementation of the PriceBitset class.
+ */
+
 #include "PriceBitset.hpp"
 
 namespace engine {

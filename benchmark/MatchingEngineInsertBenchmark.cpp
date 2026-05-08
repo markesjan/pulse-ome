@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  MatchingEngineInsertBenchmark.cpp
+ * @brief Benchmarks focused on the order insertion performance of the MatchingEngine.
+ */
+
 #include <benchmark/benchmark.h>
 #include "MatchingEngine.hpp"
 

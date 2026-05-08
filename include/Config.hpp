@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  Config.hpp
+ * @brief Definition of the Config structure for program settings.
+ */
+
 #pragma once
 
 #include <string>

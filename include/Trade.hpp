@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  Trade.hpp
+ * @brief Definition of the Trade structure.
+ */
+
 #pragma once
 
 #include "Types.hpp"

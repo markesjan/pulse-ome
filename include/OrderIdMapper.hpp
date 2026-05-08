@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  OrderIdMapper.hpp
+ * @brief Declaration of the OrderIdMapper class for mapping external to internal IDs.
+ */
+
 #pragma once
 
 #include <unordered_map>

@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  Types.hpp
+ * @brief Common type definitions and enums for the matching engine.
+ */
+
 #pragma once
 
 #include <cstdint>

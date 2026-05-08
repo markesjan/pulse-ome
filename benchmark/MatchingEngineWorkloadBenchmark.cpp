@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  MatchingEngineWorkloadBenchmark.cpp
+ * @brief Benchmarks for the MatchingEngine under realistic workload.
+ */
+
 #include <benchmark/benchmark.h>
 #include "MatchingEngine.hpp"
 

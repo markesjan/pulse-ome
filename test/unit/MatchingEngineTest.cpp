@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  MatchingEngineTest.cpp
+ * @brief Unit tests for the MatchingEngine class.
+ */
+
 #include <gtest/gtest.h>
 
 #include "MatchingEngine.hpp"

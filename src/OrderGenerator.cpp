@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  OrderGenerator.cpp
+ * @brief Implementation of the OrderGenerator class.
+ */
+
 #include "OrderGenerator.hpp"
 
 #include <random>

@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  PriceBitset.hpp
+ * @brief Declaration of the PriceBitset class for efficient price level tracking.
+ */
+
 #pragma once
 
 #include <vector>

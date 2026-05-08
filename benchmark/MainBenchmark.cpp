@@ -1,7 +1,14 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) 2026 Jan Markes
+ *
+ * @file  MainBenchmark.cpp
+ * @brief Main entry point for Google Benchmark with environment isolation and performance tuning.
+ */
+
 #include <benchmark/benchmark.h>
 #include <pthread.h>
 #include <sys/mman.h>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <print>
@@ -22,7 +29,7 @@ int main(int argc, char** argv) {
             try {
                 cpuCore = std::stoi(argv[++i]);
             } catch (...) {
-                std::cerr << "Invalid CPU core: " << argv[i] << std::endl;
+                std::println(stderr, "Invalid CPU core: {}", argv[i]);
             }
         } else {
             newArgv.push_back(argv[i]);
