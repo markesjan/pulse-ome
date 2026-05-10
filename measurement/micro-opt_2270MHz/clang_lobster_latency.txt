@@ -1,0 +1,108 @@
+ cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv -m -c 11 -l
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        38.86 ms
+[ 1/10] Bench: 38.83 ms
+[ 2/10] Bench: 38.88 ms
+[ 3/10] Bench: 38.80 ms
+[ 4/10] Bench: 38.99 ms
+[ 5/10] Bench: 38.89 ms
+[ 6/10] Bench: 38.77 ms
+[ 7/10] Bench: 38.85 ms
+[ 8/10] Bench: 38.82 ms
+[ 9/10] Bench: 38.90 ms
+[10/10] Bench: 38.87 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        38.86 ms
+Avg throughput:      9.40 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 9243 ns
+Average:             68 ns
+Median (p50):        60 ns
+90. perc (p90):      80 ns
+99. perc (p99):      260 ns
+99.9. perc (p99.9):  721 ns
+=============================================
+ cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv -m -c 11 -l
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        27.26 ms
+[ 1/10] Bench: 27.30 ms
+[ 2/10] Bench: 27.25 ms
+[ 3/10] Bench: 27.24 ms
+[ 4/10] Bench: 27.30 ms
+[ 5/10] Bench: 27.26 ms
+[ 6/10] Bench: 27.28 ms
+[ 7/10] Bench: 27.29 ms
+[ 8/10] Bench: 27.27 ms
+[ 9/10] Bench: 27.31 ms
+[10/10] Bench: 27.26 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        27.28 ms
+Avg throughput:      9.47 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 8612 ns
+Average:             67 ns
+Median (p50):        60 ns
+90. perc (p90):      80 ns
+99. perc (p99):      230 ns
+99.9. perc (p99.9):  821 ns
+=============================================
+ cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv -m -c 11 -l
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        65.87 ms
+[ 1/10] Bench: 65.85 ms
+[ 2/10] Bench: 65.89 ms
+[ 3/10] Bench: 65.81 ms
+[ 4/10] Bench: 65.87 ms
+[ 5/10] Bench: 65.84 ms
+[ 6/10] Bench: 65.84 ms
+[ 7/10] Bench: 65.89 ms
+[ 8/10] Bench: 65.78 ms
+[ 9/10] Bench: 65.82 ms
+[10/10] Bench: 65.84 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        65.84 ms
+Avg throughput:      9.65 M orders/s
+
+--- Latency ---
+Min:                 40 ns
+Max:                 16574 ns
+Average:             65 ns
+Median (p50):        60 ns
+90. perc (p90):      70 ns
+99. perc (p99):      130 ns
+99.9. perc (p99.9):  1101 ns
+=============================================

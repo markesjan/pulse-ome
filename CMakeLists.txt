@@ -21,8 +21,21 @@ if (ENABLE_PGO_GENERATE)
     set(PGO_FLAGS "-fprofile-generate")
     message(STATUS "PGO: Profile Generation ENABLED")
 elseif (ENABLE_PGO_USE)
-    set(PGO_FLAGS "-fprofile-use" "-fprofile-correction" "-Wno-missing-profile")
-    message(STATUS "PGO: Profile Use ENABLED")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        set(PGO_FLAGS
+                "-fprofile-use=default.profdata"
+                "-Wno-profile-instr-out-of-date"
+                "-Wno-profile-instr-unprofiled"
+        )
+        message(STATUS "PGO: Profile Use ENABLED (Clang mode)")
+    else ()
+        set(PGO_FLAGS
+                "-fprofile-use"
+                "-fprofile-correction"
+                "-Wno-missing-profile"
+        )
+        message(STATUS "PGO: Profile Use ENABLED (GCC mode)")
+    endif ()
 endif ()
 
 function(apply_pgo TARGET_NAME)

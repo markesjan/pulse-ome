@@ -1,0 +1,90 @@
+cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv -m -c 11
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/AAPL/AAPL_2012-06-21_message_lvl10.csv
+Loaded 365401 relevant order events.
+Running 11 iterations...
+
+Warmup:        9.31 ms
+[ 1/10] Bench: 9.26 ms
+[ 2/10] Bench: 9.26 ms
+[ 3/10] Bench: 9.23 ms
+[ 4/10] Bench: 9.26 ms
+[ 5/10] Bench: 9.24 ms
+[ 6/10] Bench: 9.22 ms
+[ 7/10] Bench: 9.22 ms
+[ 8/10] Bench: 9.22 ms
+[ 9/10] Bench: 9.21 ms
+[10/10] Bench: 9.22 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    365401
+Created trades:      37273
+Match rate:          10.20 %
+Avg duration:        9.23 ms
+Avg throughput:      39.57 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv -m -c 11   
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/AMZN/AMZN_2012-06-21_message_lvl10.csv
+Loaded 258329 relevant order events.
+Running 11 iterations...
+
+Warmup:        6.28 ms
+[ 1/10] Bench: 6.50 ms
+[ 2/10] Bench: 6.28 ms
+[ 3/10] Bench: 6.29 ms
+[ 4/10] Bench: 6.28 ms
+[ 5/10] Bench: 6.26 ms
+[ 6/10] Bench: 6.26 ms
+[ 7/10] Bench: 6.27 ms
+[ 8/10] Bench: 6.30 ms
+[ 9/10] Bench: 6.30 ms
+[10/10] Bench: 6.30 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    258329
+Created trades:      19666
+Match rate:          7.61 %
+Avg duration:        6.30 ms
+Avg throughput:      40.98 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
+ cmake-build-pgo-clang (main) ✗ ./matching_engine -i ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv -m -c 11
+Memory locked successfully
+Thread successfully pinned thread to core 11
+Loading orders from file: ../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv
+Loaded 635351 relevant order events.
+Running 11 iterations...
+
+Warmup:        13.51 ms
+[ 1/10] Bench: 13.47 ms
+[ 2/10] Bench: 13.47 ms
+[ 3/10] Bench: 13.47 ms
+[ 4/10] Bench: 13.47 ms
+[ 5/10] Bench: 13.47 ms
+[ 6/10] Bench: 13.47 ms
+[ 7/10] Bench: 13.47 ms
+[ 8/10] Bench: 13.46 ms
+[ 9/10] Bench: 13.48 ms
+[10/10] Bench: 13.47 ms
+
+============= Benchmark results =============
+--- General ---
+Processed orders:    635351
+Created trades:      33398
+Match rate:          5.26 %
+Avg duration:        13.47 ms
+Avg throughput:      47.16 M orders/s
+
+--- Latency ---
+Latency measurement disabled
+=============================================
