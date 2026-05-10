@@ -29,7 +29,7 @@ constexpr int TOTAL_RUNS = WARMUP_RUNS + BENCHMARK_RUNS;
 constexpr std::size_t MAX_ORDERS = 10'000'000;
 constexpr Price MAX_PRICE = 100'000'000;
 
-Application::Application(const Config& config) : config(config) {
+Application::Application(const Config& cfg) : config(cfg) {
     idMapper.emplace(MAX_ORDERS);
 }
 
@@ -117,7 +117,7 @@ void Application::applyIsolation() const {
     if (config.cpuCore >= 0) {
         cpu_set_t cpuset;
         CPU_ZERO(&cpuset);
-        CPU_SET(config.cpuCore, &cpuset);
+        CPU_SET(static_cast<std::size_t>(config.cpuCore), &cpuset);
 
         if (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) != 0)
             std::println(stderr, "Warning: Failed to pin thread to core {}", config.cpuCore);

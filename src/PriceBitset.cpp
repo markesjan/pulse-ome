@@ -45,7 +45,7 @@ Price PriceBitset::findNextAsk(Price startPrice) const {
     uint64_t mask0 = ~((1ULL << (startPrice & 63)) - 1);
     BitBlock block0 = l0[i0] & mask0;
     if (block0)
-        return (i0 << 6) + __builtin_ctzll(block0);
+        return (i0 << 6) + static_cast<Price>(__builtin_ctzll(block0));
 
     uint64_t startl1 = i0 + 1;
     uint64_t i1 = startl1 >> 6;
@@ -55,8 +55,8 @@ Price PriceBitset::findNextAsk(Price startPrice) const {
     uint64_t mask1 = ~((1ULL << (startl1 & 63)) - 1);
     BitBlock block1 = l1[i1] & mask1;
     if (block1) {
-        uint64_t nextl0 = (i1 << 6) + __builtin_ctzll(block1);
-        return (nextl0 << 6) + __builtin_ctzll(l0[nextl0]);
+        uint64_t nextl0 = (i1 << 6) + static_cast<Price>(__builtin_ctzll(block1));
+        return (nextl0 << 6) + static_cast<Price>(__builtin_ctzll(l0[nextl0]));
     }
 
     uint64_t startl2 = i1 + 1;
@@ -67,9 +67,9 @@ Price PriceBitset::findNextAsk(Price startPrice) const {
     uint64_t mask2 = ~((1ULL << (startl2 & 63)) - 1);
     BitBlock block2 = l2[i2] & mask2;
     if (block2) {
-        uint64_t nextl1 = (i2 << 6) + __builtin_ctzll(block2);
-        uint64_t nextl0 = (nextl1 << 6) + __builtin_ctzll(l1[nextl1]);
-        return (nextl0 << 6) + __builtin_ctzll(l0[nextl0]);
+        uint64_t nextl1 = (i2 << 6) + static_cast<Price>(__builtin_ctzll(block2));
+        uint64_t nextl0 = (nextl1 << 6) + static_cast<Price>(__builtin_ctzll(l1[nextl1]));
+        return (nextl0 << 6) + static_cast<Price>(__builtin_ctzll(l0[nextl0]));
     }
 
     uint64_t startl3 = i2 + 1;
@@ -80,10 +80,10 @@ Price PriceBitset::findNextAsk(Price startPrice) const {
     uint64_t mask3 = ~((1ULL << (startl3 & 63)) - 1);
     BitBlock block3 = l3[i3] & mask3;
     if (block3) {
-        uint64_t nextl2 = (i3 << 6) + __builtin_ctzll(block3);
-        uint64_t nextl1 = (nextl2 << 6) + __builtin_ctzll(l2[nextl2]);
-        uint64_t nextl0 = (nextl1 << 6) + __builtin_ctzll(l1[nextl1]);
-        return (nextl0 << 6) + __builtin_ctzll(l0[nextl0]);
+        uint64_t nextl2 = (i3 << 6) + static_cast<Price>(__builtin_ctzll(block3));
+        uint64_t nextl1 = (nextl2 << 6) + static_cast<Price>(__builtin_ctzll(l2[nextl2]));
+        uint64_t nextl0 = (nextl1 << 6) + static_cast<Price>(__builtin_ctzll(l1[nextl1]));
+        return (nextl0 << 6) + static_cast<Price>(__builtin_ctzll(l0[nextl0]));
     }
 
     return UINT64_MAX;
@@ -98,7 +98,7 @@ Price PriceBitset::findNextBid(Price startPrice) const {
     uint64_t mask0 = (bitPos0 == 63) ? ~0ULL : ((1ULL << (bitPos0 + 1)) - 1);
     BitBlock block0 = l0[i0] & mask0;
     if (block0)
-        return (i0 << 6) + 63 - __builtin_clzll(block0);
+        return (i0 << 6) + 63 - static_cast<Price>(__builtin_clzll(block0));
 
     if (i0 == 0)
         return UINT64_MAX;
@@ -110,8 +110,8 @@ Price PriceBitset::findNextBid(Price startPrice) const {
     BitBlock block1 = l1[i1] & mask1;
 
     if (block1) {
-        uint64_t nextl0 = (i1 << 6) + 63 - __builtin_clzll(block1);
-        return (nextl0 << 6) + 63 - __builtin_clzll(l0[nextl0]);
+        uint64_t nextl0 = (i1 << 6) + 63 - static_cast<Price>(__builtin_clzll(block1));
+        return (nextl0 << 6) + 63 - static_cast<Price>(__builtin_clzll(l0[nextl0]));
     }
 
     if (i1 == 0)
@@ -124,9 +124,9 @@ Price PriceBitset::findNextBid(Price startPrice) const {
     BitBlock block2 = l2[i2] & mask2;
 
     if (block2) {
-        uint64_t nextl1 = (i2 << 6) + 63 - __builtin_clzll(block2);
-        uint64_t nextl0 = (nextl1 << 6) + 63 - __builtin_clzll(l1[nextl1]);
-        return (nextl0 << 6) + 63 - __builtin_clzll(l0[nextl0]);
+        uint64_t nextl1 = (i2 << 6) + 63 - static_cast<Price>(__builtin_clzll(block2));
+        uint64_t nextl0 = (nextl1 << 6) + 63 - static_cast<Price>(__builtin_clzll(l1[nextl1]));
+        return (nextl0 << 6) + 63 - static_cast<Price>(__builtin_clzll(l0[nextl0]));
     }
 
     if (i2 == 0)
@@ -139,10 +139,10 @@ Price PriceBitset::findNextBid(Price startPrice) const {
     BitBlock block3 = l3[i3] & mask3;
 
     if (block3) {
-        uint64_t nextl2 = (i3 << 6) + 63 - __builtin_clzll(block3);
-        uint64_t nextl1 = (nextl2 << 6) + 63 - __builtin_clzll(l2[nextl2]);
-        uint64_t nextl0 = (nextl1 << 6) + 63 - __builtin_clzll(l1[nextl1]);
-        return (nextl0 << 6) + 63 - __builtin_clzll(l0[nextl0]);
+        uint64_t nextl2 = (i3 << 6) + 63 - static_cast<Price>(__builtin_clzll(block3));
+        uint64_t nextl1 = (nextl2 << 6) + 63 - static_cast<Price>(__builtin_clzll(l2[nextl2]));
+        uint64_t nextl0 = (nextl1 << 6) + 63 - static_cast<Price>(__builtin_clzll(l1[nextl1]));
+        return (nextl0 << 6) + 63 - static_cast<Price>(__builtin_clzll(l0[nextl0]));
     }
 
     return UINT64_MAX;

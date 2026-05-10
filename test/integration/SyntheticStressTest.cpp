@@ -18,9 +18,7 @@ protected:
     MatchingEngine matchingEngine{150'000, 20'000};
     std::vector<Trade> trades;
 
-    void SetUp() override {
-        trades.reserve(100'000);
-    }
+    void SetUp() override { trades.reserve(100'000); }
 };
 
 TEST_F(SyntheticStressTest, DefaultGeneratorSetup) {
@@ -39,8 +37,9 @@ TEST_F(SyntheticStressTest, DefaultGeneratorSetup) {
         ASSERT_GE(top.askQty, 0) << "Ask quantity underflow (index: " << i << ")";
         ASSERT_GE(top.bidQty, 0) << "Bid quantity underflow (index: " << i << ")";
 
-        if (top.askQty > 0 && top.bidQty > 0)
+        if (top.askQty > 0 && top.bidQty > 0) {
             ASSERT_GT(top.askPrice, top.bidPrice) << "Unexecuted trade (index: " << i << ")";
+        }
     }
 
     ASSERT_GT(trades.size(), 0) << "Zero trades were executed";
@@ -62,8 +61,9 @@ TEST_F(SyntheticStressTest, ZeroCancels) {
         ASSERT_GE(top.askQty, 0) << "Ask quantity underflow (index: " << i << ")";
         ASSERT_GE(top.bidQty, 0) << "Bid quantity underflow (index: " << i << ")";
 
-        if (top.askQty > 0 && top.bidQty > 0)
+        if (top.askQty > 0 && top.bidQty > 0) {
             ASSERT_GT(top.askPrice, top.bidPrice) << "Unexecuted trade (index: " << i << ")";
+        }
     }
 
     ASSERT_GT(trades.size(), 0) << "Zero trades were executed";
@@ -85,8 +85,9 @@ TEST_F(SyntheticStressTest, HighCancels) {
         ASSERT_GE(top.askQty, 0) << "Ask quantity underflow (index: " << i << ")";
         ASSERT_GE(top.bidQty, 0) << "Bid quantity underflow (index: " << i << ")";
 
-        if (top.askQty > 0 && top.bidQty > 0)
+        if (top.askQty > 0 && top.bidQty > 0) {
             ASSERT_GT(top.askPrice, top.bidPrice) << "Unexecuted trade (index: " << i << ")";
+        }
     }
 
     ASSERT_GT(trades.size(), 0) << "Zero trades were executed";

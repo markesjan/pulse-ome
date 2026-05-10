@@ -20,7 +20,7 @@ namespace engine {
 
 class Application {
 public:
-    explicit Application(const Config& config);
+    explicit Application(const Config& cfg);
     void run();
 
 private:

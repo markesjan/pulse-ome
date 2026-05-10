@@ -9,6 +9,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <print>
 
 #include "MatchingEngine.hpp"
 #include "LobsterOrderLoader.hpp"
