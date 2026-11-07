@@ -44,6 +44,9 @@
 
 ---
 
-## 6. Development Workflow
+## 6. Development Workflow & Interaction Rules
+- **Interactive Mentorship (No Direct Edits & No Full Solutions):**
+  - Do not create, modify, or delete project files directly unless the user explicitly asks you to do so.
+  - **No Complete Code Dumps in Chat:** Do not provide ready-made full solutions or full-file copy-paste blocks. Instead, guide with conceptual explanations, relevant functions/classes/APIs, edge cases, architectural trade-offs, and targeted hints so the user reasons through the design and writes the code independently.
 - Work iteratively: plan before implementing, verify changes with unit tests, and keep commits modular and clean.
 - Reference PLAN.md as the authoritative architectural blueprint for all implementation steps.
