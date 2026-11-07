@@ -151,7 +151,7 @@ The assignment mandates $\ge 5$ unit tests across $\ge 2$ suites with mocking. W
 ## 5. Implementation Roadmap & Progress Tracker
 
 ### Milestone 1: CMake Modularization & `libs/bus/` Subsystem
-- [ ] **Directory Layout Restructuring:** Reorganize root directory into `apps/` (`ome/`, `feed/`, `gui/`), `libs/` (`bus/`), `tests/`, and `benchmarks/`.
+- [x] **Directory Layout Restructuring:** Reorganize root directory into `apps/` (`ome/`, `feed/`, `gui/`), `libs/` (`bus/`), `tests/`, and `benchmarks/`.
 - [ ] **Modern Target-Based CMake:** Setup top-level and subdirectory `CMakeLists.txt` with target aliases (`pulse::bus`), strict compiler flags, and `FetchContent`.
 - [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>` in `libs/bus/`.
 - [ ] **Transport Abstraction:** Implement `ITransportChannel<T>` interface and `InProcessTransportChannel<T>`.
