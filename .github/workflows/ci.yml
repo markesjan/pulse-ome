@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prepare-env:
+    name: Prepare CI Environment
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.image-meta.outputs.image_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute Image Tag & Check Existence
+        id: image-meta
+        run: |
+          DOCKERFILE_HASH="${{ hashFiles('.github/docker/Dockerfile') }}"
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_TAG="ghcr.io/${REPO_LOWER}/ci-env:${DOCKERFILE_HASH}"
+          
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          
+          if docker manifest inspect "${IMAGE_TAG}" > /dev/null 2>&1; then
+            echo "image_exists=true" >> $GITHUB_OUTPUT
+            echo "CI image ${IMAGE_TAG} already exists in GHCR. Skipping build."
+          else
+            echo "image_exists=false" >> $GITHUB_OUTPUT
+            echo "CI image ${IMAGE_TAG} not found in GHCR. Build required."
+          fi
+
+      - name: Build and Push CI Image
+        if: steps.image-meta.outputs.image_exists != 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: .github/docker/Dockerfile
+          push: true
+          tags: ${{ steps.image-meta.outputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-test:
+    name: Build & Test
+    needs: prepare-env
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.prepare-env.outputs.image_tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_COMPILE_WARNINGS_AS_ERROR=ON
+
+      - name: Build Project
+        run: cmake --build build --parallel
+
+      - name: Run Tests
+        run: ctest --test-dir build --output-on-failure
+
+  format-check:
+    name: Format Check
+    needs: prepare-env
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.prepare-env.outputs.image_tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Check Formatting (Changed Files Only)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            BASE="origin/$BASE_REF"
+          elif [ "$REF_NAME" = "main" ]; then
+            BASE="HEAD~1"
+          else
+            BASE="origin/main"
+          fi
+          git diff --name-only --diff-filter=d "$BASE" -- '*.cpp' '*.hpp' '*.h' | \
+            xargs -r clang-format --dry-run -Werror
