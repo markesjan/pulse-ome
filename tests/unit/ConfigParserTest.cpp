@@ -7,8 +7,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "ConfigParser.hpp"
 
@@ -16,13 +16,9 @@ namespace engine {
 
 class ConfigParserTest : public testing::Test {
 protected:
-    void SetUp() override {
-        testing::internal::CaptureStdout();
-    }
+    void SetUp() override { testing::internal::CaptureStdout(); }
 
-    void TearDown() override {
-        testing::internal::GetCapturedStdout();
-    }
+    void TearDown() override { testing::internal::GetCapturedStdout(); }
 
     static Config parse(const std::vector<std::string>& args) {
         std::vector<char*> argv;
@@ -45,12 +41,8 @@ TEST_F(ConfigParserTest, ParseArgumentsDefaultValuesCreatesDefaultConfig) {
 }
 
 TEST_F(ConfigParserTest, ParseArgumentsShortFlagsCreatesValidConfig) {
-    auto config = parse({
-        "-i", "../input.csv",
-        "-o", "../out/output.csv",
-        "-g", "1000",
-        "-s", "67",
-        "-l"});
+    auto config =
+        parse({"-i", "../input.csv", "-o", "../out/output.csv", "-g", "1000", "-s", "67", "-l"});
 
     EXPECT_EQ(config.orderFile, "../input.csv");
     EXPECT_EQ(config.tradeFile, "../out/output.csv");
@@ -60,12 +52,8 @@ TEST_F(ConfigParserTest, ParseArgumentsShortFlagsCreatesValidConfig) {
 }
 
 TEST_F(ConfigParserTest, ParseArgumentsLongFlagsCreatesValidConfig) {
-    auto config = parse({
-        "--input", "data_in.csv",
-        "--output", "data_out.csv",
-        "--generate", "5000",
-        "--seed", "99",
-        "--latency"});
+    auto config = parse({"--input", "data_in.csv", "--output", "data_out.csv", "--generate", "5000",
+                         "--seed", "99", "--latency"});
 
     EXPECT_EQ(config.orderFile, "data_in.csv");
     EXPECT_EQ(config.tradeFile, "data_out.csv");
@@ -75,21 +63,16 @@ TEST_F(ConfigParserTest, ParseArgumentsLongFlagsCreatesValidConfig) {
 }
 
 TEST_F(ConfigParserTest, ParseArgumentsInvalidArgumentExitsWith1) {
-    EXPECT_EXIT(parse({"--unknown-flag"}),
-                testing::ExitedWithCode(1),
+    EXPECT_EXIT(parse({"--unknown-flag"}), testing::ExitedWithCode(1),
                 "Invalid argument: --unknown-flag");
 }
 
 TEST_F(ConfigParserTest, ParseArgumentsHelpFlagExitsWith0) {
-    EXPECT_EXIT(parse({"--help"}),
-                testing::ExitedWithCode(0),
-                "");
+    EXPECT_EXIT(parse({"--help"}), testing::ExitedWithCode(0), "");
 }
 
 TEST_F(ConfigParserTest, ParseArgumentsMissingValueForFlagExitsWith1) {
-    EXPECT_EXIT(parse({"-i"}),
-                testing::ExitedWithCode(1),
-                "Invalid argument: -i");
+    EXPECT_EXIT(parse({"-i"}), testing::ExitedWithCode(1), "Invalid argument: -i");
 }
 
 } // namespace engine
