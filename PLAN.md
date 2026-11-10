@@ -153,8 +153,8 @@ The assignment mandates $\ge 5$ unit tests across $\ge 2$ suites with mocking. W
 ### Milestone 0: Monorepo
 - [x] **Directory Layout Restructuring:** Reorganize root directory into `apps/` (`ome/`, `feed/`, `gui/`), `libs/` (`bus/`), `tests/`, and `benchmarks/`.
 - [x] **Modern Target-Based CMake:** Setup top-level and subdirectory `CMakeLists.txt` with target aliases (`pulse::bus`), strict compiler flags, and `FetchContent`.
-- [ ] **CI/CD Pipeline Setup:** Configure GitHub Actions workflow (`.github/workflows/ci.yml`) with GCC 15, zero-warning policy, automated test execution and format check
-- [ ] **Documentation Update:** Update `README.md` to reflect the new monorepo structure, build instructions, and testing commands.
+- [x] **CI/CD Pipeline Setup:** Configure GitHub Actions workflow (`.github/workflows/ci.yml`) with GCC 15, zero-warning policy, automated test execution and format check
+- [x] **Documentation Update:** Update `README.md` to reflect the new monorepo structure, build instructions, and testing commands.
 
 ### Milestone 1: `libs/bus/` Subsystem
 - [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>` in `libs/bus/`.
