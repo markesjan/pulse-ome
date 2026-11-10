@@ -11,9 +11,9 @@
 #include <gtest/gtest.h>
 #include <print>
 
-#include "MatchingEngine.hpp"
 #include "LobsterOrderLoader.hpp"
 #include "LobsterStateLoader.hpp"
+#include "MatchingEngine.hpp"
 
 namespace engine {
 
@@ -34,9 +34,7 @@ protected:
     MatchingEngine matchingEngine{10'000'000, 100'000'000};
     std::vector<Trade> trades;
 
-    void SetUp() override {
-        trades.reserve(10'000);
-    }
+    void SetUp() override { trades.reserve(10'000); }
 };
 
 TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
@@ -52,18 +50,16 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         const auto& firstState = expectedStates[0];
         for (std::size_t lvl = 0; lvl < depth; ++lvl) {
             if (firstState[lvl].askQty > 0) {
-                matchingEngine.processOrder(OrderMessage{0, 999999900 + lvl,
-                                                         firstState[lvl].askPrice,
-                                                         firstState[lvl].askQty, EventType::New,
-                                                         Side::Sell},
-                                            trades);
+                matchingEngine.processOrder(
+                    OrderMessage{0, 999999900 + lvl, firstState[lvl].askPrice,
+                                 firstState[lvl].askQty, EventType::New, Side::Sell},
+                    trades);
             }
             if (firstState[lvl].bidQty > 0) {
-                matchingEngine.processOrder(OrderMessage{0, 999999800 + lvl,
-                                                         firstState[lvl].bidPrice,
-                                                         firstState[lvl].bidQty, EventType::New,
-                                                         Side::Buy},
-                                            trades);
+                matchingEngine.processOrder(
+                    OrderMessage{0, 999999800 + lvl, firstState[lvl].bidPrice,
+                                 firstState[lvl].bidQty, EventType::New, Side::Buy},
+                    trades);
             }
         }
     }
@@ -97,20 +93,19 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    StaticLobsterFiles,
-    LobsterReplayTest,
-    ::testing::Values(
-        // LobsterScenario{"MSFT", 1,
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl1.csv",
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl1.csv"},
-        // LobsterScenario{"MSFT", 5,
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl5.csv",
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl5.csv"},
-        // LobsterScenario{"MSFT", 10,
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv",
-        // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl10.csv"}
-    ));
+INSTANTIATE_TEST_SUITE_P(StaticLobsterFiles,
+                         LobsterReplayTest,
+                         ::testing::Values(
+                             // LobsterScenario{"MSFT", 1,
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl1.csv",
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl1.csv"},
+                             // LobsterScenario{"MSFT", 5,
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl5.csv",
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl5.csv"},
+                             // LobsterScenario{"MSFT", 10,
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_message_lvl10.csv",
+                             // "../data/LOBSTER/MSFT/MSFT_2012-06-21_orderbook_lvl10.csv"}
+                             ));
 
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(LobsterReplayTest);
 

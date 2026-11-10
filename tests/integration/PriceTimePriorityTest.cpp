@@ -41,8 +41,7 @@ TEST_F(PriceTimePriorityTest, BasicMatchingAndCancels) {
 
     // Modify resting liquidity
     matchingEngine.processOrder(
-        {1'500'000'000, 104, 10200, 20, EventType::PartialCancel, Side::Sell},
-        trades);
+        {1'500'000'000, 104, 10200, 20, EventType::PartialCancel, Side::Sell}, trades);
     verifyTop(10200, 30, 10000, 50);
     matchingEngine.processOrder({1'600'000'000, 101, 10000, 50, EventType::FullCancel, Side::Buy},
                                 trades);
@@ -81,8 +80,7 @@ TEST_F(PriceTimePriorityTest, AggressiveSweepOrder) {
 
     // Modify passive liquidity
     matchingEngine.processOrder(
-        {1'400'000'000, 202, 50010, 50, EventType::PartialCancel, Side::Sell},
-        trades);
+        {1'400'000'000, 202, 50010, 50, EventType::PartialCancel, Side::Sell}, trades);
     matchingEngine.processOrder({1'500'000'000, 203, 50020, 200, EventType::FullCancel, Side::Sell},
                                 trades);
     verifyTop(50000, 100, 0, 0);
@@ -209,15 +207,11 @@ TEST_F(PriceTimePriorityTest, CancelNonExistentOrAlreadyFilled) {
                                 trades);
 
     // Try to cancel already matched order
-    EXPECT_NO_THROW(
-        matchingEngine.processOrder({1'200'000'000, 701, 10000, 100, EventType::FullCancel, Side::
-            Buy}, trades
-        ));
+    EXPECT_NO_THROW(matchingEngine.processOrder(
+        {1'200'000'000, 701, 10000, 100, EventType::FullCancel, Side::Buy}, trades));
     // Try to cancel a completely random ID
-    EXPECT_NO_THROW(
-        matchingEngine.processOrder({1'300'000'000, 999, 50000, 100, EventType::FullCancel, Side::
-            Sell},
-            trades));
+    EXPECT_NO_THROW(matchingEngine.processOrder(
+        {1'300'000'000, 999, 50000, 100, EventType::FullCancel, Side::Sell}, trades));
 
     ASSERT_EQ(trades.size(), 1);
 }

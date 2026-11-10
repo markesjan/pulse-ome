@@ -7,8 +7,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <fstream>
 #include <cstdio>
+#include <fstream>
 #include <string>
 
 #include "LobsterOrderLoader.hpp"
@@ -90,8 +90,7 @@ TEST_F(LobsterOrderLoaderTest, LoadNonExistentFileExitsWith1) {
     const std::string badPath = "not_exists_12345.csv";
     OrderIdMapper idMapper(0);
 
-    EXPECT_EXIT(LobsterOrderLoader::load(badPath, idMapper),
-                testing::ExitedWithCode(1),
+    EXPECT_EXIT(LobsterOrderLoader::load(badPath, idMapper), testing::ExitedWithCode(1),
                 "Couldn't open file: not_exists_12345.csv");
 }
 

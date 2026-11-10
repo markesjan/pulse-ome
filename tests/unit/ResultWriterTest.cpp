@@ -19,13 +19,9 @@ class ResultWriterTest : public testing::Test {
 protected:
     const std::string testFilePath = "test_trades_output.csv";
 
-    void SetUp() override {
-        std::remove(testFilePath.c_str());
-    }
+    void SetUp() override { std::remove(testFilePath.c_str()); }
 
-    void TearDown() override {
-        std::remove(testFilePath.c_str());
-    }
+    void TearDown() override { std::remove(testFilePath.c_str()); }
 
     static std::vector<std::string> readLines(const std::string& path) {
         std::vector<std::string> lines;
@@ -40,10 +36,8 @@ protected:
 };
 
 TEST_F(ResultWriterTest, WriteTradesValidDataCreatesValidCsv) {
-    std::vector<Trade> trades = {
-        {1'000'000'000, 1001, 10, 20, 15000, 50},
-        {1'500'000'000, 1002, 11, 21, 15100, 100}
-    };
+    std::vector<Trade> trades = {{1'000'000'000, 1001, 10, 20, 15000, 50},
+                                 {1'500'000'000, 1002, 11, 21, 15100, 100}};
 
     ResultWriter::writeTrades(trades, testFilePath);
 
