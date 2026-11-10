@@ -1,6 +1,6 @@
 # PulseOME
 
-[![CI](https://github.com/joneh/pulse-ome/actions/workflows/ci.yml/badge.svg)](https://github.com/joneh/pulse-ome/actions/workflows/ci.yml)
+[![CI](https://github.com/markesjan/pulse-ome/actions/workflows/ci.yml/badge.svg)](https://github.com/markesjan/pulse-ome/actions/workflows/ci.yml)
 [![C++23](https://img.shields.io/badge/standard-C%2B%2B23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
