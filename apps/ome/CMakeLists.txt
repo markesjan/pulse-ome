@@ -22,6 +22,7 @@ target_include_directories(pulse_ome_lib
 target_link_libraries(pulse_ome_lib
         PUBLIC
         pulse::bus
+        pulse::proto
         PRIVATE
         pulse_compiler_flags
 )
