@@ -32,7 +32,7 @@ TEST(OrderGeneratorTest, GenerateSameSeedProducesIdenticalResults) {
         EXPECT_EQ(orders1[i].orderId, orders2[i].orderId);
         EXPECT_EQ(orders1[i].price, orders2[i].price);
         EXPECT_EQ(orders1[i].quantity, orders2[i].quantity);
-        EXPECT_EQ(orders1[i].eventType, orders2[i].eventType);
+        EXPECT_EQ(orders1[i].action, orders2[i].action);
         EXPECT_EQ(orders1[i].side, orders2[i].side);
     }
 }
@@ -57,7 +57,7 @@ TEST(OrderGeneratorTest, GenerateZeroCancelReturnsOnlyNewOrders) {
     auto orders = OrderGenerator::generate(42, 500, 0, 10'000, 14.0, 8);
 
     for (const auto& order : orders) {
-        EXPECT_EQ(order.eventType, EventType::New);
+        EXPECT_EQ(order.action, EventType::New);
         EXPECT_GT(order.price, 0);
         EXPECT_GT(order.quantity, 0);
     }
@@ -68,11 +68,11 @@ TEST(OrderGeneratorTest, GenerateWithCancelsReturnsBothCancelTypes) {
 
     bool hasCancel = false;
     for (const auto& order : orders) {
-        if (order.eventType == EventType::FullCancel) {
+        if (order.action == EventType::FullCancel) {
             EXPECT_EQ(order.quantity, 0);
             EXPECT_EQ(order.price, 0);
             hasCancel = true;
-        } else if (order.eventType == EventType::PartialCancel) {
+        } else if (order.action == EventType::PartialCancel) {
             EXPECT_GT(order.quantity, 0);
             EXPECT_LE(order.quantity, 100);
             EXPECT_EQ(order.price, 0);
