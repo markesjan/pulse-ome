@@ -14,7 +14,7 @@ MatchingEngine::MatchingEngine(std::size_t maxOrders, Price maxPrice)
     : orderBook(maxOrders, maxPrice), tradeIdCnt(0) {}
 
 void MatchingEngine::processOrder(const OrderMessage& orderMsg, std::vector<Trade>& trades) {
-    switch (orderMsg.eventType) {
+    switch (orderMsg.action) {
         case EventType::New:
             orderMsg.side == Side::Buy ? processBuyOrder(orderMsg, trades)
                                        : processSellOrder(orderMsg, trades);

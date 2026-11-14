@@ -3,23 +3,17 @@
  * Copyright (c) 2026 Jan Markes
  *
  * @file  Order.hpp
- * @brief Definitions of Order and OrderMessage structures.
+ * @brief Definition of internal Order structure.
  */
 
 #pragma once
 
 #include "Types.hpp"
+#include "proto/Messages.hpp"
 
 namespace engine {
 
-struct OrderMessage {
-    Timestamp timestamp;
-    OrderId orderId;
-    Price price;
-    Quantity quantity;
-    EventType eventType;
-    Side side;
-};
+using OrderMessage = pulse::proto::OrderMessage;
 
 struct alignas(32) Order {
     Timestamp timestamp;

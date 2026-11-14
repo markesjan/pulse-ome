@@ -87,7 +87,7 @@ TEST_P(LobsterReplayTest, ReplayAndVerifyState) {
         if (HasFailure()) {
             std::println(stderr, "Market desynchronized ({})", symbol);
             std::println(stderr, "Message ID: {}, Type: {}", orders[i].orderId,
-                         static_cast<int>(orders[i].eventType));
+                         static_cast<int>(orders[i].action));
             FAIL() << "Stopping test for " << symbol;
         }
     }

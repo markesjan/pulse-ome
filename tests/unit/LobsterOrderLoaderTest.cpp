@@ -51,14 +51,14 @@ TEST_F(LobsterOrderLoaderTest, LoadValidCsvReturnsOrders) {
     ASSERT_EQ(orders.size(), 2);
 
     EXPECT_EQ(orders[0].timestamp, 3'420'003'988'397);
-    EXPECT_EQ(orders[0].eventType, EventType::New);
+    EXPECT_EQ(orders[0].action, EventType::New);
     EXPECT_EQ(orders[0].orderId, idMapper.toInternal(16'135'101));
     EXPECT_EQ(orders[0].quantity, 300);
     EXPECT_EQ(orders[0].price, 309'500);
     EXPECT_EQ(orders[0].side, Side::Buy);
 
     EXPECT_EQ(orders[1].timestamp, 34'200'203'283'207);
-    EXPECT_EQ(orders[1].eventType, EventType::FullCancel);
+    EXPECT_EQ(orders[1].action, EventType::FullCancel);
     EXPECT_EQ(orders[1].orderId, idMapper.toInternal(16'166'153));
     EXPECT_EQ(orders[1].quantity, 100);
     EXPECT_EQ(orders[1].price, 309'700);

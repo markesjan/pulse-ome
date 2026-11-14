@@ -1,187 +1,262 @@
 # Technical Implementation Plan: PulseOME Ecosystem for NI-ADP
 
-This document serves as the comprehensive technical specification and execution plan for transforming **PulseOME** (an ultra-low-latency C++23 order matching engine) into a modular 4-component exchange ecosystem fulfilling all requirements of the **NI-ADP** course at FIT CTU.
+This document serves as a technical specification and architectural blueprint for transforming **PulseOME** (a low-latency C++23 order matching engine) into a modular exchange ecosystem fulfilling all requirements of the **NI-ADP** (Advanced Design Patterns) course at FIT CTU.
 
 ---
 
 ## 1. Architectural Overview & Component Decomposition
 
-The system is split into **4 decoupled components** with strictly defined process and memory boundaries:
+The system is decomposed into **4 decoupled components** interacting over lock-free SPSC ring buffers with strict process, memory, and thread isolation:
 
 ```mermaid
 flowchart TB
-    subgraph ProcessFeed ["Process 1: Market Feed Ingest"]
-        FeedCtrl["FeedController (Playback State Machine)"]
-        FeedStrat["IngestionStrategy (LOBSTER / Synthetic / Binance)"]
-        BinanceAdapter["BinanceWsAdapter"]
+    subgraph ProcessFeed ["Process 1: Market Feed Ingest (pulse_feed)"]
+        FeedCtrl["FeedController\n(Playback State Machine)"]
+        FeedStrat["IngestionStrategy\n(LOBSTER / Synthetic / Binance)"]
+        BinanceAdapter["BinanceWsAdapter\n(JSON to POD OrderMessage)"]
+        FeedCtrl --> FeedStrat
+        BinanceAdapter --> FeedStrat
     end
 
-    subgraph BusLibrary ["Bus Library: Lock-Free SPSC Ring Buffers"]
-        InRing[("Inbound Ring Buffer (SHM / In-Memory)\n[OrderMessage POD]")]
-        OutRing[("Outbound Ring Buffer (SHM / In-Memory)\n[Market & Telemetry Event PODs]")]
+    subgraph BusLibrary ["Transport Layer: libs/bus & libs/proto"]
+        InRing[("Inbound Ring Buffer (/pulse_inbound)\n[OrderMessage POD - 32B]")]
+        OutRing[("Outbound Ring Buffer (/pulse_outbound)\n[EngineEvent Variant - 64B]")]
+        CtrlRing[("Feed Control Ring Buffer (/pulse_feed_ctrl)\n[FeedCommand POD - 16B]")]
     end
 
-    subgraph ProcessOME ["Process 2: Pulse OME Core Service"]
+    subgraph ProcessOME ["Process 2: Core Matching Engine Master (pulse_ome)"]
+        ShmMaster["SHM Lifecycle Master\n(Owner of /dev/shm segments & SharedRingHeader)"]
         CoreReader["Zero-Copy Inbound Consumer"]
-        Engine["MatchingEngine (Cache-aligned, 0-alloc hot path)"]
-        HwClock["HardwareClock (Singleton)"]
+        Engine["MatchingEngine\n(DOD, 64B cache-aligned, 0-alloc hot path)"]
+        HwClock["HardwareClock (Singleton)\n(TSC cycle-to-ns calibrator in libs/bus)"]
         CorePublisher["Outbound Event Dispatcher"]
+
+        ShmMaster -.-> InRing
+        ShmMaster -.-> OutRing
+        CoreReader --> Engine --> CorePublisher
+        HwClock -.-> Engine
     end
 
-    subgraph ProcessGUI ["Process 3: GUI Dashboard (Dear ImGui)"]
-        RemoteProxy["RemoteEngineProxy (Background Consumer @ Line-rate)"]
-        LocalModel["Market & Telemetry Model (Subject / Observable)"]
-        GuiCtrl["DashboardController (Command Invoker + Memento History)"]
-        Bridge["IRendererBridge (ImGuiGlfwRenderer vs HeadlessMockRenderer)"]
-        
+    subgraph ProcessGUI ["Process 3: GUI Dashboard (pulse_gui)"]
+        RemoteProxy["RemoteEngineProxy\n(Background Consumer @ Line-rate)"]
+        LocalModel["Market & Telemetry Model\n(Subject / Observable)"]
+        GuiCtrl["DashboardController\n(Command Invoker + Memento History)"]
+        Bridge["IRendererBridge\n(ImGuiGlfwRenderer vs HeadlessMockRenderer)"]
+
         subgraph Tabs ["ImGui Views (Observers)"]
-            Tab1["Tab 1: LOB Depth & Spread Visualizer"]
+            Tab1["Tab 1: LOB Depth & Spread Visualizer (ImPlot)"]
             Tab2["Tab 2: Latency & Throughput Telemetry"]
             Tab3["Tab 3: Feed Playback Controller"]
             Tab4["Tab 4: Config Editor & Operator Console"]
         end
+
+        RemoteProxy --> LocalModel
+        LocalModel -.->|Observer Notify| Tabs
+        Tabs -->|User Input| GuiCtrl
+        GuiCtrl -->|Undo/Redo| LocalModel
+        Bridge --> Tabs
     end
 
-    FeedCtrl --> FeedStrat
-    FeedStrat --> InRing
-    BinanceAdapter --> FeedStrat
-    
-    InRing --> CoreReader --> Engine --> CorePublisher --> OutRing
-    HwClock -.-> Engine
-    
-    OutRing --> RemoteProxy
-    RemoteProxy --> LocalModel
-    LocalModel -.->|Observer Notify| Tabs
-    Tabs -->|User Input| GuiCtrl
-    GuiCtrl -->|Commands| RemoteProxy
-    GuiCtrl -->|Undo/Redo| LocalModel
-    Bridge --> Tabs
+    %% Inter-process communication flows
+    FeedStrat -->|push| InRing
+    InRing -->|pop| CoreReader
+    CorePublisher -->|push| OutRing
+    OutRing -->|pop| RemoteProxy
+    GuiCtrl -->|dispatch FeedCommand| CtrlRing
+    CtrlRing -->|poll cmd| FeedCtrl
 ```
 
 ---
 
-## 2. Design Patterns Specification (14 Patterns)
+## 2. Memory Architecture & IPC Protocol
 
-All object-oriented patterns are deployed outside the ultra-low-latency hot path (primarily in GUI, Feed, and Bus infrastructure):
+### 2.1 POSIX Shared Memory Topology & Lifecycle Ownership
+- **OME as Core Master:** `pulse_ome` acts as the master of the exchange infrastructure.
+  - On startup: pre-cleans stale segments via `shm_unlink`, creates segments (`/pulse_inbound`, `/pulse_outbound`) using `shm_open(O_CREAT | O_RDWR, 0666)`, pre-faults pages, and locks physical RAM via `mlock()` to eliminate page faults.
+  - Populates the `SharedRingHeader` metadata block.
+  - On clean shutdown: gracefully transitions state to `Stopping` and unlinks shared memory segments.
+- **Client Attachment (Feed & GUI):**
+  - Clients attach via `shm_open(O_RDWR)` without `O_CREAT`.
+  - Validate `magic` number (`0x50554C53`), ABI version, and verify `engineState == EngineState::Running`.
+  - Monitor `heartbeatCycles` to detect engine stalls or sudden crashes without polling syscalls.
 
-### 2.1 Core Mandatory Patterns (11 Patterns)
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ alignas(64) SharedRingHeader                                           │
+│   - uint32_t magic = 0x50554C53 ("PULSE")                              │
+│   - uint32_t version = 1                                               │
+│   - std::atomic<EngineState> state (Starting, Running, Stopping)       │
+│   - std::atomic<uint64_t> heartbeatCycles                              │
+├────────────────────────────────────────────────────────────────────────┤
+│ alignas(64) std::atomic<uint64_t> writeIndex                           │
+├────────────────────────────────────────────────────────────────────────┤
+│ alignas(64) std::atomic<uint64_t> readIndex                            │
+├────────────────────────────────────────────────────────────────────────┤
+│ alignas(64) Slot buffer[Capacity]                                      │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.2 SPSC Lock-Free Ring Buffer Mechanics (`libs/bus/`)
+- **Variant:** Single-Producer Single-Consumer (SPSC) ring buffer with power-of-two capacity for fast bitwise masking (`index & (Capacity - 1)`).
+- **Zero Cache-Line Contention:** `writeIndex` and `readIndex` are isolated on independent 64-byte cache lines (`alignas(64)`) to completely prevent false sharing between CPU cores.
+- **Memory Ordering:**
+  - Producer writes slot payload first, then publishes via `writeIndex.store(val, std::memory_order_release)`.
+  - Consumer acquires index via `writeIndex.load(std::memory_order_acquire)`, reads slot payload, then publishes via `readIndex.store(val, std::memory_order_release)`.
+  - Zero mutexes, zero spinlock overhead, sub-15 ns message delivery.
+- **Backpressure Policy:**
+  - When Inbound Ring is full, `pulse_feed` blocks without dropping messages to guarantee strict causal consistency for L3 order book replays.
+  - Wait strategy: 2-stage backpressure (tight loop with `_mm_pause()` for initial cycles, followed by `std::this_thread::yield()`).
+
+### 2.3 Binary Protocol Definitions (`libs/proto/`)
+All structs are flat, trivially copyable Plain Old Data (POD) enforcing `std::is_trivially_copyable_v` and `std::is_standard_layout_v`:
+
+1. **`Types.hpp`:**
+   - Primitive aliases: `Timestamp`, `OrderId`, `TradeId`, `Price`, `Quantity` (`uint64_t`, `uint32_t`).
+   - `OrderAction` (`uint8_t` enum: `Invalid=0`, `New=1`, `PartialCancel=2`, `FullCancel=3`, `Execution=4`, `HiddenExecution=5`).
+   - `Side` (`int8_t` enum: `Sell=-1`, `Buy=1`).
+2. **`Messages.hpp`:**
+   - `OrderMessage`: Inbound order POD (32 bytes, cache-aligned). Contains timestamp, orderId, price, quantity, action, side.
+3. **`Events.hpp`:**
+   - `TradeEvent` (48 B): Executed match details (timestamp, tradeId, makerOrderId, takerOrderId, price, quantity, takerSide).
+   - `BookDepthEvent` (24 B): Aggregated level update for GUI depth walls (timestamp, price, totalQuantity, side, levelIndex).
+   - `LatencyTelemetryEvent` (24 B): Engine execution latency (timestamp, orderId, engineCycles).
+   - `EngineStatusEvent` (24 B): Periodic engine health and metrics (timestamp, sequenceNumber, ringOccupancy, engineState).
+   - **`EngineEvent` Variant (64 B):**
+     `using EngineEvent = std::variant<TradeEvent, BookDepthEvent, LatencyTelemetryEvent, EngineStatusEvent>;`
+     Padded and aligned to 64 bytes (`alignas(64)`), ensuring each slot in the Outbound Ring maps to exactly one CPU cache line. Dispatched via **Visitor** pattern in consumers.
+4. **`Commands.hpp`:**
+   - `FeedCommand` (16 B): Control message sent over `/pulse_feed_ctrl` (Play, Pause, Step, Stop, SetSpeed, ChangeStrategy).
+
+---
+
+## 3. Design Patterns Specification (14 Patterns)
+
+All 14 object-oriented patterns are deployed in supporting subsystems (GUI, Feed, Bus) without compromising the critical path of the matching engine:
+
+### 3.1 Core Mandatory Patterns (11 Patterns)
 | # | Pattern | Component / Concrete Classes | Practical Justification |
 |---|---|---|---|
-| 1 | **MVC** | `gui::Model`, `gui::*View`, `gui::DashboardController` | Strict separation of the local market state cache from ImGui immediate-mode rendering and operator input handling. |
+| 1 | **MVC** | `gui::Model`, `gui::*View`, `gui::DashboardController` | Decouples local market state cache from ImGui immediate-mode rendering and operator input handling. |
 | 2 | **Strategy** | `feed::IngestionStrategy`, `LobsterReplayStrategy`, `SyntheticGeneratorStrategy`, `BinanceLiveStrategy` | Runtime-pluggable market data ingestion algorithms (historical NASDAQ replay vs synthetic random walk vs live exchange stream). |
-| 3 | **Bridge** | `gui::IRendererBridge`, `ImGuiGlfwRenderer`, `HeadlessMockRenderer` | Decouples GUI presentation logic from the concrete rendering backend (enabling headless automated testing without an active display server). |
-| 4 | **Proxy** | `gui::RemoteEngineProxy` (implements `IEngineService`) | Represents the remote OME process. Drains the outbound ring at line-rate, throttles GUI updates to 60 FPS, and validates commands before dispatch. |
-| 5 | **State** | `feed::PlaybackState` (`StoppedState`, `PlayingState`, `PausedState`, `SteppingState`) | Manages the lifecycle of market data generation and event stepping. |
-| 6 | **Visitor** | `telemetry::EventVisitor`, `MetricsAggregatorVisitor`, `OrderBookUpdateVisitor`, `JsonExportVisitor` | Type-safe polymorphic traversal over heterogeneous flat POD events (`TradeEvent`, `BookDepthEvent`, `LatencyTelemetryEvent`) without adding virtual methods to the structs. |
+| 3 | **Bridge** | `gui::IRendererBridge`, `ImGuiGlfwRenderer`, `HeadlessMockRenderer` | Decouples GUI presentation logic from the concrete rendering backend, enabling headless automated testing in CI without an X11/Wayland display server. |
+| 4 | **Proxy** | `gui::RemoteEngineProxy` (implements `IEngineService`) | Represents the remote OME process. Drains the outbound ring at line-rate on a worker thread, throttles GUI updates to 60 FPS, and validates commands. |
+| 5 | **State** | `feed::PlaybackState` (`StoppedState`, `PlayingState`, `PausedState`, `SteppingState`) | Manages the lifecycle of market data generation and event stepping with deterministic state transitions. |
+| 6 | **Visitor** | `telemetry::EventVisitor`, `MetricsAggregatorVisitor`, `OrderBookUpdateVisitor`, `JsonExportVisitor` | Type-safe polymorphic traversal over heterogeneous flat POD events (`EngineEvent` variant) without virtual methods in event structs. |
 | 7 | **Observer** | `gui::IModelObserver`, `gui::Model` | Model acts as Subject, notifying subscribed tabs/widgets whenever a new aggregated tick or snapshot is ingested. |
-| 8 | **Command** | `gui::ICommand`, `ChangeConfigCommand`, `PlaceManualOrderCommand`, `PauseFeedCommand` | Encapsulates operator actions and parameter updates into first-class objects for uniform execution, audit logging, and reversal. |
+| 8 | **Command** | `gui::ICommand`, `ChangeConfigCommand`, `PlaceManualOrderCommand`, `PauseFeedCommand`, `StepFeedCommand` | Encapsulates operator actions and parameter updates into first-class objects for uniform execution, audit logging, and reversal. |
 | 9 | **Memento** | `core::ConfigMemento`, `gui::CommandHistory` | Captures engine/feed configuration snapshots to provide full **Undo/Redo** functionality (`Ctrl+Z` / `Ctrl+Y`) in the operator configuration tab. |
 | 10 | **Abstract Factory** | `transport::TransportFactory`, `ShmTransportFactory`, `InProcessTransportFactory` | Instantiates coherent channel families (POSIX Shared Memory `/dev/shm` for production deployment vs In-Process ring buffers for fast unit testing). |
-| 11 | **Singleton** | `telemetry::HardwareClock` | Globally accessible processor cycle calibrator (`rdtsc`) providing sub-nanosecond timestamp conversion with zero syscall overhead. |
+| 11 | **Singleton** | `bus::HardwareClock` (in `libs/bus/include/bus/HardwareClock.hpp`) | Globally accessible processor cycle calibrator (`rdtsc`) providing sub-nanosecond timestamp conversion with zero syscall overhead. |
 
-### 2.2 Bonus Patterns (3 Patterns)
+### 3.2 Bonus Patterns (3 Patterns)
 | # | Pattern | Component / Concrete Classes | Practical Justification |
 |---|---|---|---|
-| 12 | **Adapter** | `feed::BinanceWsAdapter` | Adapts external JSON WebSocket payloads from Binance API into normalized internal `engine::OrderMessage` POD structures. |
-| 13 | **Decorator** | `bus::LatencyMeasuringChannelDecorator` | Transparently wraps transport channels to measure and log queue residence time without modifying core ring buffer code. |
+| 12 | **Adapter** | `feed::BinanceWsAdapter` | Adapts external JSON WebSocket payloads from Binance API into normalized internal `proto::OrderMessage` POD structures. |
+| 13 | **Decorator** | `bus::LatencyMeasuringChannelDecorator<T>` | Transparently wraps transport channels to measure and log queue residence time and backpressure delay without modifying core ring buffer code. |
 | 14 | **Builder** | `test::OrderScenarioBuilder` | Fluent builder interface for composing deterministic multi-order market test scenarios for unit test suites. |
 
 ---
 
-## 3. Detailed Component Architecture
+## 4. Component Details & Internal Mechanics
 
-### 3.1 `libs/bus/` (Inter-Process & Inter-Thread Transport Library - `pulse::bus`)
-- **`RingBuffer<T, Capacity>`:** Template lock-free single-producer single-consumer (SPSC) ring buffer. Cache-line padded (64 bytes) to eliminate false sharing, using `acquire`/`release` memory barriers and zero runtime allocations.
-- **`ITransportChannel<T>`:** Abstract transport interface with `push(const T&)` and `pop(T&)`.
-- **`ShmTransportChannel<T>`:** Backed by POSIX Shared Memory (`shm_open`, `ftruncate`, `mmap`).
+### 4.1 `libs/bus/` (Lock-Free Inter-Process & Inter-Thread Transport)
+- **`RingBuffer<T, Capacity>`:** Template lock-free SPSC circular queue with cache-line padding and acquire/release barriers.
+- **`ITransportChannel<T>`:** Abstract transport interface exposing `bool push(const T&)` and `bool pop(T&)`.
+- **`ShmTransportChannel<T>`:** RAII wrapper managing POSIX shared memory segments (`shm_open`, `ftruncate`, `mmap`, `munmap`, `shm_unlink`).
 - **`InProcessTransportChannel<T>`:** Heap-backed memory channel for unit tests and local execution.
-- **`Events.hpp`:** Flat binary POD outbound event representations:
-  - `TradeEvent` (executed trade: price, quantity, timestamp, trade ID)
-  - `BookDepthEvent` (level update: price, quantity, side)
-  - `LatencyTelemetryEvent` (engine cycle count / nanosecond latency tick)
-  - `EngineStatusEvent` (ring occupancy, queue drops, heartbeat)
+- **`HardwareClock` (Singleton):** CPU TSC cycle-to-nanosecond calibration utility, placed in `libs/bus` so all components (OME, Feed, GUI, Bus Decorator) can consume it without circular dependencies.
+- **`LatencyMeasuringChannelDecorator<T>`:** Decorator measuring push latency (backpressure) and pop latency (drain rate).
 
-### 3.2 `apps/feed/` (Market Ingestion & Playback Service - `pulse::feed`)
+### 4.2 `apps/feed/` (Market Data Ingestion Service - `pulse_feed`)
 - Standalone executable binary `pulse_feed`.
-- **`FeedController`:** Manages playback lifecycle, holding an active `IngestionStrategy` and `PlaybackState`.
-- **`IngestionStrategy` implementations:**
-  - `LobsterReplayStrategy`: Reads historical NASDAQ order books from CSV files.
-  - `SyntheticGeneratorStrategy`: Parametric random-walk generator for stress testing.
-  - `BinanceLiveStrategy`: Live cryptocurrency market data ingest via WebSocket client.
-- **`PlaybackState` transitions:**
-  - `play()`, `pause()`, `step()`, `stop()`.
+- **`FeedController`:** Coordinates playback state machine, active ingestion strategy, and outbound channel.
+- Polls non-blocking `pulse_feed_ctrl` ring buffer to execute operator commands (`Play`, `Pause`, `Step`, `Stop`, `SetSpeed`, `ChangeStrategy`).
+- Integrates `LobsterReplayStrategy`, `SyntheticGeneratorStrategy`, and `BinanceWsAdapter` with `BinanceLiveStrategy`.
 
-### 3.3 `apps/ome/` (Order Matching Engine Service - `pulse::ome`)
-- Standalone executable binary `pulse_ome` containing the core matching engine.
-- Stripped of batch I/O and disk operations; transformed into a continuous event-driven daemon.
-- Single pinned worker thread consuming `OrderMessage` from `InboundRing`, matching against the 32-byte cache-aligned `OrderBook`, and emitting execution events into `OutboundRing`.
-- Calibrated by `HardwareClock::instance()`.
+### 4.3 `apps/ome/` (Core Order Matching Engine - `pulse_ome`)
+- Standalone executable binary `pulse_ome`.
+- Stripped of batch file I/O; converted into an event-driven daemon running on an isolated CPU core.
+- Consumes `OrderMessage` from `/pulse_inbound`, matches against 32-byte cache-aligned `OrderBook`, and publishes execution events (`EngineEvent`) to `/pulse_outbound`.
+- Memory locking via `mlockall(MCL_CURRENT | MCL_FUTURE)` and optional thread affinity (`pthread_setaffinity_np`).
 
-### 3.4 `apps/gui/` (Interactive ImGui + ImPlot Dashboard - `pulse::gui`)
+### 4.4 `apps/gui/` (Interactive ImGui + ImPlot Dashboard - `pulse_gui`)
 - Standalone executable binary `pulse_gui`.
+- **`RemoteEngineProxy`:** Background worker thread continuously draining `/pulse_outbound` at line-rate. Aggregates data into a double-buffered local model and throttles UI refresh to 60 FPS.
 - **`IRendererBridge`:**
-  - `ImGuiGlfwRenderer`: Hardware-accelerated OpenGL3 + GLFW backend.
-  - `HeadlessMockRenderer`: Mock graphics backend enabling CI/CD automated test runs without an X11/Wayland display.
-- **`RemoteEngineProxy`:** Dedicated background worker thread continuously draining `OutboundRing` into double-buffered local model.
+  - `ImGuiGlfwRenderer`: Hardware-accelerated OpenGL3 + GLFW backend for interactive use.
+  - `HeadlessMockRenderer`: Mock graphics backend enabling CI/CD automated test runs without an X11/Wayland display server.
 - **UI Tab Layout:**
   1. *LOB Visualizer:* Interactive real-time bid/ask depth walls and spread histogram using Dear ImPlot.
   2. *Telemetry & Metrics:* Real-time latency distribution curves (p50, p90, p99) and message throughput meters.
   3. *Feed Controller:* Play, Pause, Single-Step controls, speed multiplier slider, and data source selector.
-  4. *Config & Operator:* Engine parameter editor with Undo/Redo buttons (`Ctrl+Z`), plus manual test order entry form.
+  4. *Config & Operator:* Engine parameter editor with Undo/Redo buttons (`Ctrl+Z` / `Ctrl+Y`), plus manual test order entry form.
 
 ---
 
-## 4. Verification and Testing Plan
+## 5. Verification and Testing Plan
 
-The assignment mandates $\ge 5$ unit tests across $\ge 2$ suites with mocking. We implement 3 comprehensive suites with Google Test & Google Mock:
+Mandatory testing with Google Test & Google Mock (headless CI compliant):
 
-1. **`tests/unit/FeedStateMachineTest.cpp`:**
+1. **`tests/unit/ProtoTest.cpp`:**
+   - Validates memory layout, alignment, `sizeof` guarantees, and `std::is_trivially_copyable_v` on all proto structs.
+2. **`tests/unit/BusChannelTest.cpp`:**
+   - Multi-threaded SPSC ring buffer verification ensuring zero message loss and proper memory ordering.
+   - Tests `InProcessTransportChannel` and `LatencyMeasuringChannelDecorator`.
+3. **`tests/unit/FeedStateMachineTest.cpp`:**
    - Validates state transitions (`Playing` $\to$ `Paused` $\to$ `Stepping` $\to$ `Stopped`).
-   - Mocks `ITransportChannel` using **GMock** to verify exact message emission sequences without opening OS memory.
-2. **`tests/unit/GuiCommandMementoTest.cpp`:**
+   - Mocks `ITransportChannel` using **GMock** to verify exact message emission sequences without opening OS shared memory.
+4. **`tests/unit/GuiCommandMementoTest.cpp`:**
    - Validates command invocation, parameter rollback via `ConfigMemento`, and redo operations.
    - Mocks `IEngineProxy` and `IRendererBridge` using **GMock** to run entirely headless.
-3. **`tests/unit/EventVisitorTest.cpp`:**
-   - Validates polymorphic event traversal over heterogeneous outbound event streams.
-4. **`tests/integration/HeadlessPipelineTest.cpp`:**
+5. **`tests/unit/EventVisitorTest.cpp`:**
+   - Validates polymorphic event traversal over heterogeneous `EngineEvent` variant streams.
+6. **`tests/integration/HeadlessPipelineTest.cpp`:**
    - End-to-end integration test chaining Feed $\to$ In-Process Bus $\to$ OME $\to$ GUI Model to ensure zero message loss across 100,000 orders.
 
 ---
 
-## 5. Implementation Roadmap & Progress Tracker
+## 6. Implementation Roadmap & Progress Tracker
 
-### Milestone 0: Monorepo
-- [x] **Directory Layout Restructuring:** Reorganize root directory into `apps/` (`ome/`, `feed/`, `gui/`), `libs/` (`bus/`), `tests/`, and `benchmarks/`.
-- [x] **Modern Target-Based CMake:** Setup top-level and subdirectory `CMakeLists.txt` with target aliases (`pulse::bus`), strict compiler flags, and `FetchContent`.
-- [x] **CI/CD Pipeline Setup:** Configure GitHub Actions workflow (`.github/workflows/ci.yml`) with GCC 15, zero-warning policy, automated test execution and format check
+### Monorepo Infrastructure
+- [x] **Directory Layout Restructuring:** Reorganize root directory into `apps/` (`ome/`, `feed/`, `gui/`), `libs/` (`bus/`, `proto/`), `tests/`, and `benchmarks/`.
+- [x] **Modern Target-Based CMake:** Setup top-level and subdirectory `CMakeLists.txt` with target aliases (`pulse::bus`, `pulse::proto`), strict compiler flags, and `FetchContent`.
+- [x] **CI/CD Pipeline Setup:** Configure GitHub Actions workflow (`.github/workflows/ci.yml`) with GCC 15, zero-warning policy, automated test execution, and format check.
 - [x] **Documentation Update:** Update `README.md` to reflect the new monorepo structure, build instructions, and testing commands.
 
-### Milestone 1: `libs/bus/` Subsystem
-- [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>` in `libs/bus/`.
-- [ ] **Transport Abstraction:** Implement `ITransportChannel<T>` interface and `InProcessTransportChannel<T>`.
-- [ ] **POSIX Shared Memory Transport:** Implement `ShmTransportChannel<T>` using `shm_open`, `ftruncate`, and `mmap`.
-- [ ] **Transport Abstract Factory:** Implement `TransportFactory`, `ShmTransportFactory`, and `InProcessTransportFactory` (**Abstract Factory** pattern).
-- [ ] **Channel Decorator:** Implement `LatencyMeasuringChannelDecorator<T>` (**Decorator** pattern) for queue profiling.
-- [ ] **Event Definitions:** Define flat POD structs in `libs/bus/include/bus/Events.hpp` (`TradeEvent`, `BookDepthEvent`, `LatencyTelemetryEvent`, `EngineStatusEvent`).
-- [ ] **Unit Tests for Bus:** Comprehensive test suite for ring buffers and transport channels.
+### `libs/proto/` (Binary Protocol Library)
+- [x] **Type Definitions:** Implement `libs/proto/include/proto/Types.hpp` with `OrderAction`, `Side`, and primitive aliases.
+- [x] **Inbound Messages:** Update `libs/proto/include/proto/Messages.hpp` (`OrderMessage` POD with `OrderAction action`).
+- [x] **Outbound Events:** Implement `libs/proto/include/proto/Events.hpp` (`TradeEvent`, `BookDepthEvent`, `LatencyTelemetryEvent`, `EngineStatusEvent`, and 64B cache-aligned `EngineEvent` variant).
+- [x] **Control Commands:** Implement `libs/proto/include/proto/Commands.hpp` (`FeedCommand` POD).
+- [x] **Static Assert Verifications:** Add compile-time `is_trivially_copyable` and `sizeof` assertions across all headers.
 
-### Milestone 2: `apps/feed/` Subsystem
-- [ ] **Component Migration:** Move `OrderGenerator` and `LobsterOrderLoader` from the core engine into `apps/feed/`.
+### `libs/bus/` (Lock-Free Transport Library)
+- [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>`.
+- [ ] **Shared Ring Layout & Header:** Implement `SharedRingHeader` with magic number, version, engine state, and heartbeat.
+- [ ] **Transport Abstraction:** Implement `ITransportChannel<T>` interface and `InProcessTransportChannel<T>`.
+- [ ] **POSIX Shared Memory Transport:** Implement `ShmTransportChannel<T>` using `shm_open`, `ftruncate`, `mmap`, and `munmap`.
+- [ ] **Hardware Clock Singleton:** Implement `HardwareClock` (**Singleton** pattern) in `libs/bus/include/bus/HardwareClock.hpp` for CPU TSC cycle-to-nanosecond calibration.
+- [ ] **Channel Decorator:** Implement `LatencyMeasuringChannelDecorator<T>` (**Decorator** pattern) for queue and backpressure profiling.
+- [ ] **Transport Abstract Factory:** Implement `TransportFactory`, `ShmTransportFactory`, and `InProcessTransportFactory` (**Abstract Factory** pattern).
+- [ ] **Unit Tests for Bus:** Multi-threaded stress tests verifying lock-free concurrency and zero message loss.
+
+### `apps/feed/` (Market Feed Ingestion Service)
+- [ ] **Component Migration:** Move `OrderGenerator` and `LobsterOrderLoader` from core engine into `apps/feed/`.
 - [ ] **Ingestion Strategy:** Define `IngestionStrategy` interface and implement `LobsterReplayStrategy` and `SyntheticGeneratorStrategy` (**Strategy** pattern).
 - [ ] **Binance Live Adapter:** Implement `BinanceWsAdapter` (**Adapter** pattern) and `BinanceLiveStrategy` for live WebSocket market data streaming.
 - [ ] **Playback State Machine:** Implement `PlaybackState` finite state machine (**State** pattern: `StoppedState`, `PlayingState`, `PausedState`, `SteppingState`).
-- [ ] **Feed Controller:** Implement `FeedController` coordinating strategies, playback states, and the outbound SPSC channel.
+- [ ] **Feed Controller:** Implement `FeedController` coordinating strategies, playback states, control ring polling, and the outbound SPSC channel.
 - [ ] **Feed Binary Entrypoint:** Implement `apps/feed/src/main.cpp` (`pulse_feed`) with CLI argument parsing.
 - [ ] **Feed Unit Tests with GMock:** Implement `tests/unit/FeedStateMachineTest.cpp` mocking `ITransportChannel` via **GMock**.
 
-### Milestone 3: `apps/ome/` Hardening
+### `apps/ome/` (Matching Engine Service)
 - [ ] **Engine Isolation:** Isolate core matching engine inside `apps/ome/`, stripping out batch I/O and CSV dependencies.
-- [ ] **Hardware Clock Singleton:** Implement `HardwareClock` (**Singleton** pattern) for CPU TSC cycle-to-nanosecond calibration.
-- [ ] **Continuous Event Loop:** Implement continuous zero-allocation matching loop in `apps/ome/` consuming `OrderMessage` from inbound ring and dispatching events to outbound ring.
+- [ ] **SHM Master Integration:** Implement initialization and cleanup of `/pulse_inbound` and `/pulse_outbound` segments in `pulse_ome`.
+- [ ] **Continuous Event Loop:** Implement continuous zero-allocation matching loop in `apps/ome/` consuming `OrderMessage` from inbound ring and dispatching `EngineEvent` to outbound ring.
 - [ ] **OS-Level Isolation:** Preserve and wire up thread affinity pinning (`--cpu`) and memory locking (`--lock-memory`).
-- [ ] **Verification:** Ensure existing unit tests, integration tests, and benchmarks compile cleanly and pass against the OME engine.
+- [ ] **Verification:** Ensure existing unit tests, integration tests, and benchmarks compile cleanly and pass against the refactored OME engine.
 
-### Milestone 4: `apps/gui/` Dashboard (Dear ImGui & ImPlot)
+### `apps/gui/` (Interactive ImGui Dashboard)
 - [ ] **Dependency Integration:** Integrate Dear ImGui, ImPlot, and GLFW/OpenGL3 via `FetchContent` with `SYSTEM` includes.
 - [ ] **Renderer Bridge:** Implement `IRendererBridge` (**Bridge** pattern), `ImGuiGlfwRenderer` for OpenGL window, and `HeadlessMockRenderer` for automated testing.
 - [ ] **Remote Engine Proxy:** Implement `RemoteEngineProxy` (**Proxy** pattern) running a background consumer thread draining the outbound ring buffer and updating the local model.
@@ -198,7 +273,7 @@ The assignment mandates $\ge 5$ unit tests across $\ge 2$ suites with mocking. W
   - [ ] **Controller:** Implement `DashboardController` orchestrating commands, views, and engine proxy.
 - [ ] **GUI Binary Entrypoint:** Implement `apps/gui/src/main.cpp` (`pulse_gui`).
 
-### Milestone 5: Unit Testing, Verification & Defense Prep
+### Final Verification & Defense Preparation
 - [ ] **GUI Command & Memento Test:** Implement `tests/unit/GuiCommandMementoTest.cpp` mocking `IEngineProxy` and `IRendererBridge` via **GMock**.
 - [ ] **Event Visitor Test:** Implement `tests/unit/EventVisitorTest.cpp` testing polymorphic event handling.
 - [ ] **Test Order Builder:** Implement `OrderScenarioBuilder` (**Builder** pattern) for fluent test setup.
