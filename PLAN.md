@@ -224,11 +224,11 @@ Mandatory testing with Google Test & Google Mock (headless CI compliant):
 - [x] **Documentation Update:** Update `README.md` to reflect the new monorepo structure, build instructions, and testing commands.
 
 ### `libs/proto/` (Binary Protocol Library)
-- [ ] **Type Definitions:** Implement `libs/proto/include/proto/Types.hpp` with `OrderAction`, `Side`, and primitive aliases.
-- [ ] **Inbound Messages:** Update `libs/proto/include/proto/Messages.hpp` (`OrderMessage` POD with `OrderAction action`).
-- [ ] **Outbound Events:** Implement `libs/proto/include/proto/Events.hpp` (`TradeEvent`, `BookDepthEvent`, `LatencyTelemetryEvent`, `EngineStatusEvent`, and 64B cache-aligned `EngineEvent` variant).
-- [ ] **Control Commands:** Implement `libs/proto/include/proto/Commands.hpp` (`FeedCommand` POD).
-- [ ] **Static Assert Verifications:** Add compile-time `is_trivially_copyable` and `sizeof` assertions across all headers.
+- [x] **Type Definitions:** Implement `libs/proto/include/proto/Types.hpp` with `OrderAction`, `Side`, and primitive aliases.
+- [x] **Inbound Messages:** Update `libs/proto/include/proto/Messages.hpp` (`OrderMessage` POD with `OrderAction action`).
+- [x] **Outbound Events:** Implement `libs/proto/include/proto/Events.hpp` (`TradeEvent`, `BookDepthEvent`, `LatencyTelemetryEvent`, `EngineStatusEvent`, and 64B cache-aligned `EngineEvent` variant).
+- [x] **Control Commands:** Implement `libs/proto/include/proto/Commands.hpp` (`FeedCommand` POD).
+- [x] **Static Assert Verifications:** Add compile-time `is_trivially_copyable` and `sizeof` assertions across all headers.
 
 ### `libs/bus/` (Lock-Free Transport Library)
 - [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>`.
