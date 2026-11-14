@@ -20,7 +20,7 @@ using OrderId = pulse::proto::OrderId;
 using TradeId = pulse::proto::TradeId;
 using Price = pulse::proto::Price;
 using Quantity = pulse::proto::Quantity;
-using EventType = pulse::proto::OrderEventType;
+using EventType = pulse::proto::OrderAction;
 using Side = pulse::proto::Side;
 
 using OrderIndex = uint32_t;
