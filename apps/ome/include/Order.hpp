@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include <proto/Messages.hpp>
+
 #include "Types.hpp"
-#include "proto/Messages.hpp"
 
 namespace engine {
 

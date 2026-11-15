@@ -10,12 +10,12 @@
 
 #include <type_traits>
 
-#include "Types.hpp"
+#include <proto/Types.hpp>
 
 namespace pulse::proto {
 
 struct alignas(COMMAND_SIZE) FeedCommand {
-    FeedAction action;
+    FeedAction action{FeedAction::Invalid};
     FeedSource source{FeedSource::Invalid};
     double speedMultiplier{0.0};
 };

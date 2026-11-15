@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <variant>
 
-#include "Types.hpp"
+#include <proto/Types.hpp>
 
 namespace pulse::proto {
 
