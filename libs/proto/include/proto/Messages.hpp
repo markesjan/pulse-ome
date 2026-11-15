@@ -26,5 +26,6 @@ struct alignas(MESSAGE_SIZE) OrderMessage {
 static_assert(sizeof(OrderMessage) == MESSAGE_SIZE);
 static_assert(std::is_trivially_copyable_v<OrderMessage>);
 static_assert(std::is_standard_layout_v<OrderMessage>);
+static_assert(std::is_nothrow_default_constructible_v<OrderMessage>);
 
 } // namespace pulse::proto

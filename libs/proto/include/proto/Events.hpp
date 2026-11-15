@@ -28,6 +28,7 @@ struct TradeEvent {
 
 static_assert(std::is_trivially_copyable_v<TradeEvent>);
 static_assert(std::is_standard_layout_v<TradeEvent>);
+static_assert(std::is_nothrow_default_constructible_v<TradeEvent>);
 
 struct BookDepthEvent {
     Timestamp timestamp;
@@ -39,6 +40,7 @@ struct BookDepthEvent {
 
 static_assert(std::is_trivially_copyable_v<BookDepthEvent>);
 static_assert(std::is_standard_layout_v<BookDepthEvent>);
+static_assert(std::is_nothrow_default_constructible_v<BookDepthEvent>);
 
 struct LatencyTelemetryEvent {
     Timestamp timestamp;
@@ -48,6 +50,7 @@ struct LatencyTelemetryEvent {
 
 static_assert(std::is_trivially_copyable_v<LatencyTelemetryEvent>);
 static_assert(std::is_standard_layout_v<LatencyTelemetryEvent>);
+static_assert(std::is_nothrow_default_constructible_v<LatencyTelemetryEvent>);
 
 struct EngineStatusEvent {
     Timestamp timestamp;
@@ -58,11 +61,13 @@ struct EngineStatusEvent {
 
 static_assert(std::is_trivially_copyable_v<EngineStatusEvent>);
 static_assert(std::is_standard_layout_v<EngineStatusEvent>);
+static_assert(std::is_nothrow_default_constructible_v<EngineStatusEvent>);
 
 using EngineEvent =
     std::variant<TradeEvent, BookDepthEvent, LatencyTelemetryEvent, EngineStatusEvent>;
 
 static_assert(sizeof(EngineEvent) <= EVENT_SIZE);
 static_assert(std::is_trivially_copyable_v<EngineEvent>);
+static_assert(std::is_nothrow_default_constructible_v<EngineEvent>);
 
 } // namespace pulse::proto
