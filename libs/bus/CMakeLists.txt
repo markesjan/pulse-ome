@@ -8,5 +8,6 @@ target_include_directories(pulse_bus
 
 target_link_libraries(pulse_bus
         INTERFACE
+        pulse::proto
         pulse_compiler_flags
 )
