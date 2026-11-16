@@ -18,24 +18,39 @@
 
 namespace pulse::bus {
 
-template <typename T, std::size_t Capacity>
-    requires std::is_trivially_copyable_v<T> && std::is_standard_layout_v<T> &&
-             std::is_default_constructible_v<T>
+template <typename T>
+concept TriviallyCopyablePOD = std::is_trivially_copyable_v<T> && std::is_standard_layout_v<T> &&
+                               std::is_default_constructible_v<T>;
+
+template <TriviallyCopyablePOD T, std::size_t Capacity>
 class SpscRingBuffer {
 public:
-    bool try_push(const T& item) noexcept;
-    bool try_pop(T& item) noexcept;
+    bool tryPush(const T& item) noexcept { return false; }
 
-    [[nodiscard]] std::size_t size() const noexcept;
-    [[nodiscard]] bool empty() const noexcept;
-    [[nodiscard]] bool full() const noexcept;
+    bool tryPop(T& item) noexcept { return false; }
 
-    [[nodiscard]] static constexpr std::size_t capacity() noexcept { return Capacity; }
+    std::size_t size() const noexcept {
+        const auto currReadIdx = readIdx.load(std::memory_order_acquire);
+        const auto currWriteIdx = writeIdx.load(std::memory_order_acquire);
+
+        if (currWriteIdx < currReadIdx) [[unlikely]]
+            return 0;
+
+        return std::min(currWriteIdx - currReadIdx, Capacity);
+    }
+
+    bool empty() const noexcept { return size() == 0; }
+
+    bool full() const noexcept { return size() >= Capacity; }
+
+    static constexpr std::size_t capacity() noexcept { return Capacity; }
 
 private:
     alignas(proto::CACHE_LINE_SIZE) std::atomic<proto::RingBufferIndex> writeIdx{0};
     alignas(proto::CACHE_LINE_SIZE) std::atomic<proto::RingBufferIndex> readIdx{0};
     alignas(proto::CACHE_LINE_SIZE) std::array<T, Capacity> buffer{};
+
+    static constexpr std::size_t INDEX_MASK = Capacity - 1;
 
     static_assert(std::has_single_bit(Capacity), "Capacity must be a power of two");
     static_assert(std::atomic<proto::RingBufferIndex>::is_always_lock_free,
