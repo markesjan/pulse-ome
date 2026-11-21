@@ -231,7 +231,7 @@ Mandatory testing with Google Test & Google Mock (headless CI compliant):
 - [x] **Static Assert Verifications:** Add compile-time `is_trivially_copyable` and `sizeof` assertions across all headers.
 
 ### `libs/bus/` (Lock-Free Transport Library)
-- [ ] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>`.
+- [x] **Lock-Free SPSC Ring Buffer:** Implement cache-line padded (`alignas(64)`), zero-allocation `RingBuffer<T, Capacity>`.
 - [ ] **Shared Ring Layout & Header:** Implement `SharedRingHeader` with magic number, version, engine state, and heartbeat.
 - [ ] **Transport Abstraction:** Implement `ITransportChannel<T>` interface and `InProcessTransportChannel<T>`.
 - [ ] **POSIX Shared Memory Transport:** Implement `ShmTransportChannel<T>` using `shm_open`, `ftruncate`, `mmap`, and `munmap`.
