@@ -43,3 +43,15 @@ if (ipo_supported)
     set_target_properties(pulse_ome PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 apply_pgo(pulse_ome)
+
+file(GLOB OME_TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
+add_executable(ome_unit_tests ${OME_TEST_SOURCES})
+target_link_libraries(ome_unit_tests
+        PRIVATE
+        gmock_main
+        pulse::ome
+        pulse_compiler_flags
+)
+
+include(GoogleTest)
+gtest_discover_tests(ome_unit_tests)
