@@ -10,12 +10,12 @@
 
 #include <type_traits>
 
-#include "Types.hpp"
+#include <proto/Types.hpp>
 
 namespace pulse::proto {
 
 struct alignas(COMMAND_SIZE) FeedCommand {
-    FeedAction action;
+    FeedAction action{FeedAction::Invalid};
     FeedSource source{FeedSource::Invalid};
     double speedMultiplier{0.0};
 };
@@ -23,5 +23,6 @@ struct alignas(COMMAND_SIZE) FeedCommand {
 static_assert(sizeof(FeedCommand) == COMMAND_SIZE);
 static_assert(std::is_trivially_copyable_v<FeedCommand>);
 static_assert(std::is_standard_layout_v<FeedCommand>);
+static_assert(std::is_nothrow_default_constructible_v<FeedCommand>);
 
 } // namespace pulse::proto

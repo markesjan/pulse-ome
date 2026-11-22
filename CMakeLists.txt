@@ -82,11 +82,12 @@ set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(googletest googlebenchmark)
 
+enable_testing()
+
 add_subdirectory(libs/bus)
 add_subdirectory(libs/proto)
 add_subdirectory(apps/ome)
 add_subdirectory(apps/feed)
 add_subdirectory(apps/gui)
-enable_testing()
 add_subdirectory(benchmarks)
 add_subdirectory(tests)

@@ -26,6 +26,7 @@ using Quantity = std::uint32_t;
 using CpuCycles = std::uint64_t;
 using SequenceNumber = std::uint64_t;
 using LevelIndex = std::uint32_t;
+using RingBufferIndex = std::uint64_t;
 
 enum class OrderAction : std::uint8_t {
     Invalid = 0,
