@@ -12,8 +12,11 @@
 #include <cstdint>
 #include <thread>
 #include <utility>
+#include <variant>
 
 #include <bus/SpscRingBuffer.hpp>
+#include <proto/Commands.hpp>
+#include <proto/Events.hpp>
 #include <proto/Messages.hpp>
 #include <proto/Types.hpp>
 
@@ -244,6 +247,53 @@ TEST(SpscRingBufferTest, MultiThreadedSpscStress) {
     EXPECT_EQ(expected, TOTAL_MESSAGES);
     EXPECT_TRUE(ring.empty());
     EXPECT_EQ(ring.size(), 0U);
+}
+
+TEST(SpscRingBufferTest, TransfersEngineEventVariant) {
+    SpscRingBuffer<proto::EngineEvent, 8> ring;
+
+    EXPECT_TRUE(ring.tryPush(proto::EngineEvent{proto::TradeEvent{
+        .timestamp = 111ULL,
+        .tradeId = 222ULL,
+        .makerOrderId = 10ULL,
+        .takerOrderId = 20ULL,
+        .price = 15000ULL,
+        .quantity = 50U,
+        .takerSide = proto::Side::Buy,
+    }}));
+    EXPECT_TRUE(ring.tryEmplace(proto::LatencyTelemetryEvent{
+        .timestamp = 333ULL,
+        .orderId = 20ULL,
+        .engineCycles = 420ULL,
+    }));
+
+    proto::EngineEvent out{};
+    ASSERT_TRUE(ring.tryPop(out));
+    const auto* trade = std::get_if<proto::TradeEvent>(&out);
+    ASSERT_NE(trade, nullptr);
+    EXPECT_EQ(trade->tradeId, 222ULL);
+
+    ASSERT_TRUE(ring.tryPop(out));
+    const auto* telemetry = std::get_if<proto::LatencyTelemetryEvent>(&out);
+    ASSERT_NE(telemetry, nullptr);
+    EXPECT_EQ(telemetry->engineCycles, 420ULL);
+    EXPECT_TRUE(ring.empty());
+}
+
+TEST(SpscRingBufferTest, TransfersFeedCommand) {
+    SpscRingBuffer<proto::FeedCommand, 4> ring;
+
+    EXPECT_TRUE(ring.tryPush(proto::FeedCommand{
+        .action = proto::FeedAction::SetSpeed,
+        .source = proto::FeedSource::Lobster,
+        .speedMultiplier = 2.5,
+    }));
+
+    proto::FeedCommand out{};
+    EXPECT_TRUE(ring.tryPop(out));
+    EXPECT_EQ(out.action, proto::FeedAction::SetSpeed);
+    EXPECT_EQ(out.source, proto::FeedSource::Lobster);
+    EXPECT_DOUBLE_EQ(out.speedMultiplier, 2.5);
 }
 
 } // namespace pulse::bus::test

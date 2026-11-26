@@ -18,18 +18,13 @@
 #include <concepts>
 #include <cstddef>
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 #include <proto/Types.hpp>
 
 namespace pulse::bus {
 
-template <typename T>
-concept TriviallyCopyablePOD = std::is_trivially_copyable_v<T> && std::is_standard_layout_v<T> &&
-                               std::is_default_constructible_v<T>;
-
-template <TriviallyCopyablePOD T, std::size_t Capacity>
+template <proto::Transportable T, std::size_t Capacity>
 class SpscRingBuffer {
 public:
     template <typename... Args>
@@ -42,7 +37,7 @@ public:
             return false;
 
         const auto slot = currWriteIdx & INDEX_MASK;
-        std::construct_at(&buffer[slot], std::forward<Args>(args)...);
+        std::construct_at(&buffer[slot].value, std::forward<Args>(args)...);
 
         writeIdx.store(currWriteIdx + 1, std::memory_order::release);
 
@@ -78,7 +73,7 @@ public:
             return false;
 
         const auto slot = currReadIdx & INDEX_MASK;
-        item = buffer[slot];
+        item = buffer[slot].value;
 
         readIdx.store(currReadIdx + 1, std::memory_order::release);
 
@@ -98,12 +93,12 @@ public:
             return nullptr;
 
         const auto slot = currReadIdx & INDEX_MASK;
-        return &buffer[slot];
+        return &buffer[slot].value;
     }
 
     void consume() noexcept {
         const auto currReadIdx = readIdx.load(std::memory_order::relaxed);
-        assert(currReadIdx != writeIdx.load(std::memory_order::relaxed));
+        assert(currReadIdx != writeIdx.load(std::memory_order::acquire));
         readIdx.store(currReadIdx + 1, std::memory_order::release);
     }
 
@@ -124,18 +119,28 @@ public:
     [[nodiscard]] static constexpr std::size_t capacity() noexcept { return Capacity; }
 
 private:
+    static constexpr bool HAS_EXACT_CACHE_FIT =
+        (proto::CACHE_LINE_SIZE % sizeof(T) == 0) || (sizeof(T) % proto::CACHE_LINE_SIZE == 0);
+    static constexpr std::size_t SLOT_ALIGNMENT =
+        HAS_EXACT_CACHE_FIT ? alignof(T)
+                            : std::max<std::size_t>(alignof(T), proto::CACHE_LINE_SIZE);
+
+    struct alignas(SLOT_ALIGNMENT) Slot {
+        T value{};
+    };
+
     alignas(proto::CACHE_LINE_SIZE) std::atomic<proto::RingBufferIndex> writeIdx{0};
     alignas(proto::CACHE_LINE_SIZE) std::atomic<proto::RingBufferIndex> readIdx{0};
-    alignas(proto::CACHE_LINE_SIZE) std::array<T, Capacity> buffer{};
+    alignas(proto::CACHE_LINE_SIZE) std::array<Slot, Capacity> buffer{};
 
     static constexpr std::size_t INDEX_MASK = Capacity - 1;
 
     static_assert(std::has_single_bit(Capacity), "Capacity must be a power of two");
     static_assert(std::atomic<proto::RingBufferIndex>::is_always_lock_free,
                   "Ring buffer index type must be lock-free");
-    static_assert(proto::CACHE_LINE_SIZE % sizeof(T) == 0 ||
-                      sizeof(T) % proto::CACHE_LINE_SIZE == 0,
-                  "T doesn't prevent cache-line straddling");
+    static_assert(proto::CACHE_LINE_SIZE % sizeof(Slot) == 0 ||
+                      sizeof(Slot) % proto::CACHE_LINE_SIZE == 0,
+                  "Slot doesn't prevent cache-line straddling");
 };
 
 } // namespace pulse::bus

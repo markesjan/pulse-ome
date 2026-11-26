@@ -24,5 +24,6 @@ static_assert(sizeof(FeedCommand) == COMMAND_SIZE);
 static_assert(std::is_trivially_copyable_v<FeedCommand>);
 static_assert(std::is_standard_layout_v<FeedCommand>);
 static_assert(std::is_nothrow_default_constructible_v<FeedCommand>);
+static_assert(Transportable<FeedCommand>);
 
 } // namespace pulse::proto

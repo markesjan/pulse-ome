@@ -69,5 +69,6 @@ using EngineEvent =
 static_assert(sizeof(EngineEvent) <= EVENT_SIZE);
 static_assert(std::is_trivially_copyable_v<EngineEvent>);
 static_assert(std::is_nothrow_default_constructible_v<EngineEvent>);
+static_assert(Transportable<EngineEvent>);
 
 } // namespace pulse::proto

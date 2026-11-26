@@ -10,8 +10,13 @@
 
 #include <cstdint>
 #include <new>
+#include <type_traits>
 
 namespace pulse::proto {
+
+template <typename T>
+concept Transportable = std::is_trivially_copyable_v<T> && std::is_default_constructible_v<T> &&
+                        std::is_copy_assignable_v<T>;
 
 constexpr std::uint8_t CACHE_LINE_SIZE = std::hardware_constructive_interference_size;
 constexpr std::uint8_t EVENT_SIZE = CACHE_LINE_SIZE;
