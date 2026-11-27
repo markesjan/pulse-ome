@@ -1,9 +1,6 @@
 /**
  * SPDX-License-Identifier: Apache-2.0
  * Copyright (c) 2026 Jan Markes
- *
- * @file  SpscRingBufferTest.cpp
- * @brief Unit tests for lock-free SPSC FIFO ring buffer.
  */
 
 #include <gtest/gtest.h>
